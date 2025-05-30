@@ -1,8 +1,8 @@
-class Data_Lighting_GlobalLight extends Data_Lighting_Light
+class Data_Lighting_AmbientLight extends Data_Lighting_Light
 {
     static type = 1
     
-    type = Data_Lighting_GlobalLight.type
+    type = Data_Lighting_AmbientLight.type
     weight = 100
     color = [ 50, 50, 50, 255 ]
     exposure = 0
@@ -13,7 +13,7 @@ class Data_Lighting_GlobalLight extends Data_Lighting_Light
     {
         super.createPropertiesEditor($_properties)
         
-        const _default = new Data_Lighting_GlobalLight
+        const _default = new Data_Lighting_AmbientLight
         
         this.createField($_properties, _default, `weight`, { type: `slider`, max: 200 })
         this.createField($_properties, _default, `color`, { type: `color` })

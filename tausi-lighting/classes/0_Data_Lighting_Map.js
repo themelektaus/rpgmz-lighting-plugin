@@ -26,8 +26,8 @@ class Data_Lighting_Map
         
         switch (type)
         {
-            case Data_Lighting_GlobalLight.type:
-                light = new Data_Lighting_GlobalLight
+            case Data_Lighting_AmbientLight.type:
+                light = new Data_Lighting_AmbientLight
                 break
             
             case Data_Lighting_PointLight.type:

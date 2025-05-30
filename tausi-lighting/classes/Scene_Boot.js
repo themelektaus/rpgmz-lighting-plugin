@@ -16,9 +16,9 @@ Scene_Boot.prototype.onDatabaseLoaded = function()
             {
                 map.lights[j] = Object.assign(new Data_Lighting_Reference, map.lights[j])
             }
-            else if (map.lights[j].type == Data_Lighting_GlobalLight.type)
+            else if (map.lights[j].type == Data_Lighting_AmbientLight.type)
             {
-                map.lights[j] = Object.assign(new Data_Lighting_GlobalLight, map.lights[j])
+                map.lights[j] = Object.assign(new Data_Lighting_AmbientLight, map.lights[j])
             }
             else if (map.lights[j].type == Data_Lighting_PointLight.type)
             {

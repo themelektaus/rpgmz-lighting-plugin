@@ -18,7 +18,7 @@ Sprite_Light.prototype.initialize = function(light)
     {
         bitmap = `link.svg`
     }
-    else if (light.type == Data_Lighting_GlobalLight.type)
+    else if (light.type == Data_Lighting_AmbientLight.type)
     {
         bitmap = `globelight.svg`
     }

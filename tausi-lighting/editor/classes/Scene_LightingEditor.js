@@ -162,9 +162,9 @@ Scene_LightingEditor.prototype.selectReferenceLight = function(validation)
     return false
 }
 
-Scene_LightingEditor.prototype.addGlobalLight = function(validation)
+Scene_LightingEditor.prototype.addAmbientLight = function(validation)
 {
-    return this.addLight(Data_Lighting_GlobalLight.type, validation)
+    return this.addLight(Data_Lighting_AmbientLight.type, validation)
 }
 
 Scene_LightingEditor.prototype.addPointLight = function(validation)
@@ -187,14 +187,14 @@ Scene_LightingEditor.prototype.addLight = function(type, validation)
     
     if (validation)
     {
-        return type == Data_Lighting_GlobalLight.type
+        return type == Data_Lighting_AmbientLight.type
             || type == Data_Lighting_PointLight.type
             || type == Data_Lighting_SpotLight.type
     }
     
     let light
     
-    if (type == Data_Lighting_GlobalLight.type)
+    if (type == Data_Lighting_AmbientLight.type)
     {
         light = map.getLightByType(type)
         
@@ -224,7 +224,7 @@ Scene_LightingEditor.prototype.cloneSelectedLight = function(validation)
         return false
     }
     
-    if (this.selectedLight.type == Data_Lighting_GlobalLight.type)
+    if (this.selectedLight.type == Data_Lighting_AmbientLight.type)
     {
         return false
     }
@@ -253,7 +253,7 @@ Scene_LightingEditor.prototype.duplicateSelectedLight = function(validation)
         return false
     }
     
-    if (this.selectedLight.type == Data_Lighting_GlobalLight.type)
+    if (this.selectedLight.type == Data_Lighting_AmbientLight.type)
     {
         return false
     }

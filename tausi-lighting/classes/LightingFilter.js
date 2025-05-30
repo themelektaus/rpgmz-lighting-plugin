@@ -69,7 +69,7 @@ LightingFilter.prototype.update = function()
         
         switch (light.type)
         {
-            case Data_Lighting_GlobalLight.type:
+            case Data_Lighting_AmbientLight.type:
                 lightPositions.push(0, 0)
                 lightProperties1.push(
                     light.weight / 100,
@@ -180,26 +180,26 @@ LightingFilter.prototype._fragmentSrc = function()
             vec4 color = texture2D(uSampler, vTextureCoord);
             float a = color.a;
             
-            float globalLightWeight = 1.0;
-            vec3 globalLight = color.rgb;
+            float ambientLightWeight = 1.0;
+            vec3 ambientLight = color.rgb;
             vec3 totalLight = vec3(1.0, 1.0, 1.0);
             
-            vec4 lightPower = vec4(-1.0, -1.0, -1.0, 0.0);
+            vec4 lightPower = vec4(.25, .25, .25, .0);
             
             for (int i = 0; i < ${this.lightsCapacity}; i++)
             {
                 int lightType = lightTypes[i];
                 vec4 lightColor = lightColors[i];
                 
-                if (lightType == ${Data_Lighting_GlobalLight.type})
+                if (lightType == ${Data_Lighting_AmbientLight.type})
                 {
-                    globalLightWeight = lightProperties1[i].x;
+                    ambientLightWeight = lightProperties1[i].x;
                     float lightExposure = lightProperties1[i].y;
                     float lightSaturation = lightProperties1[i].z;
                     
-                    lightPower.rgb = (abs(lightPower.rgb) * lightProperties2[i].rgb) * lightProperties2[i].a;
+                    lightPower.rgb = lightProperties2[i].rgb * lightProperties2[i].a;
                     
-                    vec3 c = globalLight;
+                    vec3 c = ambientLight;
                     
                     c *= mix(vec3(1.0, 1.0, 1.0), lightColor.rgb, lightColor.a);
                     
@@ -207,7 +207,7 @@ LightingFilter.prototype._fragmentSrc = function()
                     c = mix(vec3(g, g, g), c, lightSaturation + 1.0);
                     c += (c + vec3(c.r * .2126, c.g * .7152, c.b * .0722)) * lightExposure;
                     
-                    globalLight = c;
+                    ambientLight = c;
                     
                     continue;
                 }
@@ -279,12 +279,12 @@ LightingFilter.prototype._fragmentSrc = function()
             
             color.rgb = mix(
                 color.rgb,
-                max(vec3(.0001, .0001, .0001), globalLight) * mix(
+                max(vec3(.0001, .0001, .0001), ambientLight) * mix(
                     vec3(1.0, 1.0, 1.0),
                     totalLight,
                     max(vec3(.005, .005, .005), lightPower.rgb)
                 ),
-                globalLightWeight
+                ambientLightWeight
             );
             
             gl_FragColor = color;
