@@ -204,7 +204,6 @@ video {
 
 #gameCanvas {
     margin: 5px 0 0 5px;
-    /* outline: .125em solid #444; */
     display: block;
     margin: auto;
 }
@@ -226,7 +225,6 @@ video {
 }
 
 .field label {
-    /*flex: 1; */
     position: absolute;
     background-color: #333;
     transform: translateY(-1em);
@@ -234,7 +232,6 @@ video {
 }
 
 .field label + * {
-    /*flex: 2; */
     flex: 1;
     margin-top: 1.75em;
 }

@@ -54,8 +54,6 @@ class Data_Lighting_Map
     
     copyLight(light)
     {
-        //light = JsonEx.makeDeepCopy(light)
-        
         light = Object.assign(Object.create(Object.getPrototypeOf(light)), light)
         
         if (light.id)

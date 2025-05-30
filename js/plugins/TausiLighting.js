@@ -24,7 +24,6 @@ $dataLighting = null;
 {
     let urls
     
-    //if (location.pathname.endsWith(`/tausi-lighting/editor/index.html`))
     try
     {
         const fs = require(`fs`)
@@ -32,7 +31,6 @@ $dataLighting = null;
         urls = files.map(x => `tausi-lighting/classes/${x}`)
         fs.writeFileSync(`tausi-lighting/classes.json`, JSON.stringify(urls));
     }
-    //else
     catch
     {
         urls = await fetch(`tausi-lighting/classes.json`)

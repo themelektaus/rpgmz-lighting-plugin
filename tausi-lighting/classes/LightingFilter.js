@@ -132,9 +132,10 @@ LightingFilter.prototype.update = function()
                     light.distanceFadeOut / 1000,
                     0
                 )
+                const radians = light.direction * (Math.PI / 180)
                 lightProperties3.push(
-                    Math.cos(light.direction * (Math.PI / 180)),
-                    Math.sin(light.direction * (Math.PI / 180))
+                    Math.cos(radians),
+                    Math.sin(radians)
                 )
                 break
         }

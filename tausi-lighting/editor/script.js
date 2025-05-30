@@ -1,12 +1,3 @@
-// TODO:
-//  [x] split into files
-//  [x] refactoring
-//  [~] observer pattern
-//  [x] light abstraction
-//  [x] UI (font, style, layout, slider)
-//  [ ] packing (setup, build)
-//  [ ] publishing (github + readme)
-
 (async () =>
 {
     if (typeof nw == `object`)
