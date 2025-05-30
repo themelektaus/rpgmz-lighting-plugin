@@ -1,0 +1,302 @@
+@font-face {
+    font-family: MainFont;
+    src: url(res/inter.ttf);
+}
+
+html, body {
+    height: 100vh;
+}
+
+body {
+    margin: 0;
+    display: flex;
+}
+
+body, button, input {
+    font-family: MainFont;
+    color: white;
+    font-size: 14px;
+    line-height: 1;
+}
+
+button, input {
+    padding: .5em .825em;
+    border: none;
+    outline: none;
+}
+
+button {
+    background-color: #6660;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: .1s;
+}
+
+button.no-text {
+    background-color: transparent !important;
+    width: 1.5em;
+    height: 1.5em;
+    background-size: 1.5em;
+    padding: 0;
+}
+
+button[data-icon] {
+    background-repeat: no-repeat;
+    background-position: .4em center;
+    background-size: 1.2em;
+    padding-left: 2em;
+}
+
+button:hover {
+    background-color: #666f;
+}
+
+button.primary:hover {
+    background-color: #369f;
+}
+
+button.positive:hover {
+    background-color: #393f;
+}
+
+button.negative:hover {
+    background-color: #933f;
+}
+
+button:active {
+    filter: brightness(1.1);
+}
+
+input {
+    min-width: 0;
+}
+
+input[type="checkbox"] {
+    width: 1em;
+    height: 1em;
+}
+
+input[type="range"] {
+    padding: 0 .25em;
+    border: none;
+    appearance: none;
+    background: transparent;
+    height: 1.25em;
+}
+
+input[type="range"]:hover {
+    background-color: unset;
+}
+
+input[type="range"]:focus {
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+    background-color: #fff2;
+    height: .625em;
+}
+
+input[type="range"].r::-webkit-slider-runnable-track {
+    background-color: #f337;
+}
+
+input[type="range"].g::-webkit-slider-runnable-track {
+    background-color: #3f37;
+}
+
+input[type="range"].b::-webkit-slider-runnable-track {
+    background-color: #33f7;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    margin-top: 0;
+    background-color: #0009;
+    outline: .175em solid #fff5;
+    width: .625em;
+    height: .625em;
+    transition: all 80ms;
+}
+
+input[type="range"]:hover::-webkit-slider-thumb {
+    background-color: #fff;
+    outline-color: #fff;
+    outline-offset: 0.125em;
+}
+
+button:disabled, input:disabled {
+    filter: opacity(.5);
+    cursor: default;
+    background-color: transparent !important;
+}
+
+#errorPrinter,
+video {
+    display: none;
+}
+
+#app {
+    display: flex;
+    width: 100%;
+}
+
+#left {
+    flex: 1;
+    background: linear-gradient(-90deg, #111, #222);
+    display: flex;
+    flex-direction: column;
+    gap: .5em;
+}
+
+#left h3 {
+    margin: 2em 1em 0;
+}
+
+#main {
+    flex: 6;
+    display: flex;
+    flex-direction: column;
+    background-color: #222;
+    overflow: hidden;
+}
+
+#right {
+    flex: 2;
+    background: linear-gradient(90deg, #111, #222);
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    overflow: hidden;
+}
+
+#maps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#maps li {
+    cursor: pointer;
+    margin: 0;
+    padding: .5em 1.5em;
+}
+
+#maps li:hover {
+    background-color: #333;
+}
+
+#maps li.active {
+    background-color: #444;
+}
+
+#toolbar {
+    display: flex;
+    padding: 5px 5px 0;
+    gap: 5px;
+}
+
+#gameCanvasContainer {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+}
+
+#gameCanvas {
+    margin: 5px 0 0 5px;
+    /* outline: .125em solid #444; */
+    display: block;
+    margin: auto;
+}
+
+#properties {
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    gap: 2em;
+    overflow: auto;
+}
+
+.field {
+    display: flex;
+    gap: .5em;
+    background-color: #222;
+    padding: .5em .5em .75em;
+    position: relative;
+}
+
+.field label {
+    /*flex: 1; */
+    position: absolute;
+    background-color: #333;
+    transform: translateY(-1em);
+    padding: .5em;
+}
+
+.field label + * {
+    /*flex: 2; */
+    flex: 1;
+    margin-top: 1.75em;
+}
+
+.color {
+    display: flex;
+    flex-direction: column;
+    gap: .25em;
+    overflow: hidden;
+}
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    backdrop-filter: contrast(.6) brightness(.3) blur(.1em);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transform: scale(1.1);
+    pointer-events: none;
+    transition: .2s;
+    z-index: 1;
+}
+
+#overlay.visible {
+    opacity: 1;
+    transform: scale(1.0);
+    pointer-events: unset;
+}
+
+#dialog-window {
+    background-color: #333;
+    display: flex;
+    flex-direction: column;
+    padding: 1em;
+    gap: .5em;
+    box-shadow: 0 .5em 6em -2em #000;
+}
+
+#dialog-window .title {
+    font-size: 1.25em;
+    font-weight: bold;
+}
+
+#dialog-window .content {
+    padding: 1em;
+}
+
+#dialog-window .bottom {
+    display: flex;
+    justify-content: center;
+    gap: .5em;
+}
+
+#maps,
+#maps li,
+.field > * {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
