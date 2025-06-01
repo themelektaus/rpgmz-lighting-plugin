@@ -48,7 +48,7 @@ Scene_LightingEditor.prototype.create = function()
 {
     Scene_Base.prototype.create.call(this)
     
-    this.loadMap($dataSystem.editMapId)
+    this.loadMap(Number((location.hash || `#`).substring(1) || 0) || $dataSystem.editMapId)
 }
 
 Scene_LightingEditor.prototype.loadMap = function(mapId)

@@ -3,7 +3,7 @@ Scene_Title.prototype.createCommandWindow = function()
 {
     Scene_Title__createCommandWindow.apply(this, arguments)
     
-    if (LightingUtils.getPluginParameterBoolean(`Show in Titlescreen Menu`))
+    if (LightingUtils.getPluginParameterBoolean(`Add to Title Menu`))
     {
         if ($gameTemp.isPlaytest())
         {
@@ -17,7 +17,7 @@ Scene_Title.prototype.commandWindowRect = function()
 {
     const rect = Scene_Title__commandWindowRect.apply(this, arguments)
     
-    if (LightingUtils.getPluginParameterBoolean(`Show in Titlescreen Menu`))
+    if (LightingUtils.getPluginParameterBoolean(`Add to Title Menu`))
     {
         if ($gameTemp.isPlaytest())
         {

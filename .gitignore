@@ -1,6 +1,15 @@
 /*
 /*/
 
-!/.gitignore
+/js/*
+/js/*/
+/js/plugins/*
+
+!/js/
+!/js/plugins/
+!/js/plugins/TausiLighting.js
+!/js/plugins/TausiLightingBuilder.js
+
 !/tausi-lighting/
-!/tausi-lighting-build/
+!/tausi-lighting/*
+!/.gitignore
