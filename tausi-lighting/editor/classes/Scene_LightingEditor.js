@@ -8,6 +8,11 @@ Scene_LightingEditor.prototype.constructor = Scene_LightingEditor
 
 Scene_LightingEditor.prototype.initialize = function()
 {
+    document.querySelectorAll(`.markdown`).forEach($ =>
+    {
+        $.innerHTML = (new showdown.Converter()).makeHtml($.innerHTML)
+    })
+    
     const $_maps = document.querySelector(`#maps`)
     
     for (const $mapInfo of $dataMapInfos)
@@ -47,6 +52,11 @@ Scene_LightingEditor.prototype.initialize = function()
 Scene_LightingEditor.prototype.create = function()
 {
     Scene_Base.prototype.create.call(this)
+    
+    if (location.hash == `#help`)
+    {
+        this.help(false)
+    }
     
     this.loadMap(Number((location.hash || `#`).substring(1) || 0) || $dataSystem.editMapId)
 }
@@ -117,14 +127,19 @@ Scene_LightingEditor.prototype.update = function()
     }
 }
 
-Scene_LightingEditor.prototype.selectLight = function(light, options)
+Scene_LightingEditor.prototype.invalidate = function()
 {
-    this.selectedLight = light
-    
     for (const validation of this._validations)
     {
         validation()
     }
+}
+
+Scene_LightingEditor.prototype.selectLight = function(light, options)
+{
+    this.selectedLight = light
+    
+    this.invalidate()
     
     const $_properties = document.querySelector(`#properties`)
     $_properties.innerHTML = ``
@@ -305,9 +320,20 @@ Scene_LightingEditor.prototype.save = function(validation)
         return false
     }
     
+    const fs = require(`fs`)
+    
+    const a = fs.readFileSync(`data/Lighting.json`, `utf8`)
+    const b = JSON.stringify($dataLighting)
+    
+    if (LightingUtils.hashCode(a) == LightingUtils.hashCode(b))
+    {
+        return false
+    }
+    
     if (!validation)
     {
         this._writeToDataFile(`Lighting.json`, $dataLighting)
+        this.invalidate()
     }
     
     return true
@@ -336,7 +362,7 @@ Scene_LightingEditor.prototype.saveAndClose = function(validation)
     
     if (!validation)
     {
-        if (!this.close(validation))
+        if (!this.closeEditor(validation))
         {
             return false
         }
@@ -345,7 +371,7 @@ Scene_LightingEditor.prototype.saveAndClose = function(validation)
     return true
 }
 
-Scene_LightingEditor.prototype.close = function(validation)
+Scene_LightingEditor.prototype.closeEditor = function(validation)
 {
     if (!validation)
     {
@@ -355,11 +381,21 @@ Scene_LightingEditor.prototype.close = function(validation)
     return true
 }
 
-Scene_LightingEditor.prototype.cancel = function(validation)
+Scene_LightingEditor.prototype.hideOverlay = function(validation)
 {
     if (!validation)
     {
-        document.querySelector(`#overlay`).classList.remove(`visible`)
+        LightingUtils.hideOverlay()
+    }
+    
+    return true
+}
+
+Scene_LightingEditor.prototype.help = function(validation)
+{
+    if (!validation)
+    {
+        LightingUtils.showOverlay(`help-window`)
     }
     
     return true

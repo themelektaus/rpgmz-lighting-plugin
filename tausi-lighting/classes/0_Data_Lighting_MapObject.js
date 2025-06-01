@@ -27,6 +27,8 @@ class Data_Lighting_MapObject
         $reset.style.alignSelf = `flex-start`
         $reset.style.backgroundImage = `url(${LightingUtils.getResUrl(`power.svg`)})`
         
+        const invalidate = () => SceneManager._scene?.invalidate?.call(SceneManager._scene)
+        
         switch (options.type)
         {
             case `toggle`:
@@ -35,7 +37,11 @@ class Data_Lighting_MapObject
                 $input = document.createElement(`input`)
                 $input.type = `checkbox`
                 $input.checked = eval(value ?? `true`)
-                $input.addEventListener(`change`, () => this[property] = $input.checked)
+                $input.addEventListener(`change`, () =>
+                {
+                    this[property] = $input.checked
+                    invalidate()
+                })
                 $inputContainer.appendChild($input)
                 $reset.addEventListener(`click`, () =>
                 {
@@ -48,7 +54,11 @@ class Data_Lighting_MapObject
                 $input = document.createElement(`input`)
                 $input.type = `number`
                 $input.value = Number(value || 0)
-                $input.addEventListener(`input`, () => this[property] = Number($input.value || 0))
+                $input.addEventListener(`input`, () =>
+                {
+                    this[property] = Number($input.value || 0)
+                    invalidate()
+                })
                 $field.appendChild($input)
                 $reset.addEventListener(`click`, () =>
                 {
@@ -64,7 +74,11 @@ class Data_Lighting_MapObject
                 $input.max = options?.max ?? 100
                 $input.step = options?.step ?? 1
                 $input.value = Number(value || 0)
-                $input.addEventListener(`input`, () => this[property] = Number($input.value || 0))
+                $input.addEventListener(`input`, () =>
+                {
+                    this[property] = Number($input.value || 0)
+                    invalidate()
+                })
                 $field.appendChild($input)
                 $reset.addEventListener(`click`, () =>
                 {
@@ -103,7 +117,11 @@ class Data_Lighting_MapObject
                             break
                     }
                     $.value = Number(value[_i] || 0)
-                    $.addEventListener(`input`, () => this[property][_i] = Number($.value || 0))
+                    $.addEventListener(`input`, () =>
+                    {
+                        this[property][_i] = Number($.value || 0)
+                        invalidate()
+                    })
                     $input.appendChild($)
                     $reset.addEventListener(`click`, () =>
                     {

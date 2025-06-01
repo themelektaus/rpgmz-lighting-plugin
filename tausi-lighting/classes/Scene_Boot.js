@@ -42,6 +42,12 @@ Scene_Boot.prototype.create = function()
             const _update = createButton(`download`, `Checking for updates...`)
             _update.$_button.classList.add(`disabled`)
             
+            const _help = createButton(`help`, `Help`)
+            _help.$_button.addEventListener(`click`, () =>
+            {
+                location.href = `tausi-lighting/editor/index.html#help`
+            })
+            
             new Promise(async () =>
             {
                 const $_style = document.createElement(`style`)

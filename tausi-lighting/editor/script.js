@@ -5,7 +5,14 @@
         const nwWindow = nw.Window.get()
         nwWindow.on(`close`, () =>
         {
-            document.querySelector(`#overlay`).classList.add(`visible`)
+            if (SceneManager._scene?.save && SceneManager._scene.save(true))
+            {
+                LightingUtils.showOverlay(`exit-window`)
+            }
+            else
+            {
+                SceneManager.reloadGame()
+            }
         })
         nwWindow.maximize()
     }

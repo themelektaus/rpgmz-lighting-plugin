@@ -28,6 +28,7 @@ TouchInput._onMouseUp = function(event)
     if (event.button == 0)
     {
         delete this._lastLight
+        SceneManager._scene?.invalidate?.call(SceneManager._scene)
     }
     
     if (event.button == 1)

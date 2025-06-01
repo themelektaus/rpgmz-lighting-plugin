@@ -3,6 +3,12 @@
     src: url(res/inter.ttf);
 }
 
+::-webkit-scrollbar { width: .375em; height: .375em; }
+::-webkit-scrollbar-track { background-color: #0009; }
+::-webkit-scrollbar-corner { background-color: #0009; }
+::-webkit-scrollbar-thumb { background-color: #fff6; }
+::-webkit-scrollbar-thumb:hover { background-color: #fffc; }
+
 html, body {
     height: 100vh;
 }
@@ -22,6 +28,7 @@ body, button, input {
 button, input {
     padding: .5em .825em;
     border: none;
+    border-radius: .125em;
     outline: none;
 }
 
@@ -266,25 +273,37 @@ video {
     pointer-events: unset;
 }
 
-#dialog-window {
+.dialog-window {
     background-color: #333;
-    display: flex;
+    display: none;
     flex-direction: column;
     padding: 1em;
     gap: .5em;
+    border-radius: .25em;
     box-shadow: 0 .5em 6em -2em #000;
+    max-width: min(60em, 100% - 10em);
+    max-height: calc(100% - 10em);
 }
 
-#dialog-window .title {
-    font-size: 1.25em;
+.dialog-window.visible {
+    display: flex;
+}
+
+.dialog-window .title {
+    font-size: 1.125em;
     font-weight: bold;
+    text-transform: uppercase;
+    padding: .25em;
+    opacity: .8;
 }
 
-#dialog-window .content {
-    padding: 1em;
+.dialog-window .content {
+    padding: .5em;
+    line-height: 1.25;
+    overflow: auto;
 }
 
-#dialog-window .bottom {
+.dialog-window .bottom {
     display: flex;
     justify-content: center;
     gap: .5em;
@@ -296,4 +315,10 @@ video {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+    margin: 0;
 }
