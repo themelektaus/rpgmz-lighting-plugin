@@ -6,13 +6,17 @@
  * @target MZ
  * @author MelekTaus (Tausi)
  *
- * @param Version
+ * @param Local Version
  * @type text
- * @default 0.0.5
+ * @default 0.0.0
  *
- * @param Update URL
+ * @param Remote Version URL
  * @type text
- * @default http://localhost/download/tausi-lighting
+ * @default https://raw.githubusercontent.com/themelektaus/rpgmz-lighting-plugin/refs/heads/main/tausi-lighting/version.txt
+ *
+ * @param Remote Plugin URL
+ * @type text
+ * @default https://raw.githubusercontent.com/themelektaus/rpgmz-lighting-plugin/refs/heads/main/js/plugins/TausiLighting.js
  *
  */
 
@@ -28,8 +32,11 @@
         return
     }
     
-    const version = PluginManager.parameters(`TausiLightingBuilder`)[`Version`] || ``
-    const updateUrl = PluginManager.parameters(`TausiLightingBuilder`)[`Update URL`] || ``
+    const pluginParameters = PluginManager.parameters(`TausiLightingBuilder`)
+    
+    const localVersion = pluginParameters[`Local Version`] || ``
+    const remoteVersionUrl = pluginParameters[`Remote Version URL`] || ``
+    const remotePluginUrl = pluginParameters[`Remote Plugin URL`] || ``
     
     const fs = require(`fs`)
     const path = require(`path`)
@@ -42,7 +49,7 @@
     build += "/*" + atob(`Og==`) + "\n"
     build += " * @target MZ\n"
     build += " * @author MelekTaus (Tausi)\n"
-    build += " * @plugindesc [Version " + version + "]\n"
+    build += " * @plugindesc [Version " + localVersion + "]\n"
     build += " *\n"
     build += " * @param Show Overlay\n"
     build += " * @type boolean\n"
@@ -60,8 +67,9 @@
     build += " *\n"
     build += " */\n"
     build += "\n"
-    build += "TAUSI_LIGHTING_VERSION = \"" + version + "\";\n"
-    build += "TAUSI_LIGHTING_UPDATE_URL = \"" + updateUrl + "\";\n"
+    build += "TAUSI_LIGHTING_LOCAL_VERSION = \"" + localVersion + "\";\n"
+    build += "TAUSI_LIGHTING_REMOTE_VERSION_URL = \"" + remoteVersionUrl + "\";\n"
+    build += "TAUSI_LIGHTING_REMOTE_PLUGIN_URL = \"" + remotePluginUrl + "\";\n"
     build += "\n"
     build += atob("JGRhdGFMaWdodGluZyA9IG51bGw7CgooYXN5bmMgKCkgPT4KewogICAgdHJ5CiAgICB7CiAgICAgICAgY29uc3QgZnMgPSByZXF1aXJlKGBmc2ApCiAgICAgICAgCiAgICAgICAgaWYgKCFmcy5leGlzdHNTeW5jKGBkYXRhL0xpZ2h0aW5nLmpzb25gKSkKICAgICAgICB7CiAgICAgICAgICAgIGZzLndyaXRlRmlsZVN5bmMoYGRhdGEvTGlnaHRpbmcuanNvbmAsIGB7InZlcnNpb24iOjEsIm1hcHMiOltdfWApCiAgICAgICAgfQogICAgICAgIAogICAgICAgIHVucGFja0ZvbGRlcigKICAgICAgICAgICAgIg==")
     build += packFolder(`tausi-lighting`)

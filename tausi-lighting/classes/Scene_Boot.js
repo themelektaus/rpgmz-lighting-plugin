@@ -50,13 +50,13 @@ Scene_Boot.prototype.create = function()
                 
                 document.body.appendChild($_panel)
                 
-                const localVersion = TAUSI_LIGHTING_VERSION
+                const localVersion = TAUSI_LIGHTING_LOCAL_VERSION
                 
-                const remoteVersion = await fetch(`${TAUSI_LIGHTING_UPDATE_URL}/version.txt`)
+                const remoteVersion = await fetch(TAUSI_LIGHTING_REMOTE_VERSION_URL)
                     .catch(() => { })
-                    .then(x => x?.text()) || localVersion
+                    .then(x => x?.text()) || ``
                 
-                if (localVersion == remoteVersion)
+                if (remoteVersion.length != 5 || localVersion == remoteVersion)
                 {
                     _update.$_text.innerHTML = `No Update available`
                 }
@@ -71,7 +71,7 @@ Scene_Boot.prototype.create = function()
                         
                         _update.$_text.innerHTML = `Updating...`
                         
-                        const data = await fetch(`${TAUSI_LIGHTING_UPDATE_URL}/TausiLighting.js`)
+                        const data = await fetch(TAUSI_LIGHTING_REMOTE_PLUGIN_URL)
                             .catch(() => { })
                             .then(x => x?.arrayBuffer())
                         
