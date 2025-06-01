@@ -50,15 +50,15 @@ Scene_Boot.prototype.create = function()
                 
                 document.body.appendChild($_panel)
                 
-                const baseUrl = `https://nockal.com/download/rpgmz-lighting-plugin`
-                
                 const localVersion = TAUSI_LIGHTING_VERSION
                 
-                const remoteVersion = await fetch(`${baseUrl}/version.txt`).then(x => x.text())
+                const remoteVersion = await fetch(`${TAUSI_LIGHTING_UPDATE_URL}/version.txt`)
+                    .catch(() => { })
+                    .then(x => x?.text()) || localVersion
                 
                 if (localVersion == remoteVersion)
                 {
-                    _update.$_text.innerHTML = `No Update avaiable`
+                    _update.$_text.innerHTML = `No Update available`
                 }
                 else
                 {
@@ -71,19 +71,27 @@ Scene_Boot.prototype.create = function()
                         
                         _update.$_text.innerHTML = `Updating...`
                         
-                        const data = await fetch(`${baseUrl}/TausiLighting.js`)
-                            .then(x => x.arrayBuffer())
+                        const data = await fetch(`${TAUSI_LIGHTING_UPDATE_URL}/TausiLighting.js`)
+                            .catch(() => { })
+                            .then(x => x?.arrayBuffer())
                         
-                        const fs = require(`fs`)
-                        fs.writeFileSync(`js/plugins/TausiLighting.js`, Buffer.from(data))
-                        
-                        await new Promise(x => setTimeout(x, 1000))
-                        
-                        _update.$_text.innerHTML = `Update OK, closing...`
-                        
-                        await new Promise(x => setTimeout(x, 1000))
-                        
-                        SceneManager.terminate()
+                        if (data)
+                        {
+                            _update.$_text.innerHTML = `Update failed, closing...`
+                        }
+                        else
+                        {
+                            const fs = require(`fs`)
+                            fs.writeFileSync(`js/plugins/TausiLighting.js`, Buffer.from(data))
+                            
+                            await new Promise(x => setTimeout(x, 1000))
+                            
+                            _update.$_text.innerHTML = `Update OK, closing...`
+                            
+                            await new Promise(x => setTimeout(x, 1000))
+                            
+                            SceneManager.terminate()
+                        }
                     })
                 }
             })

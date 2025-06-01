@@ -9,6 +9,7 @@
 !/js/plugins/
 !/js/plugins/TausiLighting.js
 !/js/plugins/TausiLightingBuilder.js
+!/js/plugins/TausiLightingPublisher.js
 
 !/tausi-lighting/
 !/tausi-lighting/*

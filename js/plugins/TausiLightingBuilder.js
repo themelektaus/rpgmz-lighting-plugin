@@ -5,9 +5,16 @@
 /*:
  * @target MZ
  * @author MelekTaus (Tausi)
+ *
+ * @param Version
+ * @type text
+ * @default 0.0.5
+ *
+ * @param Update URL
+ * @type text
+ * @default http://localhost/download/tausi-lighting
+ *
  */
-
-TAUSI_LIGHTING_VERSION = `0.0.4`;
 
 (() =>
 {
@@ -21,6 +28,9 @@ TAUSI_LIGHTING_VERSION = `0.0.4`;
         return
     }
     
+    const version = PluginManager.parameters(`TausiLightingBuilder`)[`Version`] || ``
+    const updateUrl = PluginManager.parameters(`TausiLightingBuilder`)[`Update URL`] || ``
+    
     const fs = require(`fs`)
     const path = require(`path`)
     
@@ -29,10 +39,10 @@ TAUSI_LIGHTING_VERSION = `0.0.4`;
     build += "// RPG Maker MZ - Tausi Lighting\n"
     build += "//=============================================================================\n"
     build += "\n"
-    build += "/*:\n"
+    build += "/*" + atob(`Og==`) + "\n"
     build += " * @target MZ\n"
     build += " * @author MelekTaus (Tausi)\n"
-    build += " * @plugindesc [Version " + TAUSI_LIGHTING_VERSION + "]\n"
+    build += " * @plugindesc [Version " + version + "]\n"
     build += " *\n"
     build += " * @param Show Overlay\n"
     build += " * @type boolean\n"
@@ -50,7 +60,8 @@ TAUSI_LIGHTING_VERSION = `0.0.4`;
     build += " *\n"
     build += " */\n"
     build += "\n"
-    build += "TAUSI_LIGHTING_VERSION = \"" + TAUSI_LIGHTING_VERSION + "\";\n"
+    build += "TAUSI_LIGHTING_VERSION = \"" + version + "\";\n"
+    build += "TAUSI_LIGHTING_UPDATE_URL = \"" + updateUrl + "\";\n"
     build += "\n"
     build += atob("JGRhdGFMaWdodGluZyA9IG51bGw7CgooYXN5bmMgKCkgPT4KewogICAgdHJ5CiAgICB7CiAgICAgICAgY29uc3QgZnMgPSByZXF1aXJlKGBmc2ApCiAgICAgICAgCiAgICAgICAgaWYgKCFmcy5leGlzdHNTeW5jKGBkYXRhL0xpZ2h0aW5nLmpzb25gKSkKICAgICAgICB7CiAgICAgICAgICAgIGZzLndyaXRlRmlsZVN5bmMoYGRhdGEvTGlnaHRpbmcuanNvbmAsIGB7InZlcnNpb24iOjEsIm1hcHMiOltdfWApCiAgICAgICAgfQogICAgICAgIAogICAgICAgIHVucGFja0ZvbGRlcigKICAgICAgICAgICAgIg==")
     build += packFolder(`tausi-lighting`)
