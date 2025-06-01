@@ -75,23 +75,22 @@ Scene_Boot.prototype.create = function()
                             .catch(() => { })
                             .then(x => x?.arrayBuffer())
                         
-                        if (data)
+                        if (!data)
                         {
-                            _update.$_text.innerHTML = `Update failed, closing...`
+                            _update.$_text.innerHTML = `Update failed`
+                            return
                         }
-                        else
-                        {
-                            const fs = require(`fs`)
-                            fs.writeFileSync(`js/plugins/TausiLighting.js`, Buffer.from(data))
-                            
-                            await new Promise(x => setTimeout(x, 1000))
-                            
-                            _update.$_text.innerHTML = `Update OK, closing...`
-                            
-                            await new Promise(x => setTimeout(x, 1000))
-                            
-                            SceneManager.terminate()
-                        }
+                        
+                        const fs = require(`fs`)
+                        fs.writeFileSync(`js/plugins/TausiLighting.js`, Buffer.from(data))
+                        
+                        await new Promise(x => setTimeout(x, 1000))
+                        
+                        _update.$_text.innerHTML = `Update OK, closing...`
+                        
+                        await new Promise(x => setTimeout(x, 1000))
+                        
+                        SceneManager.terminate()
                     })
                 }
             })
