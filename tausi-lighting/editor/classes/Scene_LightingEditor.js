@@ -349,7 +349,7 @@ Scene_LightingEditor.prototype.close = function(validation)
 {
     if (!validation)
     {
-        nw.App.quit()
+        SceneManager.reloadGame()
     }
     
     return true

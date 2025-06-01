@@ -1,0 +1,62 @@
+#lightingEditorOverlayPanel {
+    position: fixed;
+    top: 50vh;
+    left: 0;
+    z-index: 10;
+    transform: translate(-100%, -50%);
+    transition: .2s;
+    display: flex;
+    flex-direction: column;
+    font-family: sans-serif;
+    font-size: 1em;
+    line-height: 1;
+    color: #fff;
+    padding: .5em;
+    gap: .5em;
+    border-radius: 0 .25em .25em 0;
+    backdrop-filter: blur(.1em);
+    background-color: #0009;
+    width: 2.25em;
+}
+
+#lightingEditorOverlayPanel:hover {
+    width: 12em;
+}
+
+#lightingEditorOverlayPanel .button {
+    padding: .5em;
+    border-radius: .25em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: .5em;
+    transition: .2s;
+}
+
+#lightingEditorOverlayPanel .button .icon {
+    flex: 0 0 1.25em;
+    width: 1.25em;
+    height: 1.25em;
+    background-size: 100%;
+}
+
+#lightingEditorOverlayPanel .button .text {
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    line-height: 1.25;
+}
+
+*:hover ~ #lightingEditorOverlayPanel,
+#lightingEditorOverlayPanel:hover {
+    transform: translate(0, -50%);
+}
+
+#lightingEditorOverlayPanel .button:hover {
+    background-color: #9cf6;
+}
+
+#lightingEditorOverlayPanel .button.disabled {
+    opacity: .5;
+    pointer-events: none;
+}

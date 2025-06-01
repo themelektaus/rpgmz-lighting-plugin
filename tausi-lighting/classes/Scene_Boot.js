@@ -7,74 +7,68 @@ Scene_Boot.prototype.create = function()
     {
         if (Utils.isOptionValid(`test`) && !location.pathname.endsWith(`/tausi-lighting/editor/index.html`))
         {
-            const $_buttons = document.createElement(`div`)
-            $_buttons.id = `lightingEditorOverlayButtons`
-            document.body.appendChild($_buttons)
+            const $_panel = document.createElement(`div`)
+            $_panel.id = `lightingEditorOverlayPanel`
             
-            const $_button = document.createElement(`div`)
-            $_button.classList.add(`button`)
-            $_button.innerHTML = `Lighting Editor`
-            $_button.addEventListener(`click`, () =>
+            const createButton = (icon, text) =>
+            {
+                const result = { }
+                
+                result.$_button = document.createElement(`div`)
+                result.$_button.classList.add(`button`)
+                
+                result.$_icon = document.createElement(`div`)
+                result.$_icon.classList.add(`icon`)
+                result.$_icon.style.backgroundImage = `url(${LightingUtils.getResUrl(`${icon}.svg`)})`
+                result.$_button.appendChild(result.$_icon)
+                
+                result.$_text = document.createElement(`div`)
+                result.$_text.classList.add(`text`)
+                result.$_text.innerHTML = text
+                result.$_button.appendChild(result.$_text)
+                
+                $_panel.appendChild(result.$_button)
+                
+                return result
+            }
+            
+            const _lightingEditor = createButton(`edit`, `Lighting Editor`)
+            _lightingEditor.$_button.addEventListener(`click`, () =>
             {
                 let id = Number($gameMap?.mapId() || 0)
                 location.href = `tausi-lighting/editor/index.html${id ? `#${id}` : ``}`
             })
-            $_buttons.appendChild($_button)
             
-            const $_style = document.createElement(`style`)
-            $_style.innerHTML = `
-#lightingEditorOverlayButtons {
-    position: fixed;
-    top: .25em;
-    left: 50vw;
-    transform: translate(-50%, calc(-100% - .5em));
-    z-index: 2;
-    display: flex;
-    gap: .25em;
-    transition: .2s;
-}
-#lightingEditorOverlayButtons .button {
-    padding: .5em 1em;
-    color: #fff;
-    background: linear-gradient(#555, #000);
-    border-radius: .25em;
-    cursor: pointer;
-    opacity: .8;
-    transition: .1s;
-    font-family: sans-serif;
-    filter: brightness(.9);
-}
-*:hover ~ #lightingEditorOverlayButtons,
-#lightingEditorOverlayButtons:hover {
-    transform: translate(-50%, 0);
-}
-#lightingEditorOverlayButtons .button:hover {
-    filter: brightness(1.0);
-}
-#lightingEditorOverlayButtons .button:active {
-    filter: brightness(1.2);
-}
-`
-            document.body.appendChild($_style)
+            const _update = createButton(`download`, `Checking for updates...`)
+            _update.$_button.classList.add(`disabled`)
             
             new Promise(async () =>
             {
+                const $_style = document.createElement(`style`)
+                $_style.innerHTML = await fetch(`tausi-lighting/overlay.css`).then(x => x.text())
+                document.body.appendChild($_style)
+                
+                document.body.appendChild($_panel)
+                
                 const baseUrl = `https://nockal.com/download/rpgmz-lighting-plugin`
                 
                 const localVersion = TAUSI_LIGHTING_VERSION
                 
                 const remoteVersion = await fetch(`${baseUrl}/version.txt`).then(x => x.text())
                 
-                if (localVersion != remoteVersion)
+                if (localVersion == remoteVersion)
                 {
-                    const $_button = document.createElement(`div`)
-                    $_button.classList.add(`button`)
-                    $_button.innerHTML = `Update`
-                    $_button.addEventListener(`click`, async () =>
+                    _update.$_text.innerHTML = `No Update avaiable`
+                }
+                else
+                {
+                    _update.$_text.innerHTML = `Update available`
+                    _update.$_button.classList.remove(`disabled`)
+                    _update.$_button.addEventListener(`click`, async () =>
                     {
-                        $_button.disabled = true
-                        $_button.style.opacity = .5
-                        $_button.style.pointerEvents = `none`
+                        _update.$_button.classList.add(`disabled`)
+                        
+                        _update.$_text.innerHTML = `Updating...`
                         
                         const data = await fetch(`${baseUrl}/TausiLighting.js`)
                             .then(x => x.arrayBuffer())
@@ -82,9 +76,9 @@ Scene_Boot.prototype.create = function()
                         const fs = require(`fs`)
                         fs.writeFileSync(`js/plugins/TausiLighting.js`, Buffer.from(data))
                         
+                        await new Promise(x => setTimeout(x, 1000))
                         SceneManager.reloadGame()
                     })
-                    $_buttons.appendChild($_button)
                 }
             })
         }
