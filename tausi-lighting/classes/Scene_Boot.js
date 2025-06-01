@@ -63,6 +63,7 @@ Scene_Boot.prototype.create = function()
                 else
                 {
                     _update.$_text.innerHTML = `Update available`
+                    
                     _update.$_button.classList.remove(`disabled`)
                     _update.$_button.addEventListener(`click`, async () =>
                     {
@@ -77,7 +78,12 @@ Scene_Boot.prototype.create = function()
                         fs.writeFileSync(`js/plugins/TausiLighting.js`, Buffer.from(data))
                         
                         await new Promise(x => setTimeout(x, 1000))
-                        SceneManager.reloadGame()
+                        
+                        _update.$_text.innerHTML = `Update OK, closing...`
+                        
+                        await new Promise(x => setTimeout(x, 1000))
+                        
+                        SceneManager.terminate()
                     })
                 }
             })

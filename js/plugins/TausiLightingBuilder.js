@@ -7,7 +7,7 @@
  * @author MelekTaus (Tausi)
  */
 
-TAUSI_LIGHTING_VERSION = `0.0.2`;
+TAUSI_LIGHTING_VERSION = `0.0.3`;
 
 (() =>
 {
