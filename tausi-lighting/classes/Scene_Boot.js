@@ -58,7 +58,7 @@ Scene_Boot.prototype.create = function()
                 
                 const localVersion = TAUSI_LIGHTING_LOCAL_VERSION
                 
-                const remoteVersion = await fetch(TAUSI_LIGHTING_REMOTE_VERSION_URL)
+                const remoteVersion = await fetch(LightingUtils.getPluginParameterString(`Remote Version URL`))
                     .catch(() => { })
                     .then(x => x?.text()) || ``
                 
@@ -77,7 +77,7 @@ Scene_Boot.prototype.create = function()
                         
                         _update.$_text.innerHTML = `Updating...`
                         
-                        const data = await fetch(TAUSI_LIGHTING_REMOTE_PLUGIN_URL)
+                        const data = await fetch(LightingUtils.getPluginParameterString(`Remote Plugin URL`))
                             .catch(() => { })
                             .then(x => x?.arrayBuffer())
                         

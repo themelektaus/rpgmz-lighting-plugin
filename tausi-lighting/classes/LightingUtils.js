@@ -8,6 +8,11 @@ LightingUtils.getPluginParameters = function()
     return PluginManager.parameters(`TausiLighting`)
 }
 
+LightingUtils.getPluginParameterString = function(key)
+{
+    return this.getPluginParameters()[key] || ``
+}
+
 LightingUtils.getPluginParameterBoolean = function(key)
 {
     return eval(this.getPluginParameters()[key] || `true`)
