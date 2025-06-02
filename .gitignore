@@ -11,6 +11,9 @@
 !/js/plugins/TausiLightingBuilder.js
 !/js/plugins/TausiLightingPublisher.js
 
+!/screenshots/
+!/screenshots/*
 !/tausi-lighting/
 !/tausi-lighting/*
 !/.gitignore
+!/README.md
