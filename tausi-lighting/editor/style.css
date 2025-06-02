@@ -348,6 +348,10 @@ video {
     text-decoration: underline;
 }
 
+.markdown p {
+    line-height: 1.675;
+}
+
 .markdown img {
     max-width: calc(100% - 2em);
     margin: 1em;

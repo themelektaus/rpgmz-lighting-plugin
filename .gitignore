@@ -13,7 +13,10 @@
 
 !/screenshots/
 !/screenshots/*
+
 !/tausi-lighting/
 !/tausi-lighting/*
+
 !/.gitignore
 !/README.md
+!/tausi-lighting-demo-v0.1.1.zip
