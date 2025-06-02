@@ -7,6 +7,8 @@
  * @author MelekTaus (Tausi)
  */
 
+TAUSI_LIGHTING_PUBLISHER_MODE = true;
+
 (() =>
 {
     try { require } catch { return }

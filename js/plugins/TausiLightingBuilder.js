@@ -75,6 +75,7 @@
     
     build += "TAUSI_LIGHTING_LOCAL_VERSION = \"" + localVersion + "\";\n"
     build += "TAUSI_LIGHTING_README = \"" + btoa(fs.readFileSync(`README.md`, `utf8`)) + "\";\n"
+    build += "TAUSI_LIGHTING_PUBLISHER_MODE = false;\n"
     build += "\n"
     
     build += atob("JGRhdGFMaWdodGluZyA9IG51bGw7CgooYXN5bmMgKCkgPT4KewogICAgdHJ5CiAgICB7CiAgICAgICAgY29uc3QgZnMgPSByZXF1aXJlKGBmc2ApCiAgICAgICAgCiAgICAgICAgaWYgKCFmcy5leGlzdHNTeW5jKGBkYXRhL0xpZ2h0aW5nLmpzb25gKSkKICAgICAgICB7CiAgICAgICAgICAgIGZzLndyaXRlRmlsZVN5bmMoYGRhdGEvTGlnaHRpbmcuanNvbmAsIGB7InZlcnNpb24iOjEsIm1hcHMiOltdfWApCiAgICAgICAgfQogICAgICAgIAogICAgICAgIHVucGFja0ZvbGRlcigKICAgICAgICAgICAgIg==")

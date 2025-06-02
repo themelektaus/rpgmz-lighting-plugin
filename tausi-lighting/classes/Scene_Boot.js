@@ -39,14 +39,22 @@ Scene_Boot.prototype.create = function()
                 location.href = `tausi-lighting/editor/index.html${id ? `#${id}` : ``}`
             })
             
-            const _update = createButton(`download`, `Checking for updates...`)
-            _update.$_button.classList.add(`disabled`)
+            if (!TAUSI_LIGHTING_PUBLISHER_MODE)
+            {
+                const _update = createButton(`download`, `Checking for updates...`)
+                _update.$_button.classList.add(`disabled`)
+            }
             
             const _help = createButton(`help`, `Help`)
             _help.$_button.addEventListener(`click`, () =>
             {
                 location.href = `tausi-lighting/editor/index.html#help`
             })
+            
+            if (TAUSI_LIGHTING_PUBLISHER_MODE)
+            {
+                createButton(`info`, `Publisher Mode`).$_button.classList.add(`disabled`)
+            }
             
             new Promise(async () =>
             {
@@ -55,6 +63,11 @@ Scene_Boot.prototype.create = function()
                 document.body.appendChild($_style)
                 
                 document.body.appendChild($_panel)
+                
+                if (TAUSI_LIGHTING_PUBLISHER_MODE)
+                {
+                    return
+                }
                 
                 try { require } catch { return }
                 
