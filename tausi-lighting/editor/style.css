@@ -256,7 +256,7 @@ video {
     left: 0;
     right: 0;
     bottom: 0;
-    backdrop-filter: contrast(.6) brightness(.3) blur(.1em);
+    backdrop-filter: contrast(.6) brightness(.25) blur(.2em);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -293,12 +293,12 @@ video {
     font-size: 1.125em;
     font-weight: bold;
     text-transform: uppercase;
-    padding: .25em;
+    padding: .25em .25em 0;
     opacity: .8;
 }
 
 .dialog-window .content {
-    padding: .5em;
+    padding: .75em;
     line-height: 1.25;
     overflow: auto;
 }
@@ -317,8 +317,33 @@ video {
     white-space: nowrap;
 }
 
-.markdown h1,
-.markdown h2,
-.markdown h3 {
+.markdown h1 {
     margin: 0;
+}
+
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown h5 {
+    margin: 1.5em 0 0;
+}
+
+.markdown ul {
+    padding-left: 1.5em;
+    line-height: 1.675;
+}
+
+.markdown a {
+    color: orange;
+    text-decoration: none;
+}
+
+.markdown a:hover {
+    text-decoration: underline;
+}
+
+.markdown img {
+    max-width: calc(100% - 2em);
+    margin: 1em;
+    box-shadow: 0 .5em 2em -1em #000;
 }

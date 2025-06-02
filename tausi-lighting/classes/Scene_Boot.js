@@ -56,6 +56,8 @@ Scene_Boot.prototype.create = function()
                 
                 document.body.appendChild($_panel)
                 
+                try { require } catch { return }
+                
                 const localVersion = TAUSI_LIGHTING_LOCAL_VERSION
                 
                 const remoteVersion = await fetch(LightingUtils.getPluginParameterString(`Remote Version URL`))

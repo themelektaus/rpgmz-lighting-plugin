@@ -8,17 +8,24 @@ Scene_LightingEditor.prototype.constructor = Scene_LightingEditor
 
 Scene_LightingEditor.prototype.initialize = function()
 {
-    document.querySelectorAll(`.markdown`).forEach($ =>
+    (async () =>
     {
-        $.innerHTML = (new showdown.Converter()).makeHtml($.innerHTML)
-    })
+        const $_readme = document.querySelector(`#help-window .content`)
+        const readme = await fetch(`README.md`).then(x => x.text())
+        const screenshot = await fetch(`screenshots/editor-v0.0.9.png`).then(x => x.blob())
+        $_readme.innerHTML = (new showdown.Converter()).makeHtml(readme)
+    })()
     
     const $_maps = document.querySelector(`#maps`)
     
-    for (const $mapInfo of $dataMapInfos)
+    const mapInfos = [...$dataMapInfos]
+    mapInfos.sort((a, b) => (a?.order ?? 0) - (b?.order ?? 0))
+    console.log(mapInfos)
+    
+    for (const $mapInfo of mapInfos)
     {
         const mapId = Number($mapInfo?.id || 0)
-        const mapName = String($mapInfo?.name ?? `[Map ID ${mapId}]`)
+        const mapName = String($mapInfo?.name ?? `<span style="color:#999">Empty</span>`)
         
         const $_li = document.createElement(`li`)
         $_li.dataset.id = mapId

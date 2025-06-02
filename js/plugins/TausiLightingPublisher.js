@@ -9,8 +9,8 @@
 
 (() =>
 {
-    if (require)
-    {
-        require(`fs`).writeFileSync(`tausi-lighting/version.txt`, TAUSI_LIGHTING_LOCAL_VERSION)
-    }
+    try { require } catch { return }
+    
+    require(`fs`).writeFileSync(`tausi-lighting/version.txt`, TAUSI_LIGHTING_LOCAL_VERSION)
+    
 })();
