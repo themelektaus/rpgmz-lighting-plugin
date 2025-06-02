@@ -78,6 +78,12 @@ input {
     min-width: 0;
 }
 
+input[type="number"] {
+    background-color: #fff2;
+    outline: none;
+    border: none;
+}
+
 input[type="checkbox"] {
     width: 1em;
     height: 1em;

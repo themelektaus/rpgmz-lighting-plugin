@@ -8,19 +8,15 @@ Scene_LightingEditor.prototype.constructor = Scene_LightingEditor
 
 Scene_LightingEditor.prototype.initialize = function()
 {
-    (async () =>
-    {
-        const $_readme = document.querySelector(`#help-window .content`)
-        const readme = await fetch(`README.md`).then(x => x.text())
-        const screenshot = await fetch(`screenshots/editor-v0.0.9.png`).then(x => x.blob())
-        $_readme.innerHTML = (new showdown.Converter()).makeHtml(readme)
-    })()
+    document.querySelector(`#help-window .content`)
+        .innerHTML = (new showdown.Converter()).makeHtml(
+            atob(TAUSI_LIGHTING_README)
+        )
     
     const $_maps = document.querySelector(`#maps`)
     
     const mapInfos = [...$dataMapInfos]
     mapInfos.sort((a, b) => (a?.order ?? 0) - (b?.order ?? 0))
-    console.log(mapInfos)
     
     for (const $mapInfo of mapInfos)
     {

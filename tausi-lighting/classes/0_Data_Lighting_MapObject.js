@@ -3,10 +3,12 @@ class Data_Lighting_MapObject
     enabled = true
     x = 0
     y = 0
+    followEventId = 0
     
     createPropertiesEditor($_properties)
     {
         this.createField($_properties, null, `enabled`, { type: `toggle` })
+        this.createField($_properties, null, `followEventId`, { type: `number`, min: 0 })
     }
     
     createField($_properties, _default, property, options)
@@ -53,6 +55,8 @@ class Data_Lighting_MapObject
             case `number`:
                 $input = document.createElement(`input`)
                 $input.type = `number`
+                $input.min = options?.min ?? 0
+                $input.max = options?.max ?? 1000
                 $input.value = Number(value || 0)
                 $input.addEventListener(`input`, () =>
                 {
