@@ -2,7 +2,7 @@
 Developed by [MelekTaus](https://github.com/themelektaus)
 
 ## Introduction
-Yet anotherA **Lighting System** with an **integrated WYSIWYG editor** for RPG Maker MZ enables dynamic design of light sources directly within the editor. You can place lighting effects via drag-and-drop, utilize real-time previews, and visually adjust parameters such as color, intensity, radius or flickering without scripting knowledge.
+Yet another **Lighting System** with an **integrated WYSIWYG editor** for RPG Maker MZ enables dynamic design of light sources directly within the editor. You can place lighting effects via drag-and-drop, utilize real-time previews, and visually adjust parameters such as color, intensity, radius or flickering without scripting knowledge.
 
 ## Features
 - WYSIWYG Editor
