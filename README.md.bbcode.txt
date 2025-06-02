@@ -27,7 +27,7 @@ Yet another [B]Lighting System[/B] with an integrated [B]WYSIWYG editor[/B] for 
 [B][SIZE=18px]Installation[/SIZE][/B]
 [LIST]
 [*]Download [URL='https://raw.githubusercontent.com/themelektaus/rpgmz-lighting-plugin/refs/heads/main/js/plugins/TausiLighting.js']js/plugins/TausiLighting.js[/URL] (Right click - Save as...)
-[*]Place [B]TausiLighting.js[/B] in the [B]js/plugin/[/B]-folder of your project.
+[*]Place [B]TausiLighting.js[/B] in the [B]js/plugin/[/B]-folder of your project
 [*]Import it into plugin manager
 [*]Enable the plugin
 [/LIST]
