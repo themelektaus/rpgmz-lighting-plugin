@@ -1,7 +1,7 @@
-const DataManager__makeEmptyMap = DataManager.makeEmptyMap
+const TausiLighting__Editor__DataManager__makeEmptyMap = DataManager.makeEmptyMap
 DataManager.makeEmptyMap = function()
 {
-    DataManager__makeEmptyMap.apply(this, arguments)
+    TausiLighting__Editor__DataManager__makeEmptyMap.apply(this, arguments)
     $dataMap.width = 17
     $dataMap.height = 13
 }

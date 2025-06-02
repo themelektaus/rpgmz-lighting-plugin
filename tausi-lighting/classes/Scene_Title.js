@@ -1,7 +1,7 @@
-const Scene_Title__createCommandWindow = Scene_Title.prototype.createCommandWindow
+const TausiLighting__Scene_Title__createCommandWindow = Scene_Title.prototype.createCommandWindow
 Scene_Title.prototype.createCommandWindow = function()
 {
-    Scene_Title__createCommandWindow.apply(this, arguments)
+    TausiLighting__Scene_Title__createCommandWindow.apply(this, arguments)
     
     if (LightingUtils.getPluginParameterBoolean(`Add to Title Menu`))
     {
@@ -12,10 +12,10 @@ Scene_Title.prototype.createCommandWindow = function()
     }
 }
 
-const Scene_Title__commandWindowRect = Scene_Title.prototype.commandWindowRect
+const TausiLighting__Scene_Title__commandWindowRect = Scene_Title.prototype.commandWindowRect
 Scene_Title.prototype.commandWindowRect = function()
 {
-    const rect = Scene_Title__commandWindowRect.apply(this, arguments)
+    const rect = TausiLighting__Scene_Title__commandWindowRect.apply(this, arguments)
     
     if (LightingUtils.getPluginParameterBoolean(`Add to Title Menu`))
     {

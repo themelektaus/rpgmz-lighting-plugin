@@ -1,7 +1,7 @@
-const Scene_Boot__create = Scene_Boot.prototype.create
+const TausiLighting__Scene_Boot__create = Scene_Boot.prototype.create
 Scene_Boot.prototype.create = function()
 {
-    Scene_Boot__create.apply(this, arguments)
+    TausiLighting__Scene_Boot__create.apply(this, arguments)
     
     if (LightingUtils.getPluginParameterBoolean(`Show Overlay`))
     {
@@ -119,10 +119,10 @@ Scene_Boot.prototype.create = function()
     }
 }
 
-const Scene_Boot__onDatabaseLoaded = Scene_Boot.prototype.onDatabaseLoaded
+const TausiLighting__Scene_Boot__onDatabaseLoaded = Scene_Boot.prototype.onDatabaseLoaded
 Scene_Boot.prototype.onDatabaseLoaded = function()
 {
-    Scene_Boot__onDatabaseLoaded.apply(this, arguments)
+    TausiLighting__Scene_Boot__onDatabaseLoaded.apply(this, arguments)
     
     $dataLighting = Object.assign(new Data_Lighting, $dataLighting)
     

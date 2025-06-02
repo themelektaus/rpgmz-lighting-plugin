@@ -1,3 +1,24 @@
+const TausiLighting__Editor__Spriteset_Map__update = Spriteset_Map.prototype.update
+Spriteset_Map.prototype.update = function()
+{
+    TausiLighting__Editor__Spriteset_Map__update.apply(this, arguments)
+    
+    if (LightingUtils._lightsNeedRefresh)
+    {
+        LightingUtils._lightsNeedRefresh = false
+        this.refreshLights()
+        this.update()
+    }
+    
+    if (TouchInput.isTriggered())
+    {
+        if (!TouchInput._lastLight)
+        {
+            LightingUtils.selectLight(null)
+        }
+    }
+}
+
 Spriteset_Map.prototype.refreshLights = function()
 {
     for (const sprite of this._lightSprites ?? [])
@@ -31,26 +52,5 @@ Spriteset_Map.prototype.refreshLights = function()
     for (const sprite of this._lightSprites)
     {
         this.addChild(sprite)
-    }
-}
-
-const Spriteset_Map__update = Spriteset_Map.prototype.update
-Spriteset_Map.prototype.update = function()
-{
-    Spriteset_Map__update.apply(this, arguments)
-    
-    if (LightingUtils._lightsNeedRefresh)
-    {
-        LightingUtils._lightsNeedRefresh = false
-        this.refreshLights()
-        this.update()
-    }
-    
-    if (TouchInput.isTriggered())
-    {
-        if (!TouchInput._lastLight)
-        {
-            LightingUtils.selectLight(null)
-        }
     }
 }

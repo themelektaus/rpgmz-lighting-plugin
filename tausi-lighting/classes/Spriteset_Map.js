@@ -1,7 +1,7 @@
-const Spriteset_Base__update = Spriteset_Base.prototype.update
-Spriteset_Base.prototype.update = function()
+const TausiLighting__Spriteset_Map__update = Spriteset_Map.prototype.update
+Spriteset_Map.prototype.update = function()
 {
-    Spriteset_Base__update.apply(this, arguments)
+    TausiLighting__Spriteset_Map__update.apply(this, arguments)
     
     if (LightingUtils._filterNeedsRefresh)
     {
@@ -12,7 +12,7 @@ Spriteset_Base.prototype.update = function()
     this._lightingFilter.update()
 }
 
-Spriteset_Base.prototype.refreshLightingFilter = function()
+Spriteset_Map.prototype.refreshLightingFilter = function()
 {
     const filters = this._baseSprite.filters
     

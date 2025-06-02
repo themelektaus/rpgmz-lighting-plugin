@@ -3,10 +3,10 @@ TouchInput._onWheel = function(event)
     
 }
 
-const TouchInput__onMouseDown = TouchInput._onMouseDown
+const TausiLighting__Editor__TouchInput__onMouseDown = TouchInput._onMouseDown
 TouchInput._onMouseDown = function(event)
 {
-    TouchInput__onMouseDown.call(this, event)
+    TausiLighting__Editor__TouchInput__onMouseDown.call(this, event)
     
     const x = Graphics.pageToCanvasX(event.pageX)
     const y = Graphics.pageToCanvasY(event.pageY)
@@ -20,10 +20,10 @@ TouchInput._onMouseDown = function(event)
     }
 }
 
-const TouchInput__onMouseUp = TouchInput._onMouseUp
+const TausiLighting__Editor__TouchInput__onMouseUp = TouchInput._onMouseUp
 TouchInput._onMouseUp = function(event)
 {
-    TouchInput__onMouseUp.call(this, event)
+    TausiLighting__Editor__TouchInput__onMouseUp.call(this, event)
     
     if (event.button == 0)
     {
@@ -37,10 +37,10 @@ TouchInput._onMouseUp = function(event)
     }
 }
 
-const TouchInput__onMouseMove = TouchInput._onMouseMove
+const TausiLighting__Editor__TouchInput__onMouseMove = TouchInput._onMouseMove
 TouchInput._onMouseMove = function(event)
 {
-    TouchInput__onMouseMove.call(this, event)
+    TausiLighting__Editor__TouchInput__onMouseMove.call(this, event)
     
     if (!this._lastLight && !this._lastPanningPosition)
     {
