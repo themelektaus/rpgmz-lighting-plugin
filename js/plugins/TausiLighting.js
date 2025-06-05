@@ -63,6 +63,7 @@ $dataLighting = null;
     try
     {
         const fs = require(`fs`)
+        try { fs.unlinkSync(`tausi-lighting/classes/3_Data_Lighting_GlobalLight.js`) } catch { }
         const files = fs.readdirSync(`tausi-lighting/classes`)
         urls = files.map(x => `tausi-lighting/classes/${x}`)
         fs.writeFileSync(`tausi-lighting/classes.json`, JSON.stringify(urls))
