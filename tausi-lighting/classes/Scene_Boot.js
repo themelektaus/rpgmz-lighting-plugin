@@ -39,9 +39,11 @@ Scene_Boot.prototype.create = function()
                 location.href = `tausi-lighting/editor/index.html${id ? `#${id}` : ``}`
             })
             
+            let _update
+            
             if (!TAUSI_LIGHTING_PUBLISHER_MODE)
             {
-                const _update = createButton(`download`, `Checking for updates...`)
+                _update = createButton(`download`, `Checking for updates...`)
                 _update.$_button.classList.add(`disabled`)
             }
             
