@@ -14,7 +14,11 @@ Sprite_Light.prototype.initialize = function(light)
     
     let bitmap
     
-    if (light.targetId)
+    if (light instanceof Data_Lighting_Layer)
+    {
+        bitmap = `map.svg`
+    }
+    else if (light.targetId)
     {
         bitmap = `link.svg`
     }
@@ -39,7 +43,7 @@ Sprite_Light.prototype.update = function()
     this.x = this.light.x - mapInfo.offsetX
     this.y = this.light.y - mapInfo.offsetY
     
-    if (LightingUtils.getSelectedLight() == this.light)
+    if (LightingUtils.getSelectedMapObject() == this.light)
     {
         this.setColorTone([50, 50, -50, 50])
         this.scale.x = 1.25

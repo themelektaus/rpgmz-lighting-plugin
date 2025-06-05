@@ -9,6 +9,7 @@ class Data_Lighting_PointLight extends Data_Lighting_Light
     smoothness = 100
     flickerStrength = 0
     flickerSpeed = 10
+    followEventId = 0
     
     createPropertiesEditor($_properties)
     {
@@ -16,11 +17,12 @@ class Data_Lighting_PointLight extends Data_Lighting_Light
         
         const _default = new Data_Lighting_PointLight
         
-        this.createField($_properties, _default, `color`, { type: `color` })
+        this.createField($_properties, _default, `color`, { type: `color`, max: { a: 1020 } })
         this.createField($_properties, _default, `intensity`, { type: `slider`, max: 40, step: .01 })
         this.createField($_properties, _default, `radius`, { type: `slider`, max: 4000, step: 1 })
         this.createField($_properties, _default, `smoothness`, { type: `slider`, max: 2000 })
         this.createField($_properties, _default, `flickerStrength`, { type: `slider`, max: 200 })
         this.createField($_properties, _default, `flickerSpeed`, { type: `slider`, max: 200 })
+        this.createField($_properties, null, `followEventId`, { type: `number`, min: 0 })
     }
 }

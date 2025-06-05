@@ -16,9 +16,9 @@ class Data_Lighting_AmbientLight extends Data_Lighting_Light
         const _default = new Data_Lighting_AmbientLight
         
         this.createField($_properties, _default, `weight`, { type: `slider`, max: 200 })
-        this.createField($_properties, _default, `color`, { type: `color` })
+        this.createField($_properties, _default, `color`, { type: `color`, max: { a: 1020 } })
         this.createField($_properties, _default, `exposure`, { type: `slider`, min: -100, max: 400 })
         this.createField($_properties, _default, `saturation`, { type: `slider`, min: -100, max: 400 })
-        this.createField($_properties, _default, `power`, { type: `color`, label: `Lights Power` })
+        this.createField($_properties, _default, `power`, { type: `color`, max: { a: 1020 } })
     }
 }

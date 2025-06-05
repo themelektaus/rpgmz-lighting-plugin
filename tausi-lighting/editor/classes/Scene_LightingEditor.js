@@ -8,10 +8,26 @@ Scene_LightingEditor.prototype.constructor = Scene_LightingEditor
 
 Scene_LightingEditor.prototype.initialize = function()
 {
+    LightingUtils.preloadBitmaps().then(() =>
+    {
+        document.querySelectorAll(`[data-icon]`).forEach($ =>
+        {
+            $.style.backgroundImage = `url(${LightingUtils.getResUrl($.dataset.icon)}.svg?css)`
+        })
+    })
+    
     document.querySelector(`#help-window .content`)
         .innerHTML = (new showdown.Converter()).makeHtml(
             atob(TAUSI_LIGHTING_README)
         )
+    
+    const settings = LightingUtils.toolSettings
+    const $_toolsSettings = document.querySelector(`#tools-settings`)
+    const _default = JSON.parse(JSON.stringify(settings))
+    
+    LightingUtils.createField.call(settings, $_toolsSettings, _default, `color`, { type: `color` })
+    LightingUtils.createField.call(settings, $_toolsSettings, _default, `radius`, { type: `slider`, min: 5, max: 200 })
+    LightingUtils.createField.call(settings, $_toolsSettings, _default, `smoothness`, { type: `slider` })
     
     const $_maps = document.querySelector(`#maps`)
     
@@ -26,7 +42,20 @@ Scene_LightingEditor.prototype.initialize = function()
         const $_li = document.createElement(`li`)
         $_li.dataset.id = mapId
         $_li.innerHTML = mapName
-        $_li.addEventListener(`click`, () => this.loadMap(mapId))
+        $_li.addEventListener(`click`, () =>
+        {
+            if (this._mapId == mapId)
+            {
+                return
+            }
+            
+            const $_gameCanvasContainer = document.querySelector(`#gameCanvasContainer`)
+            if (!$_gameCanvasContainer.classList.contains(`loading`))
+            {
+                $_gameCanvasContainer.classList.add(`loading`)
+                setTimeout(() => this.loadMap(mapId, { loadingPower: 3 }), 155)
+            }
+        })
         $_maps.appendChild($_li)
     }
     
@@ -38,17 +67,12 @@ Scene_LightingEditor.prototype.initialize = function()
         $.addEventListener(`click`, () => this[$.dataset.action].call(this, false))
     })
     
-    document.querySelectorAll(`[data-icon]`).forEach($ =>
-    {
-        $.style.backgroundImage = `url(${LightingUtils.getResUrl($.dataset.icon)}.svg)`
-    })
-    
     Scene_Base.prototype.initialize.call(this)
     
     const pluginParameters = PluginManager.parameters(`TausiLighting`)
     
     this._mapId = -1
-    this._loading = false
+    this._loading = 0
     this._updateMapInterpreter = eval(pluginParameters[`Update Map Interpreter in Editor`] || `true`)
 }
 
@@ -61,14 +85,25 @@ Scene_LightingEditor.prototype.create = function()
         this.help(false)
     }
     
-    this.loadMap(Number((location.hash || `#`).substring(1) || 0) || $dataSystem.editMapId)
+    const mapId = Number((location.hash || `#`).substring(1) || 0) || $dataSystem.editMapId
+    this.loadMap(mapId, { loadingPower: 5 })
 }
 
-Scene_LightingEditor.prototype.loadMap = function(mapId)
+Scene_LightingEditor.prototype.loadMap = function(mapId, options)
 {
-    if (this._mapId == mapId)
+    if (!(options?.force ?? false))
     {
-        return
+        if (this._mapId == mapId)
+        {
+            return
+        }
+        
+        if (this._loading)
+        {
+            return
+        }
+        
+        this._loading = options?.loadingPower || 1
     }
     
     document.querySelectorAll(`#maps li`).forEach($ =>
@@ -83,12 +118,11 @@ Scene_LightingEditor.prototype.loadMap = function(mapId)
         this._spriteset = null
     }
     
+    this.setSelectedMapObject(null)
+
     this._mapId = mapId
-    this._loading = true
     
     DataManager.loadMapData(this._mapId)
-    
-    this.selectLight(null)
 }
 
 Scene_LightingEditor.prototype.getMap = function()
@@ -104,7 +138,7 @@ Scene_LightingEditor.prototype.update = function()
     {
         if (DataManager.isMapLoaded())
         {
-            this._loading = false
+            this._loading--
             
             const $_gameCanvasContainer = document.querySelector(`#gameCanvasContainer`)
             
@@ -122,6 +156,15 @@ Scene_LightingEditor.prototype.update = function()
                 this.addChild(this._spriteset)
                 this._spriteset.update()
             }
+            
+            if (this._loading)
+            {
+                this.loadMap(this._mapId, { force: true })
+            }
+            else
+            {
+                setTimeout(() => $_gameCanvasContainer.classList.remove(`loading`), 195)
+            }
         }
     }
     else
@@ -138,46 +181,84 @@ Scene_LightingEditor.prototype.invalidate = function()
     }
 }
 
-Scene_LightingEditor.prototype.selectLight = function(light, options)
+Scene_LightingEditor.prototype.setSelectedMapObject = function(mapObject, options)
 {
-    this.selectedLight = light
+    this.selectedMapObject = mapObject
+    this.setActiveTool(`select`)
     
     this.invalidate()
     
     const $_properties = document.querySelector(`#properties`)
     $_properties.innerHTML = ``
     
-    if (light)
+    if (mapObject)
     {
         if (options?.stick)
         {
-            TouchInput._lastLight = light
+            TouchInput._lastMapObject = mapObject
         }
     }
     else
     {
-        TouchInput._lastLight = null
+        TouchInput._lastMapObject = null
         return
     }
     
-    light.createPropertiesEditor($_properties)
+    mapObject.createPropertiesEditor($_properties)
+}
+
+Scene_LightingEditor.prototype.setActiveTool = function(tool)
+{
+    this.activeTool = tool
+    
+    const $_tools = document.querySelector(`#tools`)
+    
+    $_tools.querySelectorAll(`[data-action]`).forEach($ => $.classList.remove(`active`))
+    $_tools.querySelector(`[data-action="setTool_${tool}"]`).classList.add(`active`)
 }
 
 Scene_LightingEditor.prototype.selectReferenceLight = function(validation)
 {
-    const targetId = this.selectedLight?.targetId
+    const targetId = this.selectedMapObject?.targetId
     
     if (targetId)
     {
         if (!validation)
         {
-            this.selectLight(this.getMap().getLightById(targetId))
+            this.setSelectedMapObject(this.getMap().getLightById(targetId))
         }
         
         return true
     }
     
     return false
+}
+
+Scene_LightingEditor.prototype.add = function(validation)
+{
+    const map = this.getMap()
+    if (!map)
+    {
+        return validation ? false : null
+    }
+    
+    if (!validation)
+    {
+        requestAnimationFrame(() =>
+        {
+            const $_addMenu = document.querySelector(`#addMenu`)
+            $_addMenu.classList.add(`visible`)
+            requestAnimationFrame(() =>
+            {
+                addEventListener(`click`, () =>
+                {
+                    $_addMenu.classList.remove(`visible`), { once: true }
+                })
+            })
+        })
+    }
+    
+    return true
 }
 
 Scene_LightingEditor.prototype.addAmbientLight = function(validation)
@@ -218,7 +299,7 @@ Scene_LightingEditor.prototype.addLight = function(type, validation)
         
         if (light)
         {
-            this.selectLight(light)
+            this.setSelectedMapObject(light)
             return light
         }
     }
@@ -227,7 +308,7 @@ Scene_LightingEditor.prototype.addLight = function(type, validation)
     
     if (light)
     {
-        this.selectLight(light, { stick: true })
+        this.setSelectedMapObject(light, { stick: true })
         
         LightingUtils.refresh()
     }
@@ -235,28 +316,55 @@ Scene_LightingEditor.prototype.addLight = function(type, validation)
     return light
 }
 
+Scene_LightingEditor.prototype.addLayer = function(validation)
+{
+    const map = this.getMap()
+    if (!map)
+    {
+        return validation ? false : null
+    }
+    
+    if (validation)
+    {
+        return true
+    }
+    
+    const layer = map.createLayer()
+    
+    this.setSelectedMapObject(layer, { stick: true })
+    
+    LightingUtils.refresh()
+    
+    return layer
+}
+
 Scene_LightingEditor.prototype.cloneSelectedLight = function(validation)
 {
-    if (!this.selectedLight)
+    if (!this.selectedMapObject)
     {
         return false
     }
     
-    if (this.selectedLight.type == Data_Lighting_AmbientLight.type)
+    if (this.selectedMapObject instanceof Data_Lighting_Layer)
     {
         return false
     }
     
-    if (this.selectedLight.targetId)
+    if (this.selectedMapObject.type == Data_Lighting_AmbientLight.type)
+    {
+        return false
+    }
+    
+    if (this.selectedMapObject.targetId)
     {
         return this.duplicateSelectedLight(validation)
     }
     
     if (!validation)
     {
-        const reference = this.getMap().createReference(this.selectedLight)
+        const reference = this.getMap().createReference(this.selectedMapObject)
         
-        this.selectLight(reference, { stick: true })
+        this.setSelectedMapObject(reference, { stick: true })
         
         LightingUtils.refresh()
     }
@@ -266,21 +374,26 @@ Scene_LightingEditor.prototype.cloneSelectedLight = function(validation)
 
 Scene_LightingEditor.prototype.duplicateSelectedLight = function(validation)
 {
-    if (!this.selectedLight)
+    if (!this.selectedMapObject)
     {
         return false
     }
     
-    if (this.selectedLight.type == Data_Lighting_AmbientLight.type)
+    if (this.selectedMapObject instanceof Data_Lighting_Layer)
+    {
+        return false
+    }
+    
+    if (this.selectedMapObject.type == Data_Lighting_AmbientLight.type)
     {
         return false
     }
     
     if (!validation)
     {
-        const light = this.getMap().copyLight(this.selectedLight)
+        const light = this.getMap().copyLight(this.selectedMapObject)
         
-        this.selectLight(light, { stick: true })
+        this.setSelectedMapObject(light, { stick: true })
         
         LightingUtils.refresh()
     }
@@ -290,7 +403,7 @@ Scene_LightingEditor.prototype.duplicateSelectedLight = function(validation)
 
 Scene_LightingEditor.prototype.removeSelectedLight = function(validation)
 {
-    if (!this.selectedLight)
+    if (!this.selectedMapObject)
     {
         return false
     }
@@ -302,16 +415,23 @@ Scene_LightingEditor.prototype.removeSelectedLight = function(validation)
     
     const map = this.getMap()
     
-    if (this.selectedLight.id)
+    if (this.selectedMapObject instanceof Data_Lighting_Layer)
     {
-        map.lights = map.lights.filter(x => !(x.id == this.selectedLight.id || x.targetId == this.selectedLight.id))
+        map.layers = map.layers.filter(x => x != this.selectedMapObject)
     }
     else
     {
-        map.lights = map.lights.filter(x => x != this.selectedLight)
+        if (this.selectedMapObject.id)
+        {
+            map.lights = map.lights.filter(x => !(x.id == this.selectedMapObject.id || x.targetId == this.selectedMapObject.id))
+        }
+        else
+        {
+            map.lights = map.lights.filter(x => x != this.selectedMapObject)
+        }
     }
     
-    this.selectLight(null)
+    this.setSelectedMapObject(null)
     
     LightingUtils.refresh()
 }
@@ -402,4 +522,44 @@ Scene_LightingEditor.prototype.help = function(validation)
     }
     
     return true
+}
+
+Scene_LightingEditor.prototype.setTool_select = function(validation)
+{
+    if (!validation)
+    {
+        this.setActiveTool(`select`)
+    }
+    
+    return true
+}
+
+Scene_LightingEditor.prototype.setTool_paint = function(validation)
+{
+    if (this.selectedMapObject instanceof Data_Lighting_Layer)
+    {
+        if (!validation)
+        {
+            this.setActiveTool(`paint`)
+        }
+        
+        return true
+    }
+    
+    return false
+}
+
+Scene_LightingEditor.prototype.setTool_erase = function(validation)
+{
+    if (this.selectedMapObject instanceof Data_Lighting_Layer)
+    {
+        if (!validation)
+        {
+            this.setActiveTool(`erase`)
+        }
+        
+        return true
+    }
+    
+    return false
 }

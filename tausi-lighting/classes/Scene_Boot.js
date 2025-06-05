@@ -131,6 +131,9 @@ Scene_Boot.prototype.onDatabaseLoaded = function()
         $dataLighting.maps[i] = Object.assign(new Data_Lighting_Map, $dataLighting.maps[i])
         
         const map = $dataLighting.maps[i]
+        
+        map.lights ??= []
+        
         for (const j in map.lights)
         {
             if (map.lights[j].targetId)
@@ -153,6 +156,13 @@ Scene_Boot.prototype.onDatabaseLoaded = function()
             {
                 map.lights[j] = Object.assign(new Data_Lighting_MapObject, map.lights[j])
             }
+        }
+        
+        map.layers ??= []
+        
+        for (const j in map.layers)
+        {
+            map.layers[j] = Object.assign(new Data_Lighting_Layer, map.layers[j])
         }
     }
 }

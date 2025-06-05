@@ -6,6 +6,7 @@ Yet another **Lighting System** with an **integrated WYSIWYG editor** for RPG Ma
 
 ## Features
 - WYSIWYG Editor
+- Painting Tool (New)
 - Ingame Overlay Panel
 - Based on WebGL Shader
 - Plugin Updater
@@ -24,10 +25,15 @@ Yet another **Lighting System** with an **integrated WYSIWYG editor** for RPG Ma
 
 ## Hints
 - There can only be one ambient light
+- Press and hold the right mouse button to use the eraser
 - Press and hold the middle mouse button for panning
 
 ## Plugin Commands / Script Calls
 Currently, there aren't any.
+
+## Known Issues
+- Slightly poorer quality when painting during overlay mode
+- Missing undo function
 
 ## Terms and Credits
 - Can be used in commercial games

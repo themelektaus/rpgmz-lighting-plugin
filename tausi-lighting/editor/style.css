@@ -18,18 +18,26 @@ body {
     display: flex;
 }
 
-body, button, input {
+body, button, input, select {
     font-family: MainFont;
     color: white;
     font-size: 14px;
     line-height: 1;
 }
 
-button, input {
+button, input, select {
     padding: .5em .825em;
     border: none;
     border-radius: .125em;
     outline: none;
+}
+
+select {
+    padding: .5em;
+}
+
+select option {
+    background-color: #444;
 }
 
 button {
@@ -39,14 +47,6 @@ button {
     transition: .1s;
 }
 
-button.no-text {
-    background-color: transparent !important;
-    width: 1.5em;
-    height: 1.5em;
-    background-size: 1.5em;
-    padding: 0;
-}
-
 button[data-icon] {
     background-repeat: no-repeat;
     background-position: .4em center;
@@ -54,8 +54,32 @@ button[data-icon] {
     padding-left: 2em;
 }
 
+button.empty-text {
+    padding-left: 1.75em;
+    padding-right: 0;
+}
+
+button.no-text {
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 10em;
+    background-size: 1.5em;
+    background-position: center;
+    padding: 0;
+}
+
+button.big {
+    width: 2.5em;
+    height: 2.5em;
+    background-size: 1.25em;
+}
+
 button:hover {
     background-color: #666f;
+}
+
+button.active {
+    background-color: #369f;
 }
 
 button.primary:hover {
@@ -74,11 +98,12 @@ button:active {
     filter: brightness(1.1);
 }
 
-input {
+input, select {
     min-width: 0;
+    border-radius: .25em;
 }
 
-input[type="number"] {
+input[type="number"], select {
     background-color: #fff2;
     outline: none;
     border: none;
@@ -142,6 +167,7 @@ button:disabled, input:disabled {
     filter: opacity(.5);
     cursor: default;
     background-color: transparent !important;
+    pointer-events: none;
 }
 
 #errorPrinter,
@@ -159,11 +185,36 @@ video {
     background: linear-gradient(-90deg, #111, #222);
     display: flex;
     flex-direction: column;
-    gap: .5em;
 }
 
 #left h3 {
-    margin: 2em 1em 0;
+    margin: 2em 1em .5em;
+}
+
+#left .left-main {
+    flex: 1;
+    overflow: hidden auto;
+}
+
+#left .left-bottom {
+    flex: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 2em;
+}
+
+#tools {
+    display: flex;
+    gap: .5em;
+}
+
+#tools-settings {
+    align-self: stretch;
+    margin: 1.5em 1em 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
 }
 
 #main {
@@ -187,6 +238,7 @@ video {
     list-style: none;
     margin: 0;
     padding: 0;
+    overflow: hidden;
 }
 
 #maps li {
@@ -209,10 +261,35 @@ video {
     gap: 5px;
 }
 
+#addMenu {
+    position: absolute;
+    z-index: 2;
+    top: 2.5em;
+    display: none;
+    flex-direction: column;
+    background-color: #111;
+    padding: .5em;
+    gap: .5em;
+}
+
+#addMenu.visible {
+    display: flex;
+}
+
+#addMenu button {
+    text-align: left;
+}
+
 #gameCanvasContainer {
     flex: 1;
     overflow: hidden;
     display: flex;
+    transition: 150ms;
+}
+
+#gameCanvasContainer.loading {
+    filter: opacity(0);
+    transform: scale(.95);
 }
 
 #gameCanvas {
@@ -232,6 +309,7 @@ video {
 .field {
     display: flex;
     gap: .5em;
+    border-radius: .25em;
     background-color: #222;
     padding: .5em .5em .75em;
     position: relative;
@@ -242,6 +320,7 @@ video {
     background-color: #333;
     transform: translateY(-1em);
     padding: .5em;
+    border-radius: .25em;
 }
 
 .field label + * {

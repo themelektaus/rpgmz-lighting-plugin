@@ -2,10 +2,21 @@ class Data_Lighting_Map
 {
     id = 0
     lights = []
+    layers = []
     
-    generateId()
+    generateLightId()
     {
-        const ids = this.lights.filter(x => x.id).map(x => x.id)
+        return this._generateId(this.lights)
+    }
+    
+    generateLayerId()
+    {
+        return this._generateId(this.layers)
+    }
+    
+    _generateId(array)
+    {
+        const ids = array.filter(x => x.id).map(x => x.id)
         return Math.max(0, ...ids) + 1
     }
     
@@ -45,7 +56,7 @@ class Data_Lighting_Map
         
         if (light)
         {
-            light.id = this.generateId()
+            light.id = this.generateLightId()
             this.lights.push(light)
         }
         
@@ -58,7 +69,7 @@ class Data_Lighting_Map
         
         if (light.id)
         {
-            light.id = this.generateId()
+            light.id = this.generateLightId()
         }
         
         if (light.color)
@@ -78,11 +89,35 @@ class Data_Lighting_Map
     
     getLightById(id)
     {
-        return this.lights.find(x => x.id == id)
+        return this._getById(this.lights, id)
     }
     
     getLightByType(type)
     {
         return this.lights.find(x => x.type == type)
+    }
+    
+    createLayer()
+    {
+        const layer = new Data_Lighting_Layer
+        
+        const mapInfo = LightingUtils.getMapInfo()
+        
+        layer.id = this.generateLayerId()
+        layer.init(mapInfo.width, mapInfo.height)
+        
+        this.layers.push(layer)
+        
+        return layer
+    }
+    
+    getLayerById(id)
+    {
+        return this._getById(this.layers, id)
+    }
+    
+    _getById(array, id)
+    {
+        return array.find(x => x.id == id)
     }
 }

@@ -11,21 +11,6 @@ LightingFilter.prototype.initialize = function()
     this.lightsCapacity = Math.max(2, ...($dataLighting.maps.map(x => x.lights.length)))
     
     PIXI.Filter.call(this, null, this._fragmentSrc())
-    
-    const map = this.getMap()
-    
-    this._eventInfos = []
-    
-    for (const event of $gameMap.events())
-    {
-        this._eventInfos.push({
-            event: event,
-            originPosition: {
-                x: event._realX * $gameMap.tileWidth(),
-                y: event._realY * $gameMap.tileHeight()
-            }
-        })
-    }
 }
 
 LightingFilter.prototype.getMap = function()
@@ -36,6 +21,7 @@ LightingFilter.prototype.getMap = function()
 
 LightingFilter.prototype.update = function()
 {
+    const map = this.getMap()
     const mapInfo = LightingUtils.getMapInfo()
     
     const screenRect = {
@@ -57,8 +43,6 @@ LightingFilter.prototype.update = function()
     const lightProperties2 = []
     const lightProperties3 = []
     
-    const map = this.getMap()
-    
     for (const i in map.lights)
     {
         let light = map.lights[i]
@@ -79,11 +63,11 @@ LightingFilter.prototype.update = function()
         
         if (light.followEventId)
         {
-            const eventInfo = this._eventInfos.find(x => x.event._eventId == light.followEventId)
-            if (eventInfo)
+            const event = $gameMap.event(light.followEventId)
+            if (event)
             {
-                x += eventInfo.event._realX * mapInfo.tileWidth - eventInfo.originPosition.x
-                y += eventInfo.event._realY * mapInfo.tileHeight - eventInfo.originPosition.y
+                x += (event._realX - event._originalRealX) * mapInfo.tileWidth
+                y += (event._realY - event._originalRealY) * mapInfo.tileHeight
             }
         }
         
