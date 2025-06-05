@@ -109,6 +109,10 @@ Scene_Boot.prototype.create = function()
                         
                         await new Promise(x => setTimeout(x, 1000))
                         
+                        fs.rmSync(`tausi-lighting`, { recursive: true, force: true })
+                        
+                        await new Promise(x => setTimeout(x, 1000))
+                        
                         _update.$_text.innerHTML = `Update OK, closing...`
                         
                         await new Promise(x => setTimeout(x, 1000))
