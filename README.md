@@ -38,3 +38,12 @@ Currently, there aren't any.
 ## Terms and Credits
 - Can be used in commercial games
 - No credits needed
+
+## Changelog
+
+### v0.1.2
+- Painting Tool: Create Light-/Shadowmaps directly in the editor
+- Editor UI adjustments
+
+### v0.1.1
+- First Release

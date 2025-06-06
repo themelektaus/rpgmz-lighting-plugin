@@ -46,12 +46,27 @@ Currently, there aren't any.
 
 
 [B][SIZE=18px]Known Issues[/SIZE][/B]
+[LIST]
 [*]Slightly poorer quality when painting during overlay mode
 [*]Missing undo function
-
+[/LIST]
 
 [B][SIZE=18px]Terms and Credits[/SIZE][/B]
 [LIST]
 [*]Can be used in commercial games
 [*]No credits needed
+[/LIST]
+
+
+[B][SIZE=18px]Changelog[/SIZE][/B]
+
+[B]v0.1.2[/B]
+[LIST]
+[*]Painting Tool: Create Light-/Shadowmaps directly in the editor
+[*]Editor UI adjustments
+[/LIST]
+
+[B]v0.1.1[/B]
+[LIST]
+[*]First Release
 [/LIST]
