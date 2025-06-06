@@ -92,35 +92,29 @@ $dataLighting = null;
         
     }
     
-    let urls
-    
-    try
-    {
-        const fs = require(`fs`)
-        
-        const files = fs.readdirSync(`tausi-lighting/classes`)
-        urls = files.map(x => `tausi-lighting/classes/${x}`)
-        fs.writeFileSync(`tausi-lighting/classes.json`, JSON.stringify(urls))
-    }
-    catch
-    {
-        urls = await fetch(`tausi-lighting/classes.json`)
-            .then(x => x.json())
-            .catch(() => { })
-    }
-    
-    if (!urls)
-    {
-        if (!location.pathname.endsWith(`/tausi-lighting/editor/index.html`))
-        {
-            location.href = `tausi-lighting/editor/index.html`
-        }
-        
-        return
-    }
-    
-    urls.unshift(`tausi-lighting/perlin.js`)
-    urls.unshift(`tausi-lighting/showdown.min.js`)
+    const urls = [
+        "tausi-lighting/classes/0_Data_Lighting.js",
+        "tausi-lighting/classes/0_Data_Lighting_Map.js",
+        "tausi-lighting/classes/0_Data_Lighting_MapObject.js",
+        "tausi-lighting/classes/1_Data_Lighting_Instance.js",
+        "tausi-lighting/classes/1_Data_Lighting_Reference.js",
+        "tausi-lighting/classes/2_Data_Lighting_Layer.js",
+        "tausi-lighting/classes/2_Data_Lighting_Light.js",
+        "tausi-lighting/classes/3_Data_Lighting_AmbientLight.js",
+        "tausi-lighting/classes/3_Data_Lighting_PointLight.js",
+        "tausi-lighting/classes/3_Data_Lighting_SpotLight.js",
+        "tausi-lighting/classes/DataManager.js",
+        "tausi-lighting/classes/Game_Event.js",
+        "tausi-lighting/classes/LayerFilter.js",
+        "tausi-lighting/classes/LightingFilter.js",
+        "tausi-lighting/classes/LightingUtils.js",
+        "tausi-lighting/classes/Scene_Boot.js",
+        "tausi-lighting/classes/Scene_Title.js",
+        "tausi-lighting/classes/Spriteset_Map.js",
+        "tausi-lighting/classes/Window_TitleCommand.js",
+        "tausi-lighting/perlin.js",
+        "tausi-lighting/showdown.min.js"
+]
     
     await new Promise(resolve =>
     {

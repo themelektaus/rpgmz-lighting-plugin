@@ -38,6 +38,15 @@
     const fs = require(`fs`)
     const path = require(`path`)
     
+    const urls = [
+        ...(
+            fs.readdirSync(`tausi-lighting/classes`)
+                .map(x => `tausi-lighting/classes/${x}`)
+        ),
+        `tausi-lighting/perlin.js`,
+        `tausi-lighting/showdown.min.js`
+    ]
+    
     let build = ""
     build += "//=============================================================================\n"
     build += "// RPG Maker MZ - Tausi Lighting\n"
@@ -133,35 +142,7 @@
     build += "        \n"
     build += "    }\n"
     build += "    \n"
-    build += "    let urls\n"
-    build += "    \n"
-    build += "    try\n"
-    build += "    {\n"
-    build += "        const fs = require(`fs`)\n"
-    build += "        \n"
-    build += "        const files = fs.readdirSync(`tausi-lighting/classes`)\n"
-    build += "        urls = files.map(x => `tausi-lighting/classes/${x}`)\n"
-    build += "        fs.writeFileSync(`tausi-lighting/classes.json`, JSON.stringify(urls))\n"
-    build += "    }\n"
-    build += "    catch\n"
-    build += "    {\n"
-    build += "        urls = await fetch(`tausi-lighting/classes.json`)\n"
-    build += "            .then(x => x.json())\n"
-    build += "            .catch(() => { })\n"
-    build += "    }\n"
-    build += "    \n"
-    build += "    if (!urls)\n"
-    build += "    {\n"
-    build += "        if (!location.pathname.endsWith(`/tausi-lighting/editor/index.html`))\n"
-    build += "        {\n"
-    build += "            location.href = `tausi-lighting/editor/index.html`\n"
-    build += "        }\n"
-    build += "        \n"
-    build += "        return\n"
-    build += "    }\n"
-    build += "    \n"
-    build += "    urls.unshift(`tausi-lighting/perlin.js`)\n"
-    build += "    urls.unshift(`tausi-lighting/showdown.min.js`)\n"
+    build += "    const urls = " + JSON.stringify(urls, null, `        `) + "\n"
     build += "    \n"
     build += "    await new Promise(resolve =>\n"
     build += "    {\n"
