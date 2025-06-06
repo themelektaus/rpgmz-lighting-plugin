@@ -43,6 +43,20 @@ $dataLighting = null;
     {
         const fs = require(`fs`)
         
+        if (fs.existsSync(`tausi-lighting/classes/3_Data_Lighting_GlobalLight.js`))
+        {
+            fs.rmSync(`tausi-lighting`, { recursive: true, force: true })
+        }
+    }
+    catch
+    {
+        
+    }
+    
+    try
+    {
+        const fs = require(`fs`)
+        
         if (!fs.existsSync(`data/Lighting.json`))
         {
             fs.writeFileSync(`data/Lighting.json`, `{"version":1,"maps":[]}`)
@@ -63,7 +77,7 @@ $dataLighting = null;
     try
     {
         const fs = require(`fs`)
-        try { fs.unlinkSync(`tausi-lighting/classes/3_Data_Lighting_GlobalLight.js`) } catch { }
+        
         const files = fs.readdirSync(`tausi-lighting/classes`)
         urls = files.map(x => `tausi-lighting/classes/${x}`)
         fs.writeFileSync(`tausi-lighting/classes.json`, JSON.stringify(urls))
