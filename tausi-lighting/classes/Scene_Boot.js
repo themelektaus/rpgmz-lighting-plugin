@@ -105,11 +105,31 @@ Scene_Boot.prototype.create = function()
                         }
                         
                         const fs = require(`fs`)
+                        const path = require(`path`)
+                        
                         fs.writeFileSync(`js/plugins/TausiLighting.js`, Buffer.from(data))
                         
                         await new Promise(x => setTimeout(x, 1000))
                         
-                        fs.rmSync(`tausi-lighting`, { recursive: true, force: true })
+                        const rmSync = function(folder)
+                        {
+                            fs.readdirSync(folder).forEach((file, _) =>
+                            {
+                                const _path = path.join(folder, file)
+                                if (fs.lstatSync(_path).isDirectory())
+                                {
+                                    rmSync(_path)
+                                }
+                                else
+                                {
+                                    fs.unlinkSync(_path)
+                                }
+                            })
+                            
+                            fs.rmdirSync(folder)
+                        }
+                        
+                        rmSync(`tausi-lighting`)
                         
                         await new Promise(x => setTimeout(x, 1000))
                         
