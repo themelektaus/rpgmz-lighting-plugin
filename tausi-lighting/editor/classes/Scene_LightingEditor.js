@@ -74,6 +74,27 @@ Scene_LightingEditor.prototype.initialize = function()
     this._mapId = -1
     this._loading = 0
     this._updateMapInterpreter = eval(pluginParameters[`Update Map Interpreter in Editor`] || `true`)
+    
+    addEventListener(`keypress`, e =>
+    {
+        if (e.ctrlKey && e.code == `KeyS`)
+        {
+            this.save()
+            return
+        }
+        
+        if (e.ctrlKey && e.code == `KeyY`)
+        {
+            this.redo()
+            return
+        }
+        
+        if (e.ctrlKey && e.code == `KeyZ`)
+        {
+            this.undo()
+            return
+        }
+    })
 }
 
 Scene_LightingEditor.prototype.create = function()
@@ -196,11 +217,13 @@ Scene_LightingEditor.prototype.setSelectedMapObject = function(mapObject, option
         if (options?.stick)
         {
             TouchInput._lastMapObject = mapObject
+            TouchInput._lastMapObjectMoved = false
         }
     }
     else
     {
         TouchInput._lastMapObject = null
+        TouchInput._lastMapObjectMoved = false
         return
     }
     
@@ -247,7 +270,14 @@ Scene_LightingEditor.prototype.add = function(validation)
         requestAnimationFrame(() =>
         {
             const $_addMenu = document.querySelector(`#addMenu`)
+            
+            const $_button = document.querySelector(`#toolbar button[data-action="add"]`)
+            const rect = $_button.getBoundingClientRect()
+            
+            $_addMenu.style.top = `calc(${rect.bottom}px + .5em)`
+            $_addMenu.style.left = `${rect.left}px`
             $_addMenu.classList.add(`visible`)
+            
             requestAnimationFrame(() =>
             {
                 addEventListener(`click`, () =>
@@ -304,11 +334,14 @@ Scene_LightingEditor.prototype.addLight = function(type, validation)
         }
     }
     
+    LightingUtils.dump()
+    
     light = map.createLight(type)
     
     if (light)
     {
         this.setSelectedMapObject(light, { stick: true })
+        TouchInput._lastMapObjectMoved = true
         
         LightingUtils.refresh()
     }
@@ -329,9 +362,12 @@ Scene_LightingEditor.prototype.addLayer = function(validation)
         return true
     }
     
+    LightingUtils.dump()
+    
     const layer = map.createLayer()
     
     this.setSelectedMapObject(layer, { stick: true })
+    TouchInput._lastMapObjectMoved = true
     
     LightingUtils.refresh()
     
@@ -413,6 +449,8 @@ Scene_LightingEditor.prototype.removeSelectedLight = function(validation)
         return true
     }
     
+    LightingUtils.dump()
+    
     const map = this.getMap()
     
     if (this.selectedMapObject instanceof Data_Lighting_Layer)
@@ -436,6 +474,99 @@ Scene_LightingEditor.prototype.removeSelectedLight = function(validation)
     LightingUtils.refresh()
 }
 
+Scene_LightingEditor.prototype.undo = function(validation)
+{
+    if (!$dataLighting)
+    {
+        return false
+    }
+    
+    if (!LightingUtils.undo(validation))
+    {
+        return false
+    }
+    
+    if (!validation)
+    {
+        this.reselectMapObject(this.activeTool)
+        this.invalidate()
+    }
+    
+    return true
+}
+
+Scene_LightingEditor.prototype.redo = function(validation)
+{
+    if (!$dataLighting)
+    {
+        return false
+    }
+    
+    if (!LightingUtils.redo(validation))
+    {
+        return false
+    }
+    
+    if (!validation)
+    {
+        this.reselectMapObject(this.activeTool)
+        this.invalidate()
+    }
+    
+    return true
+}
+
+Scene_LightingEditor.prototype.reselectMapObject = function(tool)
+{
+    if (!this.selectedMapObject)
+    {
+        return
+    }
+    
+    if (this.selectedMapObject instanceof Data_Lighting_Reference)
+    {
+        const light = this.getMap().lights.find(x => x.targetId == this.selectedMapObject.targetId)
+        if (light)
+        {
+            this.setSelectedMapObject(light)
+        }
+        else
+        {
+            this.setSelectedMapObject(null)
+        }
+        return
+    }
+    
+    if (this.selectedMapObject instanceof Data_Lighting_Light)
+    {
+        const light = this.getMap().lights.find(x => x.id == this.selectedMapObject.id)
+        if (light)
+        {
+            this.setSelectedMapObject(light)
+        }
+        else
+        {
+            this.setSelectedMapObject(null)
+        }
+        return
+    }
+    
+    if (this.selectedMapObject instanceof Data_Lighting_Layer)
+    {
+        const layer = this.getMap().layers.find(x => x.id == this.selectedMapObject.id)
+        if (layer)
+        {
+            this.setSelectedMapObject(layer)
+            this.setActiveTool(tool)
+        }
+        else
+        {
+            this.setSelectedMapObject(null)
+        }
+        return
+    }
+}
+
 Scene_LightingEditor.prototype.save = function(validation)
 {
     if (!$dataLighting)
@@ -443,10 +574,19 @@ Scene_LightingEditor.prototype.save = function(validation)
         return false
     }
     
+    const data = JSON.parse(JSON.stringify($dataLighting))
+    for (const map of data.maps)
+    {
+        for (const layer of map.layers)
+        {
+            delete layer.urlContent
+        }
+    }
+    
     const fs = require(`fs`)
     
     const a = fs.readFileSync(`data/Lighting.json`, `utf8`)
-    const b = JSON.stringify($dataLighting)
+    const b = JSON.stringify(data)
     
     if (LightingUtils.hashCode(a) == LightingUtils.hashCode(b))
     {
@@ -455,7 +595,16 @@ Scene_LightingEditor.prototype.save = function(validation)
     
     if (!validation)
     {
-        this._writeToDataFile(`Lighting.json`, $dataLighting)
+        this._writeToDataFile(`Lighting.json`, data)
+        
+        for (const map of $dataLighting.maps)
+        {
+            for (const layer of map.layers)
+            {
+                Data_Lighting_Layer.saveUrlContent(layer.url, layer.urlContent)
+            }
+        }
+        
         this.invalidate()
     }
     

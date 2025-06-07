@@ -325,3 +325,137 @@ LightingUtils.createField = function($_properties, _default, property, options)
     
     $_properties.appendChild($field)
 }
+
+LightingUtils.dump = function()
+{
+    if (!$dataLighting)
+    {
+        return false
+    }
+    
+    let fs
+    
+    try
+    {
+        fs = require(`fs`)
+    }
+    catch
+    {
+        return false
+    }
+    
+    const data = JSON.parse(JSON.stringify($dataLighting))
+    
+    this.history ??= []
+    this.currentHistoryIndex ??= null
+    
+    if (this.currentHistoryIndex !== null)
+    {
+        while (this.history.length > this.currentHistoryIndex)
+        {
+            this.history.pop()
+        }
+        this.currentHistoryIndex = null
+    }
+    
+    this.history.push(data)
+    
+    return true
+}
+
+LightingUtils.undo = function(validation)
+{
+    const index = this.currentHistoryIndex === null
+        ? (this.history ?? []).length - 1
+        : this.currentHistoryIndex - 1
+    
+    if (LightingUtils.restore(true, index))
+    {
+        if (validation)
+        {
+            return true
+        }
+        
+        if (this.currentHistoryIndex === null)
+        {
+            this.dump()
+        }
+        
+        if (LightingUtils.restore(false, index))
+        {
+            if (!validation)
+            {
+                this.currentHistoryIndex = index
+            }
+            return true
+        }
+    }
+    
+    return false
+}
+
+LightingUtils.redo = function(validation)
+{
+    if (this.currentHistoryIndex === null)
+    {
+        return false
+    }
+    
+    const index = this.currentHistoryIndex + 1
+    
+    if (LightingUtils.restore(validation, index))
+    {
+        if (!validation)
+        {
+            this.currentHistoryIndex = index
+            
+            if (this.currentHistoryIndex >= this.history.length)
+            {
+                this.currentHistoryIndex = null
+                
+                this.history.pop()
+            }
+        }
+        return true
+    }
+}
+
+LightingUtils.restore = function(validation, index)
+{
+    if (!this.history)
+    {
+        return false
+    }
+    
+    if (index < 0)
+    {
+        return false
+    }
+    
+    if (index >= this.history.length)
+    {
+        return false
+    }
+    
+    let fs
+    
+    try
+    {
+        fs = require(`fs`)
+    }
+    catch
+    {
+        return false
+    }
+    
+    if (!validation)
+    {
+        const data = this.history[index]
+        
+        $dataLighting = Data_Lighting.load(JSON.parse(JSON.stringify(data)))
+        
+        this.refresh()
+    }
+    
+    return true
+}

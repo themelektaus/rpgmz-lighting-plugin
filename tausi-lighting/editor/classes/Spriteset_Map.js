@@ -81,7 +81,6 @@ Spriteset_Map.prototype.refreshLightSprites = function()
     }
 }
 
-
 Spriteset_Map.prototype.refreshCursorSprites = function()
 {
     if (this._radiusSprite)
@@ -116,7 +115,6 @@ Spriteset_Map.prototype.refreshCursorSprites = function()
     
     this.addChild(this._radiusSprite)
 }
-
 
 Spriteset_Map.prototype.updateLayerPainting = function()
 {
@@ -203,7 +201,11 @@ Spriteset_Map.prototype.updateLayerPaint = function(sprite, tool)
     {
         if (sprite == this._lastLayerSprite)
         {
-            sprite.layer.write(sprite.bitmap)
+            LightingUtils.dump()
+            
+            sprite.layer.setUrlContent(sprite.bitmap)
+            
+            SceneManager._scene?.invalidate?.call(SceneManager._scene)
         }
         
         this._lastLayerSprite = null
@@ -229,9 +231,7 @@ Spriteset_Map.prototype.paintLayer = function(sprite, tool, x, y, color, radius,
     
     const context = sprite.bitmap.context
     
-    //context.save()
-    
-    const operation = context.globalCompositeOperation
+    context.save()
     
     switch (tool)
     {
@@ -256,10 +256,8 @@ Spriteset_Map.prototype.paintLayer = function(sprite, tool, x, y, color, radius,
     
     context.fillStyle = gradient
     context.fillRect(x - r, y - r, r2, r2)
-
-    context.globalCompositeOperation = operation
     
-    //context.restore()
+    context.restore()
     
     sprite.bitmap._baseTexture.update()
     

@@ -26,6 +26,10 @@
             </div>
             <div id="main">
                 <div id="toolbar">
+                    <button data-action="undo" data-icon="undo" class="empty-text">&nbsp;</button>
+                    <button data-action="redo" data-icon="redo" class="empty-text">&nbsp;</button>
+                    <button data-action="save" data-icon="save" class="positive">Save</button>
+                    <div style="flex: 1; "></div>
                     <button data-action="add" data-icon="add" class="primary empty-text">&nbsp;</button>
                     <div id="addMenu">
                         <button data-action="addAmbientLight" data-icon="globelight" class="primary">Ambient Light</button>
@@ -34,13 +38,12 @@
                         <button data-action="addLayer" data-icon="map" class="primary">Layer</button>
                     </div>
                     <button data-action="duplicateSelectedLight" data-icon="copy" class="primary">Duplicate</button>
-                    <button data-action="removeSelectedLight" data-icon="delete" class="negative">Delete</button>
-                    <div style="flex: 1; "></div>
                     <button data-action="selectReferenceLight" data-icon="click">Reference</button>
                     <button data-action="cloneSelectedLight" data-icon="clone" class="primary">Clone</button>
+                    <button data-action="removeSelectedLight" data-icon="delete" class="negative">Delete</button>
                     <div style="flex: 1; "></div>
                     <button data-action="help" data-icon="help">Help</button>
-                    <button data-action="save" data-icon="save" class="positive">Save</button>
+                    
                 </div>
                 <div id="gameCanvasContainer" class="loading"></div>
             </div>

@@ -42,7 +42,11 @@ Spriteset_Map.prototype.refreshLayers = function()
         
         sprite.layer = layer
         sprite.filterMode = layer.filterMode
-        sprite.bitmap = Bitmap.load(layer.url + `?t=${(new Date()).getTime()}`)
+        sprite.bitmap = Bitmap.load(
+            layer.urlContent
+                ? `data:image/png;base64,${layer.urlContent}`
+                : `${layer.url}?t=${(new Date()).getTime()}`
+        )
         sprite.scale.x = 1 / layer.scale
         sprite.scale.y = 1 / layer.scale
         this._layerSprites.push(sprite)

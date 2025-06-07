@@ -6,7 +6,7 @@ Yet another **Lighting System** with an **integrated WYSIWYG editor** for RPG Ma
 
 ## Features
 - WYSIWYG Editor
-- Painting Tool (New)
+- Painting Tool
 - Ingame Overlay Panel
 - Based on WebGL Shader
 - Plugin Updater
@@ -33,13 +33,16 @@ Currently, there aren't any.
 
 ## Known Issues
 - Slightly poorer quality when painting during overlay mode
-- Missing undo function
+- ~~Missing undo function~~
 
 ## Terms and Credits
 - Can be used in commercial games
 - No credits needed
 
 ## Changelog
+
+### v0.1.3
+- Undo/Redo
 
 ### v0.1.2
 - Painting Tool: Create Light-/Shadowmaps directly in the editor

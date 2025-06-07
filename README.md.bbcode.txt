@@ -1,4 +1,4 @@
-[B][SIZE=22px]Tausi Lighting[/SIZE][/B] - v0.1.2
+[B][SIZE=22px]Tausi Lighting[/SIZE][/B] - v0.1.3
 
 Author: [URL='https://github.com/themelektaus']themelektaus[/URL]
 Source: [URL='https://github.com/themelektaus/rpgmz-lighting-plugin']github.com/themelektaus/rpgmz-lighting-plugin[/URL]
@@ -14,7 +14,7 @@ Yet another [B]Lighting System[/B] with an integrated [B]WYSIWYG editor[/B] for 
 [B][SIZE=18px]Features[/SIZE][/B]
 [LIST]
 [*]WYSIWYG Editor
-[*][B]Painting Tool (New)[/B]
+[*][B]Painting Tool[/B]
 [*]Ingame Overlay Panel
 [*]Based on WebGL Shader
 [*]Plugin Updater
@@ -59,6 +59,11 @@ Currently, there aren't any.
 
 
 [B][SIZE=18px]Changelog[/SIZE][/B]
+
+[B]v0.1.3[/B]
+[LIST]
+[*]Undo/Redo
+[/LIST]
 
 [B]v0.1.2[/B]
 [LIST]

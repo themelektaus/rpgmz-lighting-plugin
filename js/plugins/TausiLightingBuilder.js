@@ -22,11 +22,6 @@
 
 (() =>
 {
-    if (typeof nw != `object`)
-    {
-        return
-    }
-    
     try { require } catch { return }
     
     const pluginParameters = PluginManager.parameters(`TausiLightingBuilder`)
