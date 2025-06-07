@@ -41,7 +41,13 @@ TouchInput._onMouseUp = function(event)
     
     if (event.button == 0)
     {
+        if (this._lastMapObjectMoved)
+        {
+            LightingUtils.dump()
+        }
+        
         delete this._lastMapObject
+        delete this._lastMapObjectMoved
         
         SceneManager._scene?.invalidate?.call(SceneManager._scene)
     }
@@ -83,15 +89,10 @@ TouchInput._onMouseMove = function(event)
     
     if (this._lastMapObject)
     {
-        if (!this._lastMapObjectMoved)
-        {
-            this._lastMapObjectMoved = true
-            LightingUtils.dump()
-        }
-        
         const mapInfo = LightingUtils.getMapInfo()
         this._lastMapObject.x = x + mapInfo.offsetX
         this._lastMapObject.y = y + mapInfo.offsetY
+        this._lastMapObjectMoved = true
     }
     
     if (this._lastPanningPosition)

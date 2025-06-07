@@ -173,14 +173,21 @@ LightingUtils.createField = function($_properties, _default, property, options)
             $input.checked = eval(value ?? `true`)
             $input.addEventListener(`change`, () =>
             {
-                this[property] = $input.checked
-                invalidate()
+                if (this[property] != $input.checked)
+                {
+                    this[property] = $input.checked
+                    LightingUtils.dump()
+                    invalidate()
+                }
             })
             $inputContainer.appendChild($input)
             $reset.addEventListener(`click`, () =>
             {
-                $input.value = _default[property]
-                $input.dispatchEvent(new Event(`change`))
+                if ($input.value != _default[property])
+                {
+                    $input.value = _default[property]
+                    $input.dispatchEvent(new Event(`change`))
+                }
             })
             break
         
@@ -195,11 +202,20 @@ LightingUtils.createField = function($_properties, _default, property, options)
                 this[property] = Number($input.value || 0)
                 invalidate()
             })
+            $input.addEventListener(`change`, () =>
+            {
+                LightingUtils.dump()
+                invalidate()
+            })
             $field.appendChild($input)
             $reset.addEventListener(`click`, () =>
             {
-                $input.value = _default[property]
-                $input.dispatchEvent(new Event(`input`))
+                if ($input.value != _default[property])
+                {
+                    $input.value = _default[property]
+                    $input.dispatchEvent(new Event(`input`))
+                    $input.dispatchEvent(new Event(`change`))
+                }
             })
             break
         
@@ -231,15 +247,22 @@ LightingUtils.createField = function($_properties, _default, property, options)
             
             $select.addEventListener(`change`, () =>
             {
-                this[property] = Number($select.value || 0)
-                invalidate()
+                if (this[property] != Number($select.value || 0))
+                {
+                    this[property] = Number($select.value || 0)
+                    LightingUtils.dump()
+                    invalidate()
+                }
             })
             
             $field.appendChild($select)
             $reset.addEventListener(`click`, () =>
             {
-                $select.value = _default[property]
-                $select.dispatchEvent(new Event(`change`))
+                if ($select.value != _default[property])
+                {
+                    $select.value = _default[property]
+                    $select.dispatchEvent(new Event(`change`))
+                }
             })
             break
         
@@ -255,11 +278,20 @@ LightingUtils.createField = function($_properties, _default, property, options)
                 this[property] = Number($input.value || 0)
                 invalidate()
             })
+            $input.addEventListener(`change`, () =>
+            {
+                LightingUtils.dump()
+                invalidate()
+            })
             $field.appendChild($input)
             $reset.addEventListener(`click`, () =>
             {
-                $input.value = _default[property]
-                $input.dispatchEvent(new Event(`input`))
+                if ($input.value != _default[property])
+                {
+                    $input.value = _default[property]
+                    $input.dispatchEvent(new Event(`input`))
+                    $input.dispatchEvent(new Event(`change`))
+                }
             })
             break
             
@@ -298,11 +330,19 @@ LightingUtils.createField = function($_properties, _default, property, options)
                     this[property][_i] = Number($.value || 0)
                     invalidate()
                 })
+                $.addEventListener(`change`, () =>
+                {
+                    LightingUtils.dump()
+                    invalidate()
+                })
                 $input.appendChild($)
                 $reset.addEventListener(`click`, () =>
                 {
-                    $.value = _default[property][_i]
-                    $.dispatchEvent(new Event(`input`))
+                    if ($.value != _default[property][_i])
+                    {
+                        $.value = _default[property][_i]
+                        $.dispatchEvent(new Event(`input`))
+                    }
                 })
             }
             break
@@ -347,15 +387,11 @@ LightingUtils.dump = function()
     const data = JSON.parse(JSON.stringify($dataLighting))
     
     this.history ??= []
-    this.currentHistoryIndex ??= null
+    this.historyIndex = (this.historyIndex ?? -1) + 1
     
-    if (this.currentHistoryIndex !== null)
+    while (this.history.length > this.historyIndex)
     {
-        while (this.history.length > this.currentHistoryIndex)
-        {
-            this.history.pop()
-        }
-        this.currentHistoryIndex = null
+        this.history.pop()
     }
     
     this.history.push(data)
@@ -365,59 +401,12 @@ LightingUtils.dump = function()
 
 LightingUtils.undo = function(validation)
 {
-    const index = this.currentHistoryIndex === null
-        ? (this.history ?? []).length - 1
-        : this.currentHistoryIndex - 1
-    
-    if (LightingUtils.restore(true, index))
-    {
-        if (validation)
-        {
-            return true
-        }
-        
-        if (this.currentHistoryIndex === null)
-        {
-            this.dump()
-        }
-        
-        if (LightingUtils.restore(false, index))
-        {
-            if (!validation)
-            {
-                this.currentHistoryIndex = index
-            }
-            return true
-        }
-    }
-    
-    return false
+    return LightingUtils.restore(validation, (this.historyIndex ?? 0) - 1)
 }
 
 LightingUtils.redo = function(validation)
 {
-    if (this.currentHistoryIndex === null)
-    {
-        return false
-    }
-    
-    const index = this.currentHistoryIndex + 1
-    
-    if (LightingUtils.restore(validation, index))
-    {
-        if (!validation)
-        {
-            this.currentHistoryIndex = index
-            
-            if (this.currentHistoryIndex >= this.history.length)
-            {
-                this.currentHistoryIndex = null
-                
-                this.history.pop()
-            }
-        }
-        return true
-    }
+    return LightingUtils.restore(validation, (this.historyIndex ?? 0) + 1)
 }
 
 LightingUtils.restore = function(validation, index)
@@ -453,6 +442,8 @@ LightingUtils.restore = function(validation, index)
         const data = this.history[index]
         
         $dataLighting = Data_Lighting.load(JSON.parse(JSON.stringify(data)))
+        
+        this.historyIndex = index
         
         this.refresh()
     }

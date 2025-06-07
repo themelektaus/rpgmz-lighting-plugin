@@ -8,6 +8,8 @@ Scene_LightingEditor.prototype.constructor = Scene_LightingEditor
 
 Scene_LightingEditor.prototype.initialize = function()
 {
+    LightingUtils.dump()
+    
     LightingUtils.preloadBitmaps().then(() =>
     {
         document.querySelectorAll(`[data-icon]`).forEach($ =>
@@ -217,13 +219,11 @@ Scene_LightingEditor.prototype.setSelectedMapObject = function(mapObject, option
         if (options?.stick)
         {
             TouchInput._lastMapObject = mapObject
-            TouchInput._lastMapObjectMoved = false
         }
     }
     else
     {
         TouchInput._lastMapObject = null
-        TouchInput._lastMapObjectMoved = false
         return
     }
     
@@ -334,15 +334,11 @@ Scene_LightingEditor.prototype.addLight = function(type, validation)
         }
     }
     
-    LightingUtils.dump()
-    
     light = map.createLight(type)
     
     if (light)
     {
         this.setSelectedMapObject(light, { stick: true })
-        TouchInput._lastMapObjectMoved = true
-        
         LightingUtils.refresh()
     }
     
@@ -362,12 +358,9 @@ Scene_LightingEditor.prototype.addLayer = function(validation)
         return true
     }
     
-    LightingUtils.dump()
-    
     const layer = map.createLayer()
     
     this.setSelectedMapObject(layer, { stick: true })
-    TouchInput._lastMapObjectMoved = true
     
     LightingUtils.refresh()
     
@@ -449,23 +442,24 @@ Scene_LightingEditor.prototype.removeSelectedLight = function(validation)
         return true
     }
     
-    LightingUtils.dump()
-    
     const map = this.getMap()
     
     if (this.selectedMapObject instanceof Data_Lighting_Layer)
     {
         map.layers = map.layers.filter(x => x != this.selectedMapObject)
+        LightingUtils.dump()
     }
     else
     {
         if (this.selectedMapObject.id)
         {
             map.lights = map.lights.filter(x => !(x.id == this.selectedMapObject.id || x.targetId == this.selectedMapObject.id))
+            LightingUtils.dump()
         }
         else
         {
             map.lights = map.lights.filter(x => x != this.selectedMapObject)
+            LightingUtils.dump()
         }
     }
     

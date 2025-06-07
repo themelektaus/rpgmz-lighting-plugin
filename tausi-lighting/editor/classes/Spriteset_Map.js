@@ -201,9 +201,9 @@ Spriteset_Map.prototype.updateLayerPaint = function(sprite, tool)
     {
         if (sprite == this._lastLayerSprite)
         {
-            LightingUtils.dump()
-            
             sprite.layer.setUrlContent(sprite.bitmap)
+            
+            LightingUtils.dump()
             
             SceneManager._scene?.invalidate?.call(SceneManager._scene)
         }
