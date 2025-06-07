@@ -14,7 +14,7 @@ Yet another [B]Lighting System[/B] with an integrated [B]WYSIWYG editor[/B] for 
 [B][SIZE=18px]Features[/SIZE][/B]
 [LIST]
 [*]WYSIWYG Editor
-[*][B]Painting Tool[/B]
+[*]Painting Tool
 [*]Ingame Overlay Panel
 [*]Based on WebGL Shader
 [*]Plugin Updater
