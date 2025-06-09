@@ -8,7 +8,9 @@ LightingFilter.prototype.constructor = LightingFilter;
 
 LightingFilter.prototype.initialize = function()
 {
-    this.lightsCapacity = Math.max(2, ...($dataLighting.maps.map(x => x.lights.length)))
+    const map = this.getMap()
+    const mapObjects = map.getMapObjectsOfType(Data_Lighting_Light)
+    this.lightsCapacity = Math.max(2, mapObjects.length)
     
     PIXI.Filter.call(this, null, this._fragmentSrc())
 }
@@ -43,11 +45,13 @@ LightingFilter.prototype.update = function()
     const lightProperties2 = []
     const lightProperties3 = []
     
-    for (const i in map.lights)
+    let i = -1
+    
+    for (const mapObject of map.getMapObjectsOfType(Data_Lighting_Light))
     {
-        let light = map.lights[i]
+        i++
         
-        if (light.enabled === false)
+        if (mapObject.enabled === false)
         {
             lightTypes.push(0)
             lightColors.push(0, 0, 0, 0)
@@ -58,12 +62,12 @@ LightingFilter.prototype.update = function()
             continue
         }
         
-        let x = light.x
-        let y = light.y
+        let x = mapObject.x
+        let y = mapObject.y
         
-        if (light.followEventId)
+        if (mapObject.followEventId)
         {
-            const event = $gameMap.event(light.followEventId)
+            const event = $gameMap.event(mapObject.followEventId)
             if (event)
             {
                 x += (event._realX - event._originalRealX) * mapInfo.tileWidth
@@ -71,17 +75,14 @@ LightingFilter.prototype.update = function()
             }
         }
         
-        if (light.targetId)
-        {
-            light = map.getLightById(light.targetId)
-        }
+        const light = mapObject.object
         
-        lightTypes.push(light.type)
+        lightTypes.push(light.constructor.shaderType)
         lightColors.push(...light.color.map(x => x / 255))
         
-        switch (light.type)
+        switch (light.constructor.shaderType)
         {
-            case Data_Lighting_AmbientLight.type:
+            case Data_Lighting_AmbientLight.shaderType:
                 lightPositions.push(0, 0)
                 lightProperties1.push(
                     light.weight / 100,
@@ -98,7 +99,7 @@ LightingFilter.prototype.update = function()
                 lightProperties3.push(0, 0)
                 break
             
-            case Data_Lighting_PointLight.type:
+            case Data_Lighting_PointLight.shaderType:
                 lightPositions.push(
                     viewportOffset.x + x / screenRect.width,
                     viewportOffset.y + y / screenRect.height
@@ -127,7 +128,7 @@ LightingFilter.prototype.update = function()
                 lightProperties3.push(0, 0)
                 break
             
-            case Data_Lighting_SpotLight.type:
+            case Data_Lighting_SpotLight.shaderType:
                 lightPositions.push(
                     viewportOffset.x + x / screenRect.width,
                     viewportOffset.y + y / screenRect.height
@@ -203,7 +204,7 @@ LightingFilter.prototype._fragmentSrc = function()
                 int lightType = lightTypes[i];
                 vec4 lightColor = lightColors[i];
                 
-                if (lightType == ${Data_Lighting_AmbientLight.type})
+                if (lightType == ${Data_Lighting_AmbientLight.shaderType})
                 {
                     ambientLightWeight = lightProperties1[i].x;
                     float lightExposure = lightProperties1[i].y;
@@ -224,7 +225,7 @@ LightingFilter.prototype._fragmentSrc = function()
                     continue;
                 }
                 
-                if (lightType == ${Data_Lighting_PointLight.type})
+                if (lightType == ${Data_Lighting_PointLight.shaderType})
                 {
                     vec2 position = vTextureCoord * screenRect.zw / 816.0;
                     vec2 lightPosition = lightPositions[i] * screenRect.zw / 816.0;
@@ -247,7 +248,7 @@ LightingFilter.prototype._fragmentSrc = function()
                     continue;
                 }
                     
-                if (lightType == ${Data_Lighting_SpotLight.type})
+                if (lightType == ${Data_Lighting_SpotLight.shaderType})
                 {
                     vec2 position = vTextureCoord * screenRect.zw / 816.0;
                     vec2 lightPosition = lightPositions[i] * screenRect.zw / 816.0;

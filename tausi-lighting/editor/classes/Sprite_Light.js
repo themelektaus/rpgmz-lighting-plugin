@@ -1,28 +1,24 @@
-function Sprite_Light()
+function Sprite_MapObject()
 {
     this.initialize(...arguments)
 }
 
-Sprite_Light.prototype = Object.create(Sprite_Clickable.prototype);
-Sprite_Light.prototype.constructor = Sprite_Light;
+Sprite_MapObject.prototype = Object.create(Sprite_Clickable.prototype);
+Sprite_MapObject.prototype.constructor = Sprite_MapObject;
 
-Sprite_Light.prototype.initialize = function(light)
+Sprite_MapObject.prototype.initialize = function(mapObject)
 {
-    this.light = light
+    this.mapObject = mapObject
     
     Sprite_Clickable.prototype.initialize.call(this)
     
     let bitmap
     
-    if (light instanceof Data_Lighting_Layer)
+    if (mapObject.object instanceof Data_Lighting_Layer)
     {
         bitmap = `map.svg`
     }
-    else if (light.targetId)
-    {
-        bitmap = `link.svg`
-    }
-    else if (light.type == Data_Lighting_AmbientLight.type)
+    else if (mapObject.object instanceof Data_Lighting_AmbientLight)
     {
         bitmap = `globelight.svg`
     }
@@ -37,13 +33,13 @@ Sprite_Light.prototype.initialize = function(light)
     this.anchor.y = .5
 }
 
-Sprite_Light.prototype.update = function()
+Sprite_MapObject.prototype.update = function()
 {
     const mapInfo = LightingUtils.getMapInfo()
-    this.x = this.light.x - mapInfo.offsetX
-    this.y = this.light.y - mapInfo.offsetY
+    this.x = this.mapObject.x - mapInfo.offsetX
+    this.y = this.mapObject.y - mapInfo.offsetY
     
-    if (LightingUtils.getSelectedMapObject() == this.light)
+    if (LightingUtils.getSelectedMapObject() == this.mapObject)
     {
         this.setColorTone([50, 50, -50, 50])
         this.scale.x = 1.25

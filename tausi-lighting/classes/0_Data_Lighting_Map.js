@@ -1,123 +1,44 @@
 class Data_Lighting_Map
 {
+    root = null
+    
     id = 0
-    lights = []
-    layers = []
+    objects = []
     
-    generateLightId()
+    serialize()
     {
-        return this._generateId(this.lights)
-    }
-    
-    generateLayerId()
-    {
-        return this._generateId(this.layers)
-    }
-    
-    _generateId(array)
-    {
-        const ids = array.filter(x => x.id).map(x => x.id)
-        return Math.max(0, ...ids) + 1
-    }
-    
-    createReference(light)
-    {
-        const reference = new Data_Lighting_Reference
-        reference.targetId = light.id
-        reference.x = light.x
-        reference.y = light.y
-        this.lights.push(reference)
-        
-        return reference
-    }
-    
-    createLight(type)
-    {
-        let light
-        
-        switch (type)
-        {
-            case Data_Lighting_AmbientLight.type:
-                light = new Data_Lighting_AmbientLight
-                break
-            
-            case Data_Lighting_PointLight.type:
-                light = new Data_Lighting_PointLight
-                break
-            
-            case Data_Lighting_SpotLight.type:
-                light = new Data_Lighting_SpotLight
-                break
-            
-            default:
-                light = null
-                break
+        return {
+            id: this.id,
+            objects: this.objects.map(x => x.serialize())
         }
-        
-        if (light)
-        {
-            light.id = this.generateLightId()
-            this.lights.push(light)
-        }
-        
-        return light
     }
     
-    copyLight(light)
+    static deserialize(root, data)
     {
-        light = Object.assign(Object.create(Object.getPrototypeOf(light)), light)
-        
-        if (light.id)
-        {
-            light.id = this.generateLightId()
-        }
-        
-        if (light.color)
-        {
-            light.color = [...light.color]
-        }
-        
-        if (light.power)
-        {
-            light.power = [...light.power]
-        }
-        
-        this.lights.push(light)
-        
-        return light
+        const result = new Data_Lighting_Map
+        result.root = root
+        result.id = data.id
+        result.objects = [ ...data.objects.map(x => Data_Lighting_MapObject.deserialize(result, x)) ]
+        return result
     }
     
-    getLightById(id)
+    createObject(object)
     {
-        return this._getById(this.lights, id)
+        object = object.id ? object : this.root.createObject(object)
+        object.root = this.root
+        
+        const mapObject = new Data_Lighting_MapObject
+        mapObject.map = this
+        mapObject.id = this.root.generateMapObjectId()
+        mapObject.objectId = object.id
+        
+        this.objects.push(mapObject)
+        
+        return mapObject
     }
     
-    getLightByType(type)
+    getMapObjectsOfType(type)
     {
-        return this.lights.find(x => x.type == type)
-    }
-    
-    createLayer()
-    {
-        const layer = new Data_Lighting_Layer
-        
-        const mapInfo = LightingUtils.getMapInfo()
-        
-        layer.id = this.generateLayerId()
-        layer.init(mapInfo.width, mapInfo.height)
-        
-        this.layers.push(layer)
-        
-        return layer
-    }
-    
-    getLayerById(id)
-    {
-        return this._getById(this.layers, id)
-    }
-    
-    _getById(array, id)
-    {
-        return array.find(x => x.id == id)
+        return this.objects.filter(x => x.object instanceof type)
     }
 }

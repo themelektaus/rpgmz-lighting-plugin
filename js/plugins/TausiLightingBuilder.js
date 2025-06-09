@@ -42,6 +42,93 @@
         `tausi-lighting/showdown.min.js`
     ]
     
+    const commands = [
+        {
+            name: `interpolate`,
+            text: `Interpolate`,
+            desc: ``,
+            args: [
+                {
+                    name: `objects`,
+                    text: `Objects`,
+                    type: `struct<interpolationObjects>[]`,
+                    value: []
+                },
+                {
+                    name: `duration`,
+                    text: `Duration`,
+                    type: `number`,
+                    value: 60
+                },
+                {
+                    name: `wait`,
+                    text: `Wait`,
+                    type: `boolean`,
+                    value: true
+                }
+            ]
+        }
+    ]
+    
+    const structs = [
+        {
+            name: `interpolationObjects`,
+            params: [
+                {
+                    name: `target`,
+                    text: `Target`,
+                    type: `text`,
+                    value: ``
+                },
+                {
+                    name: `property`,
+                    text: `Property`,
+                    type: `combo`,
+                    options: [
+                        `Enabled`,
+                        `X`,
+                        `Y`,
+                        `Follow Event ID`,
+                        `Light: Color (R)`,
+                        `Light: Color (G)`,
+                        `Light: Color (B)`,
+                        `Light: Color (A)`,
+                        `Ambient Light: Weight`,
+                        `Ambient Light: Exposure`,
+                        `Ambient Light: Saturation`,
+                        `Ambient Light: Power (R)`,
+                        `Ambient Light: Power (G)`,
+                        `Ambient Light: Power (B)`,
+                        `Ambient Light: Power (A)`,
+                        `Point/Spot Light: Intensity`,
+                        `Point Light: Radius`,
+                        `Point Light: Smoothness`,
+                        `Point Light: Flicker Strength`,
+                        `Point Light: Flicker Speed`,
+                        `Spot Light: Width`,
+                        `Spot Light: Spread`,
+                        `Spot Light: Spread Fade`,
+                        `Spot Light: Direction`,
+                        `Spot Light: Distance`,
+                        `Spot Light: Distance Fade In`,
+                        `Spot Light: Distance Fade Out`,
+                        `Layer: Filter Mode`,
+                        `Layer: Blend Mode`,
+                        `Layer: Opacity`,
+                        `Layer: Power`
+                    ],
+                    value: `Enabled`
+                },
+                {
+                    name: `to`,
+                    text: `Value`,
+                    type: `number`,
+                    value: 0
+                }
+            ]
+        }
+    ]
+    
     let build = ""
     build += "//=============================================================================\n"
     build += "// RPG Maker MZ - Tausi Lighting\n"
@@ -72,9 +159,57 @@
     build += " * @type text\n"
     build += " * @default " + remotePluginUrl + "\n"
     build += " *\n"
+    for (const command of commands)
+    {
+        build += " * @command " + command.name + "\n"
+        build += " * @text " + command.text + "\n"
+        if (command.desc)
+        {
+            build += " * @desc " + command.desc + "\n"
+        }
+        build += " *\n"
+        for (const arg of command.args)
+        {
+            build += " * @arg " + arg.name + "\n"
+            build += " * @text " + arg.text + "\n"
+            if (arg.desc)
+            {
+                build += " * @desc " + arg.desc + "\n"
+            }
+            build += " * @type " + arg.type + "\n"
+            build += " * @default " + JSON.stringify(arg.value).replace(/^\"|\"$/g, ``) + "\n"
+            build += " *\n"
+        }
+    }
     build += " * @help Simple Lighting System with a WYSIWYG-Editor\n"
     build += " *\n"
     build += " */\n"
+    for (const struct of structs)
+    {
+        build += "{\n"
+        build += "\n"
+        build += "/*" + atob(`fg==`) + "struct" + atob(`fg==`) + struct.name + atob(`Og==`) + "\n"
+        build += "\n"
+        for (const param of struct.params)
+        {
+            build += "@param " + param.name + "\n"
+            build += "@text " + param.text + "\n"
+            if (param.desc)
+            {
+                build += "@desc " + param.desc + "\n"
+            }
+            build += "@type " + param.type + "\n"
+            for (const option of param.options ?? [])
+            {
+                build += "@option " + option + "\n"
+            }
+            build += "@default " + JSON.stringify(param.value).replace(/^\"|\"$/g, ``) + "\n"
+            build += "\n"
+        }
+        build += "*/\n"
+        build += "\n"
+        build += "}\n"
+    }
     build += "\n"
     build += "TAUSI_LIGHTING_LOCAL_VERSION = \"" + localVersion + "\";\n"
     build += "TAUSI_LIGHTING_README = \"" + btoa(fs.readFileSync(`README.md`, `utf8`)) + "\";\n"
@@ -124,7 +259,7 @@
     build += "        \n"
     build += "        if (!fs.existsSync(`data/Lighting.json`))\n"
     build += "        {\n"
-    build += "            fs.writeFileSync(`data/Lighting.json`, `{\"version\":1,\"maps\":[]}`)\n"
+    build += "            fs.writeFileSync(`data/Lighting.json`, `{\"version\":2,\"objects\":[],\"maps\":[]}`)\n"
     build += "        }\n"
     build += "        \n"
     build += "        unpackFolder(\n"

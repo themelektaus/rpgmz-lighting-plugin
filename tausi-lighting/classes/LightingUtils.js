@@ -28,7 +28,7 @@ LightingUtils.preloadBitmaps = function()
 {
     let loaded = 0
     
-    const names = [ `map.svg`, `link.svg`, `globelight.svg`, `light.svg` ]
+    const names = [ `map.svg`, `globelight.svg`, `light.svg` ]
     
     return new Promise(resolve =>
     {
@@ -143,16 +143,59 @@ LightingUtils.colorToHex = function(x)
     return x.toString(16).padStart(2, '0')
 }
 
+LightingUtils.get = function(object, property)
+{
+    let value
+    
+    if (property.endsWith(`]`))
+    {
+        const array = property.split(`[`, 2)[0]
+        const index = Number(property.split(`[`, 2)[1].split(`]`)[0])
+        value = object[array][index]
+    }
+    else
+    {
+        value = object[property]
+    }
+    
+    return value
+}
+
+LightingUtils.set = function(object, property, value)
+{
+    value = Number(value || 0)
+    value = typeof LightingUtils.get(object, property) == `boolean` ? !!value : value
+    
+    if (property.endsWith(`]`))
+    {
+        const array = property.split(`[`, 2)[0]
+        const index = Number(property.split(`[`, 2)[1].split(`]`)[0])
+        object[array][index] = value
+    }
+    else
+    {
+        object[property] = value 
+    }
+}
+
 LightingUtils.createField = function($_properties, _default, property, options)
 {
     const $field = document.createElement(`div`)
     $field.classList.add(`field`)
     
+    const label = options?.label ?? (
+        property.endsWith(`()`)
+            ? property.substring(0, property.length - 2)
+            : property
+    )
+    
     const $label = document.createElement(`label`)
-    $label.innerHTML = options?.label ?? property
+    $label.innerHTML = label
     $field.appendChild($label)
     
-    const value = this[property]
+    const value = property.endsWith(`()`)
+        ? this[property.substring(0, property.length - 2)].apply(this)
+        : this[property]
     
     let $input
     
@@ -161,9 +204,28 @@ LightingUtils.createField = function($_properties, _default, property, options)
     $reset.style.alignSelf = `flex-start`
     $reset.style.backgroundImage = `url(${LightingUtils.getResUrl(`power.svg`)})`
     
+    const $code = document.createElement(`button`)
+    $code.classList.add(`no-text`)
+    $code.style.alignSelf = `flex-start`
+    $code.style.backgroundImage = `url(${LightingUtils.getResUrl(`code.svg`)})`
+    
+    const $codeInfo = document.createElement(`div`)
+    $codeInfo.classList.add(`codeInfo`)
+    $codeInfo.innerHTML = `Copied to Clipboard`
+    
+    $code.addEventListener(`click`, async () =>
+    {
+        $code.disabled = true
+        await navigator.clipboard.writeText(this.generateScriptCommand(property.endsWith(`()`) ? null : property))
+        $codeInfo.classList.add(`visible`)
+        await new Promise(x => setTimeout(x, 2000))
+        $codeInfo.classList.remove(`visible`)
+        $code.disabled = false
+    })
+    
     const invalidate = () => SceneManager._scene?.invalidate?.call(SceneManager._scene)
     
-    switch (options.type)
+    switch (options?.type)
     {
         case `toggle`:
             const $inputContainer = document.createElement(`div`)
@@ -349,6 +411,7 @@ LightingUtils.createField = function($_properties, _default, property, options)
         
         default:
             $input = document.createElement(`input`)
+            $input.type = `text`
             $input.value = value
             $input.readOnly = true
             $field.appendChild($input)
@@ -356,14 +419,24 @@ LightingUtils.createField = function($_properties, _default, property, options)
         
     }
     
-    $field.appendChild($reset)
+    const $buttons = document.createElement(`div`)
+    $buttons.classList.add(`buttons`)
+    $field.appendChild($buttons)
     
-    if (!_default)
+    if (this.generateScriptCommand)
     {
-        $reset.style.visibility = `hidden`
+        $buttons.appendChild($code)
+        $buttons.appendChild($codeInfo)
+    }
+    
+    if (_default)
+    {
+        $buttons.appendChild($reset)
     }
     
     $_properties.appendChild($field)
+    
+    return $field
 }
 
 LightingUtils.dump = function()
@@ -384,7 +457,7 @@ LightingUtils.dump = function()
         return false
     }
     
-    const data = JSON.parse(JSON.stringify($dataLighting))
+    const data = $dataLighting.serialize()
     
     this.history ??= []
     this.historyIndex = (this.historyIndex ?? -1) + 1
@@ -439,9 +512,7 @@ LightingUtils.restore = function(validation, index)
     
     if (!validation)
     {
-        const data = this.history[index]
-        
-        $dataLighting = Data_Lighting.load(JSON.parse(JSON.stringify(data)))
+        $dataLighting = Data_Lighting.deserialize(this.history[index])
         
         this.historyIndex = index
         

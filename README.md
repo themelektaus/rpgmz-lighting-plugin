@@ -28,18 +28,21 @@ Yet another **Lighting System** with an **integrated WYSIWYG editor** for RPG Ma
 - Press and hold the right mouse button to use the eraser
 - Press and hold the middle mouse button for panning
 
-## Plugin Commands / Script Calls
-Currently, there aren't any.
+## Plugin Commands
+- ```Interpolate```
 
 ## Known Issues
 - Slightly poorer quality when painting during overlay mode
-- ~~Missing undo function~~
+- <del>Missing undo function</del>
 
 ## Terms and Credits
 - Can be used in commercial games
 - No credits needed
 
 ## Changelog
+
+### v0.1.5
+- Plugin Command ```Interpolate```
 
 ### v0.1.3
 - Undo/Redo

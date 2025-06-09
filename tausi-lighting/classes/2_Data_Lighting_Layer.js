@@ -1,4 +1,4 @@
-class Data_Lighting_Layer extends Data_Lighting_Instance
+class Data_Lighting_Layer extends Data_Lighting_Object
 {
     width = 0
     height = 0
@@ -11,6 +11,40 @@ class Data_Lighting_Layer extends Data_Lighting_Instance
     blendMode = 0
     opacity = 255
     power = 100
+    
+    serialize()
+    {
+        const data = super.serialize()
+        data.width = this.width
+        data.height = this.height
+        data.url = this.url
+        data.urlContent = this.urlContent
+        data.urlContentHash = this.urlContentHash
+        data.scale = this.scale
+        data.filterMode = this.filterMode
+        data.blendMode = this.blendMode
+        data.opacity = this.opacity
+        data.power = this.power
+        return data
+    }
+    
+    static deserialize(root, data)
+    {
+        const result = new Data_Lighting_Layer
+        result.width = data.width
+        result.height = data.height
+        result.url = data.url
+        result.urlContent = data.urlContent
+        result.urlContentHash = data.urlContentHash
+        result.scale = data.scale
+        result.filterMode = data.filterMode
+        result.blendMode = data.blendMode
+        result.opacity = data.opacity
+        result.power = data.power
+        const layer = Object.assign(result, Data_Lighting_Object.deserialize(root, data))
+        layer.loadUrlContent()
+        return layer
+    }
     
     createPropertiesEditor($_properties)
     {
@@ -43,12 +77,13 @@ class Data_Lighting_Layer extends Data_Lighting_Instance
         this.createField($_properties, _default, `power`, { type: `slider`, max: 1000 })
     }
     
-    init(width, height)
+    onCreate()
     {
-        this.width = width
-        this.height = height
+        const mapInfo = LightingUtils.getMapInfo()
+        this.width = mapInfo.width
+        this.height = mapInfo.height
         this.url = `data/tausi-lighting-layers/${$gameMap.mapId()}-${this.id}.png`
-        this.setUrlContent(new Bitmap(width * this.scale, height * this.scale))
+        this.setUrlContent(new Bitmap(this.width * this.scale, this.height * this.scale))
     }
     
     setUrlContent(bitmap)

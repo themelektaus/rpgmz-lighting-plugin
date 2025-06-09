@@ -1,15 +1,40 @@
 class Data_Lighting_PointLight extends Data_Lighting_Light
 {
-    static type = 2
+    static shaderType = 2
     
-    type = Data_Lighting_PointLight.type
-    color = [ 255, 255, 255, 255 ]
     intensity = 10
     radius = 300
     smoothness = 100
     flickerStrength = 0
     flickerSpeed = 10
-    followEventId = 0
+    
+    constructor()
+    {
+        super()
+        this.color = [ 255, 255, 255, 255 ]
+    }
+    
+    serialize()
+    {
+        const data = super.serialize()
+        data.intensity = this.intensity
+        data.radius = this.radius
+        data.smoothness = this.smoothness
+        data.flickerStrength = this.flickerStrength
+        data.flickerSpeed = this.flickerSpeed
+        return data
+    }
+    
+    static deserialize(root, data)
+    {
+        const result = new Data_Lighting_PointLight
+        result.intensity = data.intensity
+        result.radius = data.radius
+        result.smoothness = data.smoothness
+        result.flickerStrength = data.flickerStrength
+        result.flickerSpeed = data.flickerSpeed
+        return Object.assign(result, Data_Lighting_Light.deserialize(root, data))
+    }
     
     createPropertiesEditor($_properties)
     {
@@ -23,6 +48,5 @@ class Data_Lighting_PointLight extends Data_Lighting_Light
         this.createField($_properties, _default, `smoothness`, { type: `slider`, max: 2000 })
         this.createField($_properties, _default, `flickerStrength`, { type: `slider`, max: 200 })
         this.createField($_properties, _default, `flickerSpeed`, { type: `slider`, max: 200 })
-        this.createField($_properties, null, `followEventId`, { type: `number`, min: 0 })
     }
 }

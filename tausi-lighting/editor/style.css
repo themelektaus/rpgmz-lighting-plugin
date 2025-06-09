@@ -3,6 +3,11 @@
     src: url(res/inter.ttf);
 }
 
+@font-face {
+    font-family: MonoFont;
+    src: url(res/dejavu.ttf);
+}
+
 ::-webkit-scrollbar { width: .375em; height: .375em; }
 ::-webkit-scrollbar-track { background-color: #0009; }
 ::-webkit-scrollbar-corner { background-color: #0009; }
@@ -23,6 +28,10 @@ body, button, input, select {
     color: white;
     font-size: 14px;
     line-height: 1;
+}
+
+.mono {
+    font-family: MonoFont;
 }
 
 button, input, select {
@@ -103,7 +112,9 @@ input, select {
     border-radius: .25em;
 }
 
-input[type="number"], select {
+input[type="text"],
+input[type="number"],
+select {
     background-color: #fff2;
     outline: none;
     border: none;
@@ -333,6 +344,28 @@ video {
     flex-direction: column;
     gap: .25em;
     overflow: hidden;
+}
+
+.field .buttons {
+    display: flex;
+    flex-direction: column;
+    gap: .5em;
+}
+
+.field .buttons .codeInfo {
+    position: absolute;
+    transform: translate(calc(-100% - .375em), -.5em);
+    padding: .5em;
+    background-color: #111;
+    border-radius: .5em;
+    opacity: 0;
+    pointer-events: none;
+    transition: .1s;
+}
+
+.field .buttons .codeInfo.visible {
+    opacity: 1;
+    transform: translate(calc(-100% - .375em), -.25em);
 }
 
 #overlay {

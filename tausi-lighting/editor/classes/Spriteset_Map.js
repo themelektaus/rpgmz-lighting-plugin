@@ -6,7 +6,7 @@ Spriteset_Map.prototype.update = function()
     if (LightingUtils._lightsNeedRefresh)
     {
         LightingUtils._lightsNeedRefresh = false
-        this.refreshLightSprites()
+        this.refreshMapObjectSprites()
         this.refreshCursorSprites()
         this.update()
     }
@@ -28,7 +28,7 @@ Spriteset_Map.prototype.update = function()
 Spriteset_Map.prototype.updateLayers = function()
 {
     const a = (this._layerSprites ?? []).map(x => [ x.layer.id, x.filterMode ])
-    const b = this.getMapLayers().map(x => [ x.id, x.filterMode ])
+    const b = this.getLayerMapObjects().map(x => [ x.object.id, x.object.filterMode ])
     
     if (JSON.stringify(a) != JSON.stringify(b))
     {
@@ -39,41 +39,36 @@ Spriteset_Map.prototype.updateLayers = function()
     return true
 }
 
-Spriteset_Map.prototype.refreshLightSprites = function()
+Spriteset_Map.prototype.refreshMapObjectSprites = function()
 {
-    for (const sprite of this._lightSprites ?? [])
+    for (const sprite of this._mapObjectSprites ?? [])
     {
         this.removeChild(sprite)
         sprite.destroy()
     }
     
-    this._lightSprites = []
+    this._mapObjectSprites = []
     
     const mapId = $gameMap.mapId()
     const map = $dataLighting.getMap(mapId)
     
-    for (const light of map.lights ?? [])
+    for (const mapObject of map.objects)
     {
-        this._lightSprites.push(new Sprite_Light(light))
-    }
-    
-    for (const layer of map.layers ?? [])
-    {
-        this._lightSprites.push(new Sprite_Light(layer))
+        this._mapObjectSprites.push(new Sprite_MapObject(mapObject))
     }
     
     const mapInfo = LightingUtils.getMapInfo()
     
-    for (const sprite of this._lightSprites)
+    for (const sprite of this._mapObjectSprites)
     {
-        sprite.light.x = Math.min(Math.max(0, sprite.light.x), mapInfo.width)
-        sprite.light.y = Math.min(Math.max(0, sprite.light.y), mapInfo.height)
+        sprite.mapObject.x = Math.min(Math.max(0, sprite.mapObject.x), mapInfo.width)
+        sprite.mapObject.y = Math.min(Math.max(0, sprite.mapObject.y), mapInfo.height)
         
         sprite.onPress = () =>
         {
             if (LightingUtils.getActiveTool() == `select`)
             {
-                LightingUtils.setSelectedMapObject(sprite.light, { stick: true })
+                LightingUtils.setSelectedMapObject(sprite.mapObject, { stick: true })
             }
         }
         
@@ -132,7 +127,7 @@ Spriteset_Map.prototype.updateLayerPainting = function()
         return
     }
     
-    const sprite = (this._layerSprites ?? []).find(x => x.layer == mapObject)
+    const sprite = (this._layerSprites ?? []).find(x => x.layer == mapObject.object)
     if (!sprite)
     {
         this._radiusSprite.visible = false

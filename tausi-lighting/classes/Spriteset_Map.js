@@ -18,11 +18,12 @@ Spriteset_Map.prototype.update = function()
     }
 }
 
-Spriteset_Map.prototype.getMapLayers = function()
+Spriteset_Map.prototype.getLayerMapObjects = function()
 {
-    const layers = [...$dataLighting.getMap($gameMap.mapId())?.layers ?? []]
-    layers.sort((a, b) => a.y - b.y)
-    return layers
+    const map = $dataLighting.getMap($gameMap.mapId())
+    const mapObjects = [ ...(map.getMapObjectsOfType(Data_Lighting_Layer)) ]
+    mapObjects.sort((a, b) => a.y - b.y)
+    return mapObjects
 }
 
 Spriteset_Map.prototype.refreshLayers = function()
@@ -36,10 +37,12 @@ Spriteset_Map.prototype.refreshLayers = function()
     
     this._layerSprites = []
     
-    for (const layer of this.getMapLayers())
+    for (const mapObject of this.getLayerMapObjects())
     {
         const sprite = new Sprite
+        sprite.mapObject = mapObject
         
+        const layer = mapObject.object
         sprite.layer = layer
         sprite.filterMode = layer.filterMode
         sprite.bitmap = Bitmap.load(
@@ -76,7 +79,7 @@ Spriteset_Map.prototype.updateLayers = function()
 
 Spriteset_Map.prototype.updateLayer = function(sprite)
 {
-    sprite.visible = sprite.layer.enabled && sprite.layer.filterMode == 0
+    sprite.visible = sprite.mapObject.enabled && sprite.layer.filterMode == 0
     
     if (sprite.visible)
     {

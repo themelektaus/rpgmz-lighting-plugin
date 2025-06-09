@@ -1,4 +1,4 @@
-[B][SIZE=22px]Tausi Lighting[/SIZE][/B] - v0.1.3
+[B][SIZE=22px]Tausi Lighting[/SIZE][/B] - v0.1.5
 
 Author: [URL='https://github.com/themelektaus']themelektaus[/URL]
 Source: [URL='https://github.com/themelektaus/rpgmz-lighting-plugin']github.com/themelektaus/rpgmz-lighting-plugin[/URL]
@@ -40,10 +40,10 @@ Yet another [B]Lighting System[/B] with an integrated [B]WYSIWYG editor[/B] for 
 [*]Press and hold the middle mouse button for panning
 [/LIST]
 
-[B][SIZE=18px]Plugin Commands / Script Calls[/SIZE][/B]
-
-Currently, there aren't any.
-
+[B][SIZE=18px]Plugin Commands[/SIZE][/B]
+[LIST]
+[*][FONT=Courier New][B]Interpolate[/B][/FONT]
+[/LIST]
 
 [B][SIZE=18px]Known Issues[/SIZE][/B]
 [LIST]
@@ -59,6 +59,11 @@ Currently, there aren't any.
 
 
 [B][SIZE=18px]Changelog[/SIZE][/B]
+
+[B]v0.1.5[/B]
+[LIST]
+[*]Plugin Command [FONT=Courier New][B]Interpolate[/B][/FONT]
+[/LIST]
 
 [B]v0.1.3[/B]
 [LIST]

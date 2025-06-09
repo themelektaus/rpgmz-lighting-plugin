@@ -240,23 +240,6 @@ Scene_LightingEditor.prototype.setActiveTool = function(tool)
     $_tools.querySelector(`[data-action="setTool_${tool}"]`).classList.add(`active`)
 }
 
-Scene_LightingEditor.prototype.selectReferenceLight = function(validation)
-{
-    const targetId = this.selectedMapObject?.targetId
-    
-    if (targetId)
-    {
-        if (!validation)
-        {
-            this.setSelectedMapObject(this.getMap().getLightById(targetId))
-        }
-        
-        return true
-    }
-    
-    return false
-}
-
 Scene_LightingEditor.prototype.add = function(validation)
 {
     const map = this.getMap()
@@ -293,59 +276,25 @@ Scene_LightingEditor.prototype.add = function(validation)
 
 Scene_LightingEditor.prototype.addAmbientLight = function(validation)
 {
-    return this.addLight(Data_Lighting_AmbientLight.type, validation)
+    return this._add(Data_Lighting_AmbientLight, validation)
 }
 
 Scene_LightingEditor.prototype.addPointLight = function(validation)
 {
-    return this.addLight(Data_Lighting_PointLight.type, validation)
+    return this._add(Data_Lighting_PointLight, validation)
 }
 
 Scene_LightingEditor.prototype.addSpotLight = function(validation)
 {
-    return this.addLight(Data_Lighting_SpotLight.type, validation)
-}
-
-Scene_LightingEditor.prototype.addLight = function(type, validation)
-{
-    const map = this.getMap()
-    if (!map)
-    {
-        return validation ? false : null
-    }
-    
-    if (validation)
-    {
-        return type == Data_Lighting_AmbientLight.type
-            || type == Data_Lighting_PointLight.type
-            || type == Data_Lighting_SpotLight.type
-    }
-    
-    let light
-    
-    if (type == Data_Lighting_AmbientLight.type)
-    {
-        light = map.getLightByType(type)
-        
-        if (light)
-        {
-            this.setSelectedMapObject(light)
-            return light
-        }
-    }
-    
-    light = map.createLight(type)
-    
-    if (light)
-    {
-        this.setSelectedMapObject(light, { stick: true })
-        LightingUtils.refresh()
-    }
-    
-    return light
+    return this._add(Data_Lighting_SpotLight, validation)
 }
 
 Scene_LightingEditor.prototype.addLayer = function(validation)
+{
+    return this._add(Data_Lighting_Layer, validation)
+}
+
+Scene_LightingEditor.prototype._add = function(type, validation)
 {
     const map = this.getMap()
     if (!map)
@@ -358,13 +307,24 @@ Scene_LightingEditor.prototype.addLayer = function(validation)
         return true
     }
     
-    const layer = map.createLayer()
+    if (type == Data_Lighting_AmbientLight)
+    {
+        const mapObjects = map.getMapObjectsOfType(type)
+        
+        if (mapObjects.length)
+        {
+            this.setSelectedMapObject(mapObjects[0])
+            return mapObjects[0]
+        }
+    }
     
-    this.setSelectedMapObject(layer, { stick: true })
+    const mapObject = map.createObject(type)
+    
+    this.setSelectedMapObject(mapObject, { stick: true })
     
     LightingUtils.refresh()
     
-    return layer
+    return mapObject
 }
 
 Scene_LightingEditor.prototype.cloneSelectedLight = function(validation)
@@ -374,26 +334,27 @@ Scene_LightingEditor.prototype.cloneSelectedLight = function(validation)
         return false
     }
     
-    if (this.selectedMapObject instanceof Data_Lighting_Layer)
+    if (!this.selectedMapObject.object)
     {
         return false
     }
     
-    if (this.selectedMapObject.type == Data_Lighting_AmbientLight.type)
+    if (this.selectedMapObject.object instanceof Data_Lighting_AmbientLight)
     {
         return false
     }
     
-    if (this.selectedMapObject.targetId)
+    if (this.selectedMapObject.object instanceof Data_Lighting_Layer)
     {
-        return this.duplicateSelectedLight(validation)
+        return false
     }
     
     if (!validation)
     {
-        const reference = this.getMap().createReference(this.selectedMapObject)
+        const map = this.getMap()
+        const mapObject = map.createObject(this.selectedMapObject.object)
         
-        this.setSelectedMapObject(reference, { stick: true })
+        this.setSelectedMapObject(mapObject, { stick: true })
         
         LightingUtils.refresh()
     }
@@ -408,21 +369,27 @@ Scene_LightingEditor.prototype.duplicateSelectedLight = function(validation)
         return false
     }
     
-    if (this.selectedMapObject instanceof Data_Lighting_Layer)
+    if (!this.selectedMapObject.object)
     {
         return false
     }
     
-    if (this.selectedMapObject.type == Data_Lighting_AmbientLight.type)
+    if (this.selectedMapObject.object instanceof Data_Lighting_AmbientLight)
+    {
+        return false
+    }
+    
+    if (this.selectedMapObject.object instanceof Data_Lighting_Layer)
     {
         return false
     }
     
     if (!validation)
     {
-        const light = this.getMap().copyLight(this.selectedMapObject)
+        const map = this.getMap()
+        const mapObject = map.createObject(map.root.copyObject(this.selectedMapObject.object))
         
-        this.setSelectedMapObject(light, { stick: true })
+        this.setSelectedMapObject(mapObject, { stick: true })
         
         LightingUtils.refresh()
     }
@@ -444,24 +411,9 @@ Scene_LightingEditor.prototype.removeSelectedLight = function(validation)
     
     const map = this.getMap()
     
-    if (this.selectedMapObject instanceof Data_Lighting_Layer)
-    {
-        map.layers = map.layers.filter(x => x != this.selectedMapObject)
-        LightingUtils.dump()
-    }
-    else
-    {
-        if (this.selectedMapObject.id)
-        {
-            map.lights = map.lights.filter(x => !(x.id == this.selectedMapObject.id || x.targetId == this.selectedMapObject.id))
-            LightingUtils.dump()
-        }
-        else
-        {
-            map.lights = map.lights.filter(x => x != this.selectedMapObject)
-            LightingUtils.dump()
-        }
-    }
+    map.objects = map.objects.filter(x => x != this.selectedMapObject)
+    
+    LightingUtils.dump()
     
     this.setSelectedMapObject(null)
     
@@ -517,47 +469,14 @@ Scene_LightingEditor.prototype.reselectMapObject = function(tool)
         return
     }
     
-    if (this.selectedMapObject instanceof Data_Lighting_Reference)
-    {
-        const light = this.getMap().lights.find(x => x.targetId == this.selectedMapObject.targetId)
-        if (light)
-        {
-            this.setSelectedMapObject(light)
-        }
-        else
-        {
-            this.setSelectedMapObject(null)
-        }
-        return
-    }
+    const mapObject = this.getMap().objects
+        .find(x => x.objectId == this.selectedMapObject.objectId)
     
-    if (this.selectedMapObject instanceof Data_Lighting_Light)
-    {
-        const light = this.getMap().lights.find(x => x.id == this.selectedMapObject.id)
-        if (light)
-        {
-            this.setSelectedMapObject(light)
-        }
-        else
-        {
-            this.setSelectedMapObject(null)
-        }
-        return
-    }
+    this.setSelectedMapObject(mapObject)
     
-    if (this.selectedMapObject instanceof Data_Lighting_Layer)
+    if (mapObject && mapObject.object instanceof Data_Lighting_Layer)
     {
-        const layer = this.getMap().layers.find(x => x.id == this.selectedMapObject.id)
-        if (layer)
-        {
-            this.setSelectedMapObject(layer)
-            this.setActiveTool(tool)
-        }
-        else
-        {
-            this.setSelectedMapObject(null)
-        }
-        return
+        this.setActiveTool(tool)
     }
 }
 
@@ -568,16 +487,20 @@ Scene_LightingEditor.prototype.save = function(validation)
         return false
     }
     
-    const data = JSON.parse(JSON.stringify($dataLighting))
+    const fs = require(`fs`)
+    
+    const data = $dataLighting.serialize()
+    
     for (const map of data.maps)
     {
-        for (const layer of map.layers)
+        for (const mapObject of map.objects)
         {
-            delete layer.urlContent
+            if (mapObject.object instanceof Data_Lighting_Layer)
+            {
+                delete mapObject.object.urlContent
+            }
         }
     }
-    
-    const fs = require(`fs`)
     
     const a = fs.readFileSync(`data/Lighting.json`, `utf8`)
     const b = JSON.stringify(data)
@@ -593,9 +516,12 @@ Scene_LightingEditor.prototype.save = function(validation)
         
         for (const map of $dataLighting.maps)
         {
-            for (const layer of map.layers)
+            for (const mapObject of map.objects)
             {
-                Data_Lighting_Layer.saveUrlContent(layer.url, layer.urlContent)
+                if (mapObject.object instanceof Data_Lighting_Layer)
+                {
+                    Data_Lighting_Layer.saveUrlContent(mapObject.object.url, mapObject.object.urlContent)
+                }
             }
         }
         
@@ -679,7 +605,7 @@ Scene_LightingEditor.prototype.setTool_select = function(validation)
 
 Scene_LightingEditor.prototype.setTool_paint = function(validation)
 {
-    if (this.selectedMapObject instanceof Data_Lighting_Layer)
+    if (this.selectedMapObject?.object instanceof Data_Lighting_Layer)
     {
         if (!validation)
         {
@@ -694,7 +620,7 @@ Scene_LightingEditor.prototype.setTool_paint = function(validation)
 
 Scene_LightingEditor.prototype.setTool_erase = function(validation)
 {
-    if (this.selectedMapObject instanceof Data_Lighting_Layer)
+    if (this.selectedMapObject?.object instanceof Data_Lighting_Layer)
     {
         if (!validation)
         {
