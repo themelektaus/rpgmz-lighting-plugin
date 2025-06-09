@@ -225,6 +225,8 @@ LightingUtils.createField = function($_properties, _default, property, options)
     
     const invalidate = () => SceneManager._scene?.invalidate?.call(SceneManager._scene)
     
+    const dump = options?.dump ?? false
+    
     switch (options?.type)
     {
         case `toggle`:
@@ -238,7 +240,10 @@ LightingUtils.createField = function($_properties, _default, property, options)
                 if (this[property] != $input.checked)
                 {
                     this[property] = $input.checked
-                    LightingUtils.dump()
+                    if (dump)
+                    {
+                        LightingUtils.dump()
+                    }
                     invalidate()
                 }
             })
@@ -264,11 +269,14 @@ LightingUtils.createField = function($_properties, _default, property, options)
                 this[property] = Number($input.value || 0)
                 invalidate()
             })
-            $input.addEventListener(`change`, () =>
+            if (dump)
             {
-                LightingUtils.dump()
-                invalidate()
-            })
+                $input.addEventListener(`change`, () =>
+                {
+                    LightingUtils.dump()
+                    invalidate()
+                })
+            }
             $field.appendChild($input)
             $reset.addEventListener(`click`, () =>
             {
@@ -312,7 +320,10 @@ LightingUtils.createField = function($_properties, _default, property, options)
                 if (this[property] != Number($select.value || 0))
                 {
                     this[property] = Number($select.value || 0)
-                    LightingUtils.dump()
+                    if (dump)
+                    {
+                        LightingUtils.dump()
+                    }
                     invalidate()
                 }
             })
@@ -340,11 +351,14 @@ LightingUtils.createField = function($_properties, _default, property, options)
                 this[property] = Number($input.value || 0)
                 invalidate()
             })
-            $input.addEventListener(`change`, () =>
+            if (dump)
             {
-                LightingUtils.dump()
-                invalidate()
-            })
+                $input.addEventListener(`change`, () =>
+                {
+                    LightingUtils.dump()
+                    invalidate()
+                })
+            }
             $field.appendChild($input)
             $reset.addEventListener(`click`, () =>
             {
@@ -392,11 +406,14 @@ LightingUtils.createField = function($_properties, _default, property, options)
                     this[property][_i] = Number($.value || 0)
                     invalidate()
                 })
-                $.addEventListener(`change`, () =>
+                if (dump)
                 {
-                    LightingUtils.dump()
-                    invalidate()
-                })
+                    $.addEventListener(`change`, () =>
+                    {
+                        LightingUtils.dump()
+                        invalidate()
+                    })
+                }
                 $input.appendChild($)
                 $reset.addEventListener(`click`, () =>
                 {

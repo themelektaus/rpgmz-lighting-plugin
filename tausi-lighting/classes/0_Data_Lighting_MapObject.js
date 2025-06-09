@@ -66,9 +66,10 @@ class Data_Lighting_MapObject
         }
     }
     
-    createField()
+    createField($_properties, _default, property, options)
     {
-        return LightingUtils.createField.apply(this, arguments)
+        options.dump ??= true
+        return LightingUtils.createField.call(this, $_properties, _default, property, options)
     }
     
     createPropertiesEditor($_properties)
