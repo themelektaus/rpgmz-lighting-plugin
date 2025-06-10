@@ -93,4 +93,11 @@ class Data_Lighting_MapObject
             ? `${result}.set("${property}", ${JSON.stringify(this.get(property))})`
             : result
     }
+    
+    editorMove(x, y)
+    {
+        const mapInfo = LightingUtils.getMapInfo()
+        this.x = x + mapInfo.offsetX
+        this.y = y + mapInfo.offsetY
+    }
 }

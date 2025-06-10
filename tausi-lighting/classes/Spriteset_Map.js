@@ -22,7 +22,14 @@ Spriteset_Map.prototype.getLayerMapObjects = function()
 {
     const map = $dataLighting.getMap($gameMap.mapId())
     const mapObjects = [ ...(map.getMapObjectsOfType(Data_Lighting_Layer)) ]
-    mapObjects.sort((a, b) => a.y - b.y)
+    //if (mapObjects.some(x => x.object?.invertedOrder ?? false))
+    //{
+        mapObjects.sort((a, b) => a.y - b.y)
+    //}
+    //else
+    //{
+    //    mapObjects.sort((a, b) => b.y - a.y)
+    //}
     return mapObjects
 }
 

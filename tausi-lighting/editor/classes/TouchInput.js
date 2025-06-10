@@ -46,7 +46,17 @@ TouchInput._onMouseUp = function(event)
             LightingUtils.dump()
         }
         
-        delete this._lastMapObject
+        if (this._lastMapObject)
+        {
+            if (this._lastMapObject.createPropertiesEditor)
+            {
+                const $_properties = document.querySelector(`#properties`)
+                $_properties.innerHTML = ``
+                this._lastMapObject.createPropertiesEditor($_properties)
+            }
+            delete this._lastMapObject
+        }
+        
         delete this._lastMapObjectMoved
         
         SceneManager._scene?.invalidate?.call(SceneManager._scene)
@@ -89,10 +99,11 @@ TouchInput._onMouseMove = function(event)
     
     if (this._lastMapObject)
     {
-        const mapInfo = LightingUtils.getMapInfo()
-        this._lastMapObject.x = x + mapInfo.offsetX
-        this._lastMapObject.y = y + mapInfo.offsetY
-        this._lastMapObjectMoved = true
+        if (this._lastMapObject.editorMove)
+        {
+            this._lastMapObject.editorMove(x, y)
+            this._lastMapObjectMoved = true
+        }
     }
     
     if (this._lastPanningPosition)

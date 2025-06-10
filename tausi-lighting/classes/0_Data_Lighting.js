@@ -1,6 +1,7 @@
 class Data_Lighting
 {
     version = 2
+    //version = 3
     
     objects = []
     maps = []
@@ -232,7 +233,18 @@ class Data_Lighting
                     
                     data = _data
                     break
-                    
+                
+                //case 2:
+                //    data.version = 3
+                //    for (const object of data.objects)
+                //    {
+                //        if (object.typeName == `Data_Lighting_Layer`)
+                //        {
+                //            object.invertedOrder = true
+                //        }
+                //    }
+                //    break
+                
                 default:
                     return data
             }

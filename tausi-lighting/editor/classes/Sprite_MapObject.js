@@ -6,37 +6,50 @@ function Sprite_MapObject()
 Sprite_MapObject.prototype = Object.create(Sprite_Clickable.prototype);
 Sprite_MapObject.prototype.constructor = Sprite_MapObject;
 
-Sprite_MapObject.prototype.initialize = function(mapObject)
+Sprite_MapObject.prototype.initialize = function(reference)
 {
-    this.mapObject = mapObject
+    this.reference = reference
     
     Sprite_Clickable.prototype.initialize.call(this)
     
-    const bitmap = mapObject.object.icon
-    
-    if (bitmap)
+    if (reference.object)
     {
-        this.bitmap = ImageManager.loadBitmapFromUrl(LightingUtils.getResUrl(bitmap))
+        this.getX = () => reference.x - LightingUtils.getMapInfo().offsetX
+        this.getY = () => reference.y - LightingUtils.getMapInfo().offsetY
+        
+        const bitmap = reference.object.icon
+        if (bitmap)
+        {
+            this.bitmap = ImageManager.loadBitmapFromUrl(LightingUtils.getResUrl(bitmap))
+        }
+        
+        this.anchor.x = .5
+        this.anchor.y = .5
     }
-    
-    this.anchor.x = .5
-    this.anchor.y = .5
+    else
+    {
+        this.getX = () => reference.screenX()
+        this.getY = () => reference.screenY()
+        this.bitmap = ImageManager.loadBitmapFromUrl(LightingUtils.getResUrl(`marker.svg`))
+        this.anchor.x = .5
+        this.anchor.y = 1.25
+    }
 }
 
 Sprite_MapObject.prototype.update = function()
 {
-    const mapInfo = LightingUtils.getMapInfo()
-    this.x = this.mapObject.x - mapInfo.offsetX
-    this.y = this.mapObject.y - mapInfo.offsetY
+    this.x = this.getX()
+    this.y = this.getY()
     
     const selectedMapObject = LightingUtils.getSelectedMapObject()
-    if (selectedMapObject == this.mapObject)
+    
+    if (selectedMapObject && selectedMapObject == this.reference)
     {
         this.setColorTone([50, 50, -50, 50])
         this.scale.x = 1.25
         this.scale.y = 1.25
     }
-    else if (selectedMapObject && selectedMapObject.objectId == this.mapObject.objectId)
+    else if (selectedMapObject && selectedMapObject.objectId && selectedMapObject.objectId == this.reference.objectId)
     {
         this.setColorTone([50, 50, -50, 50])
         this.scale.x = 1

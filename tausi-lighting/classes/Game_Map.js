@@ -2,6 +2,7 @@ const TausiLighting__Game_Map__update = Game_Map.prototype.update
 Game_Map.prototype.update = function()
 {
     TausiLighting__Game_Map__update.apply(this, arguments)
+    
     this.updateLights()
 }
 

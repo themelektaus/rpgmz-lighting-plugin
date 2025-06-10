@@ -227,7 +227,10 @@ Scene_LightingEditor.prototype.setSelectedMapObject = function(mapObject, option
         return
     }
     
-    mapObject.createPropertiesEditor($_properties)
+    if (mapObject.createPropertiesEditor)
+    {
+        mapObject.createPropertiesEditor($_properties)
+    }
 }
 
 Scene_LightingEditor.prototype.setActiveTool = function(tool)
@@ -491,11 +494,19 @@ Scene_LightingEditor.prototype.save = function(validation)
     
     const data = $dataLighting.serialize()
     
+    for (const object of data.objects)
+    {
+        if (object.urlContent)
+        {
+            delete object.urlContent
+        }
+    }
+    
     for (const map of data.maps)
     {
         for (const mapObject of map.objects)
         {
-            if (mapObject.object instanceof Data_Lighting_Layer)
+            if (mapObject.object && mapObject.object.urlContent)
             {
                 delete mapObject.object.urlContent
             }

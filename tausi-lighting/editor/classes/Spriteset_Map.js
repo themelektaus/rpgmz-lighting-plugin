@@ -49,29 +49,46 @@ Spriteset_Map.prototype.refreshMapObjectSprites = function()
     
     this._mapObjectSprites = []
     
-    const mapId = $gameMap.mapId()
-    const map = $dataLighting.getMap(mapId)
-    
-    for (const mapObject of map.objects)
+    for (const event of $gameMap.events())
     {
-        this._mapObjectSprites.push(new Sprite_MapObject(mapObject))
-    }
-    
-    const mapInfo = LightingUtils.getMapInfo()
-    
-    for (const sprite of this._mapObjectSprites)
-    {
-        sprite.mapObject.x = Math.min(Math.max(0, sprite.mapObject.x), mapInfo.width)
-        sprite.mapObject.y = Math.min(Math.max(0, sprite.mapObject.y), mapInfo.height)
+        const sprite = new Sprite_MapObject(event)
         
         sprite.onPress = () =>
         {
             if (LightingUtils.getActiveTool() == `select`)
             {
-                LightingUtils.setSelectedMapObject(sprite.mapObject, { stick: true })
+                LightingUtils.setSelectedMapObject(sprite.reference, { stick: true })
             }
         }
         
+        this._mapObjectSprites.push(sprite)
+    }
+    
+    const mapId = $gameMap.mapId()
+    const map = $dataLighting.getMap(mapId)
+    
+    const mapInfo = LightingUtils.getMapInfo()
+    
+    for (const mapObject of map.objects)
+    {
+        const sprite = new Sprite_MapObject(mapObject)
+        
+        sprite.reference.x = Math.min(Math.max(0, mapObject.x), mapInfo.width)
+        sprite.reference.y = Math.min(Math.max(0, mapObject.y), mapInfo.height)
+        
+        sprite.onPress = () =>
+        {
+            if (LightingUtils.getActiveTool() == `select`)
+            {
+                LightingUtils.setSelectedMapObject(sprite.reference, { stick: true })
+            }
+        }
+        
+        this._mapObjectSprites.push(sprite)
+    }
+    
+    for (const sprite of this._mapObjectSprites)
+    {
         this.addChild(sprite)
     }
 }
