@@ -13,6 +13,11 @@ class Data_Lighting_AmbientLight extends Data_Lighting_Light
         this.color = [ 50, 50, 50, 255 ]
     }
     
+    get icon()
+    {
+        return `globelight.svg`
+    }
+    
     serialize()
     {
         const data = super.serialize()
@@ -31,6 +36,22 @@ class Data_Lighting_AmbientLight extends Data_Lighting_Light
         result.saturation = data.saturation
         result.power = [ ...data.power ]
         return Object.assign(result, Data_Lighting_Light.deserialize(root, data))
+    }
+    
+    getProperties(x)
+    {
+        const properties = super.getProperties(x)
+        properties.shaderType = this.constructor.shaderType
+        properties.weight = x.get(`weight`)
+        properties.exposure = x.get(`exposure`)
+        properties.saturation = x.get(`saturation`)
+        properties.power = [
+            x.get(`power[0]`),
+            x.get(`power[1]`),
+            x.get(`power[2]`),
+            x.get(`power[3]`)
+        ]
+        return properties
     }
     
     createPropertiesEditor($_properties)

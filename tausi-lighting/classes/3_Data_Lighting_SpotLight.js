@@ -45,6 +45,21 @@ class Data_Lighting_SpotLight extends Data_Lighting_Light
         return Object.assign(result, Data_Lighting_Light.deserialize(root, data))
     }
     
+    getProperties(x)
+    {
+        const properties = super.getProperties(x)
+        properties.shaderType = this.constructor.shaderType
+        properties.intensity = x.get(`intensity`)
+        properties.width = x.get(`width`)
+        properties.spread = x.get(`spread`)
+        properties.spreadFade = x.get(`spreadFade`)
+        properties.direction = x.get(`direction`)
+        properties.distance = x.get(`distance`)
+        properties.distanceFadeIn = x.get(`distanceFadeIn`)
+        properties.distanceFadeOut = x.get(`distanceFadeOut`)
+        return properties
+    }
+    
     createPropertiesEditor($_properties)
     {
         super.createPropertiesEditor($_properties)

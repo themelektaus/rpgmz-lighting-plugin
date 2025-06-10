@@ -75,12 +75,12 @@ LightingFilter.prototype.update = function()
             }
         }
         
-        const light = mapObject.object
+        const light = mapObject.object.getProperties(mapObject)
         
-        lightTypes.push(light.constructor.shaderType)
+        lightTypes.push(light.shaderType)
         lightColors.push(...light.color.map(x => x / 255))
         
-        switch (light.constructor.shaderType)
+        switch (light.shaderType)
         {
             case Data_Lighting_AmbientLight.shaderType:
                 lightPositions.push(0, 0)

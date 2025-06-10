@@ -41,17 +41,14 @@ Spriteset_Map.prototype.refreshLayers = function()
     {
         const sprite = new Sprite
         sprite.mapObject = mapObject
-        
-        const layer = mapObject.object
-        sprite.layer = layer
-        sprite.filterMode = layer.filterMode
+        sprite.filterMode = mapObject.get(`filterMode`)
         sprite.bitmap = Bitmap.load(
-            layer.urlContent
-                ? `data:image/png;base64,${layer.urlContent}`
-                : `${layer.url}?t=${(new Date()).getTime()}`
+            mapObject.object.urlContent
+                ? `data:image/png;base64,${mapObject.object.urlContent}`
+                : `${mapObject.object.url}?t=${(new Date()).getTime()}`
         )
-        sprite.scale.x = 1 / layer.scale
-        sprite.scale.y = 1 / layer.scale
+        sprite.scale.x = 1 / mapObject.object.scale
+        sprite.scale.y = 1 / mapObject.object.scale
         this._layerSprites.push(sprite)
     }
     
@@ -79,12 +76,12 @@ Spriteset_Map.prototype.updateLayers = function()
 
 Spriteset_Map.prototype.updateLayer = function(sprite)
 {
-    sprite.visible = sprite.mapObject.enabled && sprite.layer.filterMode == 0
+    sprite.visible = sprite.mapObject.enabled && sprite.mapObject.get(`filterMode`) == 0
     
     if (sprite.visible)
     {
-        sprite.blendMode = sprite.layer.blendMode
-        sprite.opacity = sprite.layer.opacity
+        sprite.blendMode = sprite.mapObject.get(`blendMode`)
+        sprite.opacity = sprite.mapObject.get(`opacity`)
     }
     
     sprite.x = -this._tilemap.origin.x
@@ -102,7 +99,7 @@ Spriteset_Map.prototype.refreshFilters = function()
     
     this._lightingFilters = []
     
-    for (const sprite of this._layerSprites.filter(x => x.layer.filterMode < 0))
+    for (const sprite of this._layerSprites.filter(x => x.mapObject.get(`filterMode`) < 0))
     {
         const filter = new LayerFilter(sprite)
         this._lightingFilters.push(filter)
@@ -110,7 +107,7 @@ Spriteset_Map.prototype.refreshFilters = function()
     
     this._lightingFilters.push(new LightingFilter())
     
-    for (const sprite of this._layerSprites.filter(x => x.layer.filterMode > 0))
+    for (const sprite of this._layerSprites.filter(x => x.mapObject.get(`filterMode`) > 0))
     {
         const filter = new LayerFilter(sprite)
         this._lightingFilters.push(filter)

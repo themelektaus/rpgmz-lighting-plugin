@@ -26,7 +26,9 @@ LayerFilter.prototype.update = function()
     
     this.uniforms.map = this.sprite.bitmap.baseTexture
     this.uniforms.offset = offset
-    this.uniforms.weight = this.sprite.mapObject.enabled ? this.sprite.layer.opacity / 255 * (this.sprite.layer.power * .04) : 0
+    this.uniforms.weight = this.sprite.mapObject.enabled
+        ? this.sprite.mapObject.get(`opacity`) / 255 * (this.sprite.mapObject.get(`power`) * .04)
+        : 0
 }
 
 LayerFilter.prototype._fragmentSrc = function()

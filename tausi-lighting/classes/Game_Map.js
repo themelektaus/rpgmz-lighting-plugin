@@ -1,3 +1,10 @@
+const TausiLighting__Game_Map__update = Game_Map.prototype.update
+Game_Map.prototype.update = function()
+{
+    TausiLighting__Game_Map__update.apply(this, arguments)
+    this.updateLights()
+}
+
 const TausiLighting__Game_Map__updateInterpreter = Game_Map.prototype.updateInterpreter
 Game_Map.prototype.updateInterpreter = function()
 {
@@ -18,6 +25,84 @@ Game_Map.prototype.updateInterpreter = function()
     }
 }
 
+Game_Map.prototype.updateLights = function()
+{
+    for (const binding of this._lightingSwitchBinding ?? [])
+    {
+        const objects = binding.objects ?? []
+        
+        if (objects.length)
+        {
+            const v = $gameSwitches.value(binding.switch)
+            
+            for (const object of objects)
+            {
+                const _v = v ? object.on : object.off
+                
+                object.target.set(
+                    object.property,
+                    (object?.isBoolean ?? false) ? !!_v : _v
+                )
+            }
+        }
+    }
+    
+    for (const binding of this._lightingVariableBinding ?? [])
+    {
+        const objects = binding.objects ?? []
+        
+        if (objects.length)
+        {
+            const min = binding.min
+            const max = binding.max
+            const v = $gameVariables.value(binding.variable)
+            const t = LightingUtils.lerp(0, 1, (v - min) / (max - min)) 
+            
+            for (const object of objects)
+            {
+                object.target.set(
+                    object.property,
+                    (object?.isBoolean ?? false)
+                        ? t > .5
+                        : LightingUtils.lerp(object.min, object.max, t)
+                )
+            }
+        }
+    }
+}
+
+Game_Map.prototype.bindSwitch = function(interpreter, options)
+{
+    this._lightingSwitchBinding ??= []
+    
+    let binding = this._lightingSwitchBinding.find(x => x.switch == options.switch)
+    
+    if (!binding)
+    {
+        binding = { switch: options.switch }
+        this._lightingSwitchBinding.push(binding)
+    }
+    
+    binding.objects = options.objects
+}
+
+Game_Map.prototype.bindVariable = function(interpreter, options)
+{
+    this._lightingVariableBinding ??= []
+    
+    let binding = this._lightingVariableBinding.find(x => x.variable == options.variable)
+    
+    if (!binding)
+    {
+        binding = { variable: options.variable }
+        this._lightingVariableBinding.push(binding)
+    }
+    
+    binding.objects = options.objects
+    binding.min = options.min
+    binding.max = options.max
+}
+
 Game_Map.prototype.startInterpolation = function(interpreter, options)
 {
     const duration = options?.duration ?? 60
@@ -28,13 +113,20 @@ Game_Map.prototype.startInterpolation = function(interpreter, options)
     {
         const target = object?.target ?? null
         const property = object?.property ?? null
+        const isBoolean = object?.isBoolean ?? false
         const to = object?.to ?? null
         
         if (target && property && to !== null)
         {
             if (duration == 0)
             {
-                target.set(property, to)
+                target.set(property, isBoolean ? !!to : to)
+            }
+            else if (isBoolean)
+            {
+                const _from = target.get(property) ? 1 : 0
+                const _to = to ? 1 : 0
+                updates.push(t => target.set(property, !!LightingUtils.lerp(_from, _to, t)))
             }
             else
             {

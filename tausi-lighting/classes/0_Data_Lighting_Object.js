@@ -22,12 +22,12 @@ class Data_Lighting_Object
     
     get(property)
     {
-        return LightingUtils.get(this, property)
+        return LightingUtils.property(this, property).get()
     }
     
     set(property, value)
     {
-        LightingUtils.set(this, property, value)
+        LightingUtils.property(this, property).set(value)
     }
     
     createField($_properties, _default, property, options)
@@ -39,7 +39,7 @@ class Data_Lighting_Object
     createPropertiesEditor($_properties)
     {
         const $input = this
-            .createField($_properties, null, `generateScriptCommand()`, { label: `object` })
+            .createField($_properties, null, `_generateScriptCommand()`, { label: `object` })
             .querySelector(`input`)
         $input.classList.add(`mono`)
         $input.style.color = `#9cf`
@@ -47,9 +47,11 @@ class Data_Lighting_Object
     
     generateScriptCommand(property)
     {
-        const result = `$dataLighting.getObject(${this.id})`
-        return property
-            ? `${result}.${property} = ${JSON.stringify(this[property])}`
-            : result
+        return LightingUtils.getSelectedMapObject().generateScriptCommand(property)
+    }
+    
+    _generateScriptCommand()
+    {
+        return `$dataLighting.getObject(${this.id})`
     }
 }

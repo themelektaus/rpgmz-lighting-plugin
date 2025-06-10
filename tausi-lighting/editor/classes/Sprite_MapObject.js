@@ -12,22 +12,12 @@ Sprite_MapObject.prototype.initialize = function(mapObject)
     
     Sprite_Clickable.prototype.initialize.call(this)
     
-    let bitmap
+    const bitmap = mapObject.object.icon
     
-    if (mapObject.object instanceof Data_Lighting_Layer)
+    if (bitmap)
     {
-        bitmap = `map.svg`
+        this.bitmap = ImageManager.loadBitmapFromUrl(LightingUtils.getResUrl(bitmap))
     }
-    else if (mapObject.object instanceof Data_Lighting_AmbientLight)
-    {
-        bitmap = `globelight.svg`
-    }
-    else
-    {
-        bitmap = `light.svg`
-    }
-    
-    this.bitmap = ImageManager.loadBitmapFromUrl(LightingUtils.getResUrl(bitmap))
     
     this.anchor.x = .5
     this.anchor.y = .5
@@ -39,11 +29,18 @@ Sprite_MapObject.prototype.update = function()
     this.x = this.mapObject.x - mapInfo.offsetX
     this.y = this.mapObject.y - mapInfo.offsetY
     
-    if (LightingUtils.getSelectedMapObject() == this.mapObject)
+    const selectedMapObject = LightingUtils.getSelectedMapObject()
+    if (selectedMapObject == this.mapObject)
     {
         this.setColorTone([50, 50, -50, 50])
         this.scale.x = 1.25
         this.scale.y = 1.25
+    }
+    else if (selectedMapObject && selectedMapObject.objectId == this.mapObject.objectId)
+    {
+        this.setColorTone([50, 50, -50, 50])
+        this.scale.x = 1
+        this.scale.y = 1
     }
     else
     {

@@ -3,9 +3,9 @@ Spriteset_Map.prototype.update = function()
 {
     TausiLighting__Editor__Spriteset_Map__update.apply(this, arguments)
     
-    if (LightingUtils._lightsNeedRefresh)
+    if (LightingUtils._editorNeedRefresh)
     {
-        LightingUtils._lightsNeedRefresh = false
+        LightingUtils._editorNeedRefresh = false
         this.refreshMapObjectSprites()
         this.refreshCursorSprites()
         this.update()
@@ -27,7 +27,7 @@ Spriteset_Map.prototype.update = function()
 
 Spriteset_Map.prototype.updateLayers = function()
 {
-    const a = (this._layerSprites ?? []).map(x => [ x.layer.id, x.filterMode ])
+    const a = (this._layerSprites ?? []).map(x => [ x.mapObject.objectId, x.filterMode ])
     const b = this.getLayerMapObjects().map(x => [ x.object.id, x.object.filterMode ])
     
     if (JSON.stringify(a) != JSON.stringify(b))
@@ -127,7 +127,7 @@ Spriteset_Map.prototype.updateLayerPainting = function()
         return
     }
     
-    const sprite = (this._layerSprites ?? []).find(x => x.layer == mapObject.object)
+    const sprite = (this._layerSprites ?? []).find(x => x.mapObject == mapObject)
     if (!sprite)
     {
         this._radiusSprite.visible = false
@@ -157,11 +157,11 @@ Spriteset_Map.prototype.updateLayerPaint = function(sprite, tool)
             }
         }
         
-        const x = (TouchInput.x - sprite.x) * sprite.layer.scale
-        const y = (TouchInput.y - sprite.y) * sprite.layer.scale
+        const x = (TouchInput.x - sprite.x) * sprite.mapObject.object.scale
+        const y = (TouchInput.y - sprite.y) * sprite.mapObject.object.scale
         
         const color = LightingUtils.toolSettings.color
-        const radius = LightingUtils.toolSettings.radius * sprite.layer.scale
+        const radius = LightingUtils.toolSettings.radius * sprite.mapObject.object.scale
         const smoothness = LightingUtils.toolSettings.smoothness / 100
         
         const paintLayer = () => this.paintLayer(sprite, tool, x, y, color, radius, smoothness)
@@ -196,7 +196,7 @@ Spriteset_Map.prototype.updateLayerPaint = function(sprite, tool)
     {
         if (sprite == this._lastLayerSprite)
         {
-            sprite.layer.setUrlContent(sprite.bitmap)
+            sprite.mapObject.object.setUrlContent(sprite.bitmap)
             
             LightingUtils.dump()
             
@@ -220,7 +220,7 @@ Spriteset_Map.prototype.paintLayer = function(sprite, tool, x, y, color, radius,
     this._lastY = y
     
     // Use Randomness?
-    //const s = 1 / sprite.layer.scale
+    //const s = 1 / sprite.mapObject.object.scale
     //x += Math.random() * s - s / 2
     //y += Math.random() * s - s / 2
     

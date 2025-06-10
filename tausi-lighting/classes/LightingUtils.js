@@ -20,8 +20,8 @@ LightingUtils.getPluginParameterBoolean = function(key)
 
 LightingUtils.refresh = function()
 {
-    this._lightsNeedRefresh = true
     this._needsRefresh = true
+    this._editorNeedRefresh = true
 }
 
 LightingUtils.preloadBitmaps = function()
@@ -143,38 +143,23 @@ LightingUtils.colorToHex = function(x)
     return x.toString(16).padStart(2, '0')
 }
 
-LightingUtils.get = function(object, property)
+LightingUtils.property = function(object, property)
 {
-    let value
-    
     if (property.endsWith(`]`))
     {
         const array = property.split(`[`, 2)[0]
         const index = Number(property.split(`[`, 2)[1].split(`]`)[0])
-        value = object[array][index]
+        return {
+            get: () => object[array][index],
+            set: x => object[array][index] = x
+        }
     }
     else
     {
-        value = object[property]
-    }
-    
-    return value
-}
-
-LightingUtils.set = function(object, property, value)
-{
-    value = Number(value || 0)
-    value = typeof LightingUtils.get(object, property) == `boolean` ? !!value : value
-    
-    if (property.endsWith(`]`))
-    {
-        const array = property.split(`[`, 2)[0]
-        const index = Number(property.split(`[`, 2)[1].split(`]`)[0])
-        object[array][index] = value
-    }
-    else
-    {
-        object[property] = value 
+        return {
+            get: () => object[property],
+            set: x => object[property] = x
+        }
     }
 }
 

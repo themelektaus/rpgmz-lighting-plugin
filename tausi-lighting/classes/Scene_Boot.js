@@ -3,6 +3,97 @@ Scene_Boot.prototype.create = function()
 {
     TausiLighting__Scene_Boot__create.apply(this, arguments)
     
+    const propertyInfo = property =>
+    {
+        switch (property)
+        {
+            case `Enabled`: return [ `enabled`, true ]
+            case `X`: return [ `x`, null ]
+            case `Y`: return [ `y`, null ]
+            case `Follow Event ID`: return [ `followEventId`, null ]
+            case `Light: Color (R)`: return [ `color[0]`, null ]
+            case `Light: Color (G)`: return [ `color[1]`, null ]
+            case `Light: Color (B)`: return [ `color[2]`, null ]
+            case `Light: Color (A)`: return [ `color[3]`, null ]
+            case `Ambient Light: Weight`: return [ `weight`, null ]
+            case `Ambient Light: Exposure`: return [ `exposure`, null ]
+            case `Ambient Light: Saturation`: return [ `saturation`, null ]
+            case `Ambient Light: Power (R)`: return [ `power[0]`, null ]
+            case `Ambient Light: Power (G)`: return [ `power[1]`, null ]
+            case `Ambient Light: Power (B)`: return [ `power[2]`, null ]
+            case `Ambient Light: Power (A)`: return [ `power[3]`, null ]
+            case `Point/Spot Light: Intensity`: return [ `intensity`, null ]
+            case `Point Light: Radius`: return [ `radius`, null ]
+            case `Point Light: Smoothness`: return [ `smoothness`, null ]
+            case `Point Light: Flicker Strength`: return [ `flickerStrength`, null ]
+            case `Point Light: Flicker Speed`: return [ `flickerSpeed`, null ]
+            case `Spot Light: Width`: return [ `width`, null ]
+            case `Spot Light: Spread`: return [ `spread`, null ]
+            case `Spot Light: Spread Fade`: return [ `spreadFade`, null ]
+            case `Spot Light: Direction`: return [ `direction`, null ]
+            case `Spot Light: Distance`: return [ `distance`, null ]
+            case `Spot Light: Distance Fade In`: return [ `distanceFadeIn`, null ]
+            case `Spot Light: Distance Fade Out`: return [ `distanceFadeOut`, null ]
+            case `Layer: Filter Mode`: return [ `filterMode`, null ]
+            case `Layer: Blend Mode`: return [ `blendMode`, null ]
+            case `Layer: Opacity`: return [ `opacity`, null ]
+            case `Layer: Power`: return [ `power`, null ]
+            default: return [ property, null ]
+        }
+    }
+    
+    PluginManager.registerCommand(`TausiLighting`, `bindSwitch`, function(args)
+    {
+        const objects = JSON.parse(args.objects)
+        const _switch = JSON.parse(args.switch)
+        
+        for (const i in objects)
+        {
+            objects[i] = JSON.parse(objects[i])
+            objects[i].target = eval(objects[i].target)
+            const info = propertyInfo(objects[i].property)
+            objects[i].property = info[0]
+            objects[i].isBoolean = !!info[1]
+            objects[i].off = Number(objects[i].off)
+            objects[i].on = Number(objects[i].on)
+        }
+        
+        const options = {
+            objects: objects,
+            switch: _switch
+        }
+        
+        this.bindSwitch(options)
+    })
+    
+    PluginManager.registerCommand(`TausiLighting`, `bindVariable`, function(args)
+    {
+        const objects = JSON.parse(args.objects)
+        const variable = JSON.parse(args.variable)
+        const min = JSON.parse(args.min)
+        const max = JSON.parse(args.max)
+        
+        for (const i in objects)
+        {
+            objects[i] = JSON.parse(objects[i])
+            objects[i].target = eval(objects[i].target)
+            const info = propertyInfo(objects[i].property)
+            objects[i].property = info[0]
+            objects[i].isBoolean = !!info[1]
+            objects[i].min = Number(objects[i].min)
+            objects[i].max = Number(objects[i].max)
+        }
+        
+        const options = {
+            objects: objects,
+            variable: variable,
+            min: min,
+            max: max
+        }
+        
+        this.bindVariable(options)
+    })
+    
     PluginManager.registerCommand(`TausiLighting`, `interpolate`, function(args)
     {
         const objects = JSON.parse(args.objects)
@@ -12,48 +103,10 @@ Scene_Boot.prototype.create = function()
         for (const i in objects)
         {
             objects[i] = JSON.parse(objects[i])
-            
-            const convertProperty = property =>
-            {
-                switch (property)
-                {
-                    case `Enabled`: return `enabled`
-                    case `X`: return `x`
-                    case `Y`: return `y`
-                    case `Follow Event ID`: return `followEventId`
-                    case `Light: Color (R)`: return `color[0]`
-                    case `Light: Color (G)`: return `color[1]`
-                    case `Light: Color (B)`: return `color[2]`
-                    case `Light: Color (A)`: return `color[3]`
-                    case `Ambient Light: Weight`: return `weight`
-                    case `Ambient Light: Exposure`: return `exposure`
-                    case `Ambient Light: Saturation`: return `saturation`
-                    case `Ambient Light: Power (R)`: return `power[0]`
-                    case `Ambient Light: Power (G)`: return `power[1]`
-                    case `Ambient Light: Power (B)`: return `power[2]`
-                    case `Ambient Light: Power (A)`: return `power[3]`
-                    case `Point/Spot Light: Intensity`: return `intensity`
-                    case `Point Light: Radius`: return `radius`
-                    case `Point Light: Smoothness`: return `smoothness`
-                    case `Point Light: Flicker Strength`: return `flickerStrength`
-                    case `Point Light: Flicker Speed`: return `flickerSpeed`
-                    case `Spot Light: Width`: return `width`
-                    case `Spot Light: Spread`: return `spread`
-                    case `Spot Light: Spread Fade`: return `spreadFade`
-                    case `Spot Light: Direction`: return `direction`
-                    case `Spot Light: Distance`: return `distance`
-                    case `Spot Light: Distance Fade In`: return `distanceFadeIn`
-                    case `Spot Light: Distance Fade Out`: return `distanceFadeOut`
-                    case `Layer: Filter Mode`: return `filterMode`
-                    case `Layer: Blend Mode`: return `blendMode`
-                    case `Layer: Opacity`: return `opacity`
-                    case `Layer: Power`: return `power`
-                    default: return property
-                }
-            }
-            
             objects[i].target = eval(objects[i].target)
-            objects[i].property = convertProperty(objects[i].property)
+            const info = propertyInfo(objects[i].property)
+            objects[i].property = info[0]
+            objects[i].isBoolean = !!info[1]
             objects[i].to = Number(objects[i].to)
         }
         

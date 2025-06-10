@@ -11,6 +11,8 @@ class Data_Lighting_MapObject
         return this.map.root.getObject(this.objectId)
     }
     
+    objectOverrides = { }
+    
     enabled = true
     
     x = 0
@@ -44,25 +46,23 @@ class Data_Lighting_MapObject
     
     get(property)
     {
-        if (this[property] !== undefined)
+        if (this.objectOverrides[property] !== undefined)
         {
-            return LightingUtils.get(this, property)
+            return this.objectOverrides[property]
         }
-        else
-        {
-            return this.object.get(property)
-        }
+        
+        return LightingUtils.property(this.object, property).get()
     }
     
     set(property, value)
     {
         if (this[property] !== undefined)
         {
-            LightingUtils.set(this, property, value)
+            this[property] = value
         }
         else
         {
-            this.object.set(property, value)
+            this.objectOverrides[property] = value
         }
     }
     
@@ -90,7 +90,7 @@ class Data_Lighting_MapObject
     {
         const result = `$dataLighting.getMapObject(${this.id})`
         return property
-            ? `${result}.set("${property}", ${JSON.stringify(this[property])})`
+            ? `${result}.set("${property}", ${JSON.stringify(this.get(property))})`
             : result
     }
 }

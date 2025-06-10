@@ -44,6 +44,56 @@
     
     const commands = [
         {
+            name: `bindSwitch`,
+            text: `Bind Switch`,
+            desc: ``,
+            args: [
+                {
+                    name: `objects`,
+                    text: `Objects`,
+                    type: `struct<bindingSwitch>[]`,
+                    value: []
+                },
+                {
+                    name: `switch`,
+                    text: `Switch`,
+                    type: `switch`,
+                    value: 0
+                }
+            ]
+        },
+        {
+            name: `bindVariable`,
+            text: `Bind Variable`,
+            desc: ``,
+            args: [
+                {
+                    name: `objects`,
+                    text: `Objects`,
+                    type: `struct<bindingVariable>[]`,
+                    value: []
+                },
+                {
+                    name: `variable`,
+                    text: `Variable`,
+                    type: `variable`,
+                    value: 0
+                },
+                {
+                    name: `min`,
+                    text: `Min`,
+                    type: `number`,
+                    value: 0
+                },
+                {
+                    name: `max`,
+                    text: `Max`,
+                    type: `number`,
+                    value: 100
+                }
+            ]
+        },
+        {
             name: `interpolate`,
             text: `Interpolate`,
             desc: ``,
@@ -51,7 +101,7 @@
                 {
                     name: `objects`,
                     text: `Objects`,
-                    type: `struct<interpolationObjects>[]`,
+                    type: `struct<interpolationObject>[]`,
                     value: []
                 },
                 {
@@ -72,7 +122,7 @@
     
     const structs = [
         {
-            name: `interpolationObjects`,
+            name: `interpolationObject`,
             params: [
                 {
                     name: `target`,
@@ -128,6 +178,46 @@
             ]
         }
     ]
+    
+    structs.push({
+        name: `bindingSwitch`,
+        params: [
+            structs[0].params[0],
+            structs[0].params[1],
+            {
+                name: `off`,
+                text: `Off`,
+                type: `number`,
+                value: 0
+            },
+            {
+                name: `on`,
+                text: `On`,
+                type: `number`,
+                value: 1
+            }
+        ]
+    })
+    
+    structs.push({
+        name: `bindingVariable`,
+        params: [
+            structs[0].params[0],
+            structs[0].params[1],
+            {
+                name: `min`,
+                text: `Min`,
+                type: `number`,
+                value: 0
+            },
+            {
+                name: `max`,
+                text: `Max`,
+                type: `number`,
+                value: 100
+            }
+        ]
+    })
     
     let build = ""
     build += "//=============================================================================\n"

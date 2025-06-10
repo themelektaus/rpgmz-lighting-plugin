@@ -36,6 +36,18 @@ class Data_Lighting_PointLight extends Data_Lighting_Light
         return Object.assign(result, Data_Lighting_Light.deserialize(root, data))
     }
     
+    getProperties(x)
+    {
+        const properties = super.getProperties(x)
+        properties.shaderType = this.constructor.shaderType
+        properties.intensity = x.get(`intensity`)
+        properties.radius = x.get(`radius`)
+        properties.smoothness = x.get(`smoothness`)
+        properties.flickerStrength = x.get(`flickerStrength`)
+        properties.flickerSpeed = x.get(`flickerSpeed`)
+        return properties
+    }
+    
     createPropertiesEditor($_properties)
     {
         super.createPropertiesEditor($_properties)

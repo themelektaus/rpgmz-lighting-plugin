@@ -300,7 +300,7 @@ video {
 
 #gameCanvasContainer.loading {
     filter: opacity(0);
-    transform: scale(.95);
+    transform: scale(1.025);
 }
 
 #gameCanvas {

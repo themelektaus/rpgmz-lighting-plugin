@@ -12,6 +12,11 @@ class Data_Lighting_Layer extends Data_Lighting_Object
     opacity = 255
     power = 100
     
+    get icon()
+    {
+        return `map.svg`
+    }
+    
     serialize()
     {
         const data = super.serialize()
@@ -44,6 +49,16 @@ class Data_Lighting_Layer extends Data_Lighting_Object
         const layer = Object.assign(result, Data_Lighting_Object.deserialize(root, data))
         layer.loadUrlContent()
         return layer
+    }
+    
+    getProperties(x)
+    {
+        return {
+            filterMode: x.get(`filterMode`),
+            blendMode: x.get(`blendMode`),
+            opacity: x.get(`opacity`),
+            power: x.get(`power`)
+        }
     }
     
     createPropertiesEditor($_properties)
