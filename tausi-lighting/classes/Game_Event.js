@@ -3,47 +3,67 @@ Game_Event.prototype.locate = function()
 {
     TausiLighting__Game_Event__locate.apply(this, arguments)
     
-    this._originalRealX = this._realX
-    this._originalRealY = this._realY
+    this._tausiLighting_originalRealX = this._realX
+    this._tausiLighting_originalRealY = this._realY
 }
 
-Game_Event.prototype.editorMove = function(x, y)
+Game_Event.prototype.tausiLighting_EditorMove = function(x, y)
 {
-    const map = $dataLighting.getMap(this._mapId)
-    const mapInfo = LightingUtils.getMapInfo()
-    map.setEventOffset(
-        this._eventId,
-        (x - mapInfo.tileWidth / 2 + mapInfo.offsetX) / mapInfo.tileWidth - this._originalRealX,
-        (y - mapInfo.tileHeight / 2 + mapInfo.offsetY) / mapInfo.tileHeight - this._originalRealY
-    )
+    $dataLighting.getMap(this._mapId)
+        .setEventOffset(
+            this._eventId,
+            (x - $gameMap.tileWidth() / 2 + LightingUtils.getMapOffsetX()) / $gameMap.tileWidth() - this._tausiLighting_originalRealX,
+            (y - $gameMap.tileHeight() / 2 + LightingUtils.getMapOffsetY()) / $gameMap.tileHeight() - this._tausiLighting_originalRealY
+        )
 }
 
 Game_Event.prototype.screenX = function()
 {
     const map = $dataLighting.getMap(this._mapId)
-    const offset = map.getEventOffset(this._eventId)
-    return Game_CharacterBase.prototype.screenX.apply(this, arguments) + (offset.x || 0) * $gameMap.tileWidth()
+    const offsetX = map.getEvent(this._eventId)?.offsetX || 0
+    
+    let screenX = Game_CharacterBase.prototype.screenX.apply(this, arguments)
+    screenX += offsetX * $gameMap.tileWidth()
+    return screenX
 }
 
 Game_Event.prototype.screenY = function()
 {
     const map = $dataLighting.getMap(this._mapId)
-    const offset = map.getEventOffset(this._eventId)
-    return Game_CharacterBase.prototype.screenY.apply(this, arguments) + (offset.y || 0) * $gameMap.tileHeight()
+    const offsetY = map.getEvent(this._eventId)?.offsetY || 0
+    
+    let screenY = Game_CharacterBase.prototype.screenY.apply(this, arguments)
+    screenY += offsetY * $gameMap.tileHeight()
+    return screenY
 }
 
-Game_Event.prototype.createPropertiesEditor = function($_properties)
+Game_Event.prototype.tausiLighting_createPropertiesEditor = function($_properties)
 {
-    const $resetButton = document.createElement(`button`)
-    $resetButton.innerHTML = `Reset`
-    $resetButton.addEventListener(`click`, () =>
+    const map = $dataLighting.getMap(this._mapId)
+    const event = map.getEvent(this._eventId)
+    
+    LightingUtils.createField.call(event, $_properties, null, `offsetX`)
+    LightingUtils.createField.call(event, $_properties, null, `offsetY`)
+    
+    const $_round = document.createElement(`button`)
+    $_round.innerHTML = `Round`
+    
+    $_round.addEventListener(`click`, () =>
     {
-        $resetButton.disabled = true
-        $dataLighting.getMap(this._mapId).removeEventOffset(this._eventId)
+        const event = map.getEvent(this._eventId)
+        map.setEventOffset(this._eventId, Math.round(event.offsetX), Math.round(event.offsetY))
+        
+        LightingUtils.dump()
+        LightingUtils.invalidate()
+        
+        $_properties.innerHTML = ``
+        this.tausiLighting_createPropertiesEditor.call(this, $_properties)
     })
-    if (!$dataLighting.getMap(this._mapId).hasEventOffset(this._eventId))
+    
+    if (!map.hasEvent(this._eventId))
     {
-        $resetButton.disabled = true
+        $_round.disabled = true
     }
-    $_properties.appendChild($resetButton)
+    
+    $_properties.appendChild($_round)
 }

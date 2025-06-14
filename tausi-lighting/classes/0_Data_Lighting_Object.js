@@ -36,18 +36,22 @@ class Data_Lighting_Object
         return LightingUtils.createField.call(this, $_properties, _default, property, options)
     }
     
-    createPropertiesEditor($_properties)
+    tausiLighting_createPropertiesEditor($_properties)
     {
-        const $input = this
+        const $_input = this
             .createField($_properties, null, `_generateScriptCommand()`, { label: `object` })
             .querySelector(`input`)
-        $input.classList.add(`mono`)
-        $input.style.color = `#9cf`
+        $_input.classList.add(`mono`, `accent`)
     }
     
     generateScriptCommand(property)
     {
-        return LightingUtils.getSelectedMapObject().generateScriptCommand(property)
+        if (!property)
+        {
+            return this._generateScriptCommand()
+        }
+        
+        return LightingUtils.getSelection().generateScriptCommand(property)
     }
     
     _generateScriptCommand()

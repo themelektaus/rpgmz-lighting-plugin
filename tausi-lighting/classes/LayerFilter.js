@@ -15,13 +15,13 @@ LayerFilter.prototype.initialize = function(sprite)
 
 LayerFilter.prototype.update = function()
 {
-    const mapInfo = LightingUtils.getMapInfo()
+    const zoom = $gameScreen.zoomScale()
     
     const offset = [
-        mapInfo.offsetX / Graphics.width,
-        mapInfo.offsetY / Graphics.height,
-        mapInfo.width / Graphics.width,
-        mapInfo.height / Graphics.height
+        LightingUtils.getMapOffsetX() / (Graphics.width / zoom),
+        LightingUtils.getMapOffsetY() / (Graphics.height / zoom),
+        LightingUtils.getMapWidth() / (Graphics.width / zoom),
+        LightingUtils.getMapHeight() / (Graphics.height / zoom)
     ]
     
     this.uniforms.map = this.sprite.bitmap.baseTexture

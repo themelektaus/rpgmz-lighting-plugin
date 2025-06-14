@@ -48,9 +48,9 @@ class Data_Lighting_PointLight extends Data_Lighting_Light
         return properties
     }
     
-    createPropertiesEditor($_properties)
+    tausiLighting_createPropertiesEditor($_properties)
     {
-        super.createPropertiesEditor($_properties)
+        super.tausiLighting_createPropertiesEditor($_properties)
         
         const _default = new Data_Lighting_PointLight
         

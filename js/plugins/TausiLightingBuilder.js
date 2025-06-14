@@ -94,6 +94,25 @@
             ]
         },
         {
+            name: `copyEventFrom`,
+            text: `Copy Event From`,
+            desc: ``,
+            args: [
+                {
+                    name: `sourceMapId`,
+                    text: `Source Map ID`,
+                    type: `number`,
+                    value: 0
+                },
+                {
+                    name: `sourceEventId`,
+                    text: `Source Event ID`,
+                    type: `number`,
+                    value: 0
+                }
+            ]
+        },
+        {
             name: `interpolate`,
             text: `Interpolate`,
             desc: ``,
@@ -146,6 +165,7 @@
                         `Ambient Light: Weight`,
                         `Ambient Light: Exposure`,
                         `Ambient Light: Saturation`,
+                        `Ambient Light: Contrast`,
                         `Ambient Light: Power (R)`,
                         `Ambient Light: Power (G)`,
                         `Ambient Light: Power (B)`,
@@ -418,7 +438,7 @@
     {
         const structure = { }
 
-        function traverse(currentPath)
+        function pack(currentPath)
         {
             const stats = fs.statSync(currentPath)
             
@@ -433,12 +453,12 @@
             {
                 fs.readdirSync(currentPath).forEach(file =>
                 {
-                    traverse(path.join(currentPath, file))
+                    pack(path.join(currentPath, file))
                 })
             }
         }
         
-        traverse(folderPath)
+        pack(folderPath)
         
         return Buffer.from(JSON.stringify(structure)).toString(`base64`)
     }

@@ -6,7 +6,7 @@ class Data_Lighting_MapObject
     
     objectId = 0
     
-    get object()
+    getObject()
     {
         return this.map.root.getObject(this.objectId)
     }
@@ -17,7 +17,13 @@ class Data_Lighting_MapObject
     
     x = 0
     y = 0
-    followEventId = 0
+    
+    referenceEventId = 0
+    
+    getReferenceEvent()
+    {
+        return this.referenceEventId ? $gameMap.event(this.referenceEventId) : null
+    }
     
     serialize()
     {
@@ -27,7 +33,7 @@ class Data_Lighting_MapObject
             enabled: this.enabled,
             x: this.x,
             y: this.y,
-            followEventId: this.followEventId
+            referenceEventId: this.referenceEventId
         }
     }
     
@@ -40,7 +46,7 @@ class Data_Lighting_MapObject
         result.enabled = data.enabled
         result.x = data.x
         result.y = data.y
-        result.followEventId = data.followEventId
+        result.referenceEventId = data.referenceEventId
         return result
     }
     
@@ -51,7 +57,14 @@ class Data_Lighting_MapObject
             return this.objectOverrides[property]
         }
         
-        return LightingUtils.property(this.object, property).get()
+        let result = LightingUtils.property(this, property).get()
+        
+        if (result === undefined)
+        {
+            result = LightingUtils.property(this.getObject(), property).get()
+        }
+        
+        return result
     }
     
     set(property, value)
@@ -72,18 +85,17 @@ class Data_Lighting_MapObject
         return LightingUtils.createField.call(this, $_properties, _default, property, options)
     }
     
-    createPropertiesEditor($_properties)
+    tausiLighting_createPropertiesEditor($_properties)
     {
-        const $input = this
+        const $_input = this
             .createField($_properties, null, `generateScriptCommand()`, { label: `mapObject` })
             .querySelector(`input`)
-        $input.classList.add(`mono`)
-        $input.style.color = `#9cf`
+        $_input.classList.add(`mono`, `accent`)
         
         this.createField($_properties, null, `enabled`, { type: `toggle` })
-        this.createField($_properties, null, `followEventId`, { type: `number` })
+        this.createField($_properties, null, `referenceEventId`, { type: `event` })
         
-        this.object.createPropertiesEditor($_properties)
+        this.getObject().tausiLighting_createPropertiesEditor($_properties)
     }
     
     generateScriptCommand(property)
@@ -94,10 +106,9 @@ class Data_Lighting_MapObject
             : result
     }
     
-    editorMove(x, y)
+    tausiLighting_EditorMove(x, y)
     {
-        const mapInfo = LightingUtils.getMapInfo()
-        this.x = x + mapInfo.offsetX
-        this.y = y + mapInfo.offsetY
+        this.x = x + LightingUtils.getMapOffsetX()
+        this.y = y + LightingUtils.getMapOffsetY()
     }
 }

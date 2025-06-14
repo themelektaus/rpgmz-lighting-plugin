@@ -4,5 +4,6 @@ const TausiLighting__DataManager__loadMapData = DataManager.loadMapData
 DataManager.loadMapData = function()
 {
     TausiLighting__DataManager__loadMapData.apply(this, arguments)
+    
     LightingUtils.refresh()
 }

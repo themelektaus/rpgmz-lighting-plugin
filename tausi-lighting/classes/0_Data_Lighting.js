@@ -1,18 +1,41 @@
 class Data_Lighting
 {
-    version = 2
-    //version = 3
+    version = 3
     
     objects = []
     maps = []
     
     serialize()
     {
-        return {
+        const result = {
             version: this.version,
             objects: this.objects.map(x => x.serialize()),
             maps: this.maps.map(x => x.serialize())
         }
+        
+        for (const map of result.maps)
+        {
+            map.events = map.events.filter(x => x.offsetX || x.offsetY)
+        }
+        
+        result.maps = result.maps.filter(x => x.objects?.length || x.events?.length)
+        
+        return result
+    }
+    
+    serializeWithoutUrlContent()
+    {
+        const data = this.serialize()
+        
+        for (const object of data.objects)
+        {
+            if (object.urlContent)
+            {
+                delete object.urlContent
+            }
+        }
+        
+        return data
     }
     
     static deserialize(data)
@@ -27,6 +50,11 @@ class Data_Lighting
     getObject(id)
     {
         return this.objects.find(x => x.id == id)
+    }
+    
+    getCurrentMap()
+    {
+        return this.getMap($gameMap.mapId())
     }
     
     getMap(id)
@@ -64,35 +92,30 @@ class Data_Lighting
         return null
     }
     
-    generateObjectId()
+    _generateObjectId()
     {
         return Math.max(0, ...(this.objects.map(x => x.id))) + 1
     }
     
-    generateMapObjectId()
+    _generateMapObjectId()
     {
         return Math.max(0, ...(this.maps.map(x => x.objects).flat().map(x => x.id))) + 1
     }
     
-    createObject(type)
+    addObject(object)
     {
-        const object = new type
-        
-        if (object)
-        {
-            object.id = this.generateObjectId()
-            object.onCreate?.call(object)
-            this.objects.push(object)
-        }
+        object.id = this._generateObjectId()
+        object.onCreate?.call(object)
+        this.objects.push(object)
         
         return object
     }
     
     copyObject(object)
     {
-        const data = object.serialize()
+        const data = object.serialize ? object.serialize() : object
         object = eval(data.typeName).deserialize(this, data)
-        object.id = this.generateObjectId()
+        object.id = this._generateObjectId()
         object.onCopy?.apply(this)
         this.objects.push(object)
         
@@ -141,7 +164,7 @@ class Data_Lighting
                                         _object.color = [ ...light.color ]
                                         _object.weight = light.weight,
                                         _object.exposure = light.exposure,
-                                        _object.saturation = light.saturation,
+                                        _object.saturation = light.saturation
                                         _object.power = [ ...light.power ],
                                         _object.strength = light.strength
                                         _data.objects.push(_object)
@@ -234,16 +257,16 @@ class Data_Lighting
                     data = _data
                     break
                 
-                //case 2:
-                //    data.version = 3
-                //    for (const object of data.objects)
-                //    {
-                //        if (object.typeName == `Data_Lighting_Layer`)
-                //        {
-                //            object.invertedOrder = true
-                //        }
-                //    }
-                //    break
+                case 2:
+                    data.version = 3
+                    for (const map of data.maps)
+                    {
+                        for (const mapObject of map.objects)
+                        {
+                            mapObject.referenceEventId = mapObject.followEventId
+                        }
+                    }
+                    break
                 
                 default:
                     return data

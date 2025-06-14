@@ -21,7 +21,7 @@ LightingUtils.getPluginParameterBoolean = function(key)
 LightingUtils.refresh = function()
 {
     this._needsRefresh = true
-    this._editorNeedRefresh = true
+    this._editorNeedsRefresh = true
 }
 
 LightingUtils.preloadBitmaps = function()
@@ -46,38 +46,62 @@ LightingUtils.preloadBitmaps = function()
     })
 }
 
-LightingUtils.getMapInfo = function()
+LightingUtils.getMapWidth = function()
 {
-    const tileWidth = $gameMap.tileWidth()
-    const tileHeight = $gameMap.tileHeight()
-    return {
-        tileWidth: tileWidth,
-        tileHeight: tileHeight,
-        offsetX: $gameMap.displayX() * tileWidth,
-        offsetY: $gameMap.displayY() * tileHeight,
-        width: $dataMap.width * tileWidth,
-        height: $dataMap.height * tileHeight
-    }
+    return $dataMap.width * $gameMap.tileWidth()
+}
+
+LightingUtils.getMapHeight = function()
+{
+    return $dataMap.height * $gameMap.tileHeight()
+}
+
+LightingUtils.getMapOffsetX = function()
+{
+    return $gameMap.displayX() * $gameMap.tileWidth()
+}
+
+LightingUtils.getMapOffsetY = function()
+{
+    return $gameMap.displayY() * $gameMap.tileHeight()
 }
 
 LightingUtils.lerp = (a, b, t) => (1 - t) * a + t * b
 
-LightingUtils.getSelectedMapObject = function()
+LightingUtils.invalidate = function()
 {
     const scene = SceneManager._scene
-    return scene.selectedMapObject
+    return scene.invalidate(...arguments)
 }
 
-LightingUtils.setSelectedMapObject = function()
+LightingUtils.getSelection = function()
 {
     const scene = SceneManager._scene
-    scene.setSelectedMapObject(...arguments)
+    return scene.selection
+}
+
+LightingUtils.setSelection = function()
+{
+    const scene = SceneManager._scene
+    scene.setSelection(...arguments)
 }
 
 LightingUtils.getActiveTool = function()
 {
     const scene = SceneManager._scene
     return scene.activeTool
+}
+
+LightingUtils.getActiveToolData = function()
+{
+    const scene = SceneManager._scene
+    return scene.activeToolData
+}
+
+LightingUtils.setActiveTool = function()
+{
+    const scene = SceneManager._scene
+    return scene.setActiveTool(...arguments)
 }
 
 LightingUtils.toolSettings = {
@@ -150,7 +174,7 @@ LightingUtils.property = function(object, property)
         const array = property.split(`[`, 2)[0]
         const index = Number(property.split(`[`, 2)[1].split(`]`)[0])
         return {
-            get: () => object[array][index],
+            get: () => (object[array] ?? [])[index],
             set: x => object[array][index] = x
         }
     }
@@ -165,8 +189,8 @@ LightingUtils.property = function(object, property)
 
 LightingUtils.createField = function($_properties, _default, property, options)
 {
-    const $field = document.createElement(`div`)
-    $field.classList.add(`field`)
+    const $_field = document.createElement(`div`)
+    $_field.classList.add(`field`)
     
     const label = options?.label ?? (
         property.endsWith(`()`)
@@ -174,108 +198,139 @@ LightingUtils.createField = function($_properties, _default, property, options)
             : property
     )
     
-    const $label = document.createElement(`label`)
-    $label.innerHTML = label
-    $field.appendChild($label)
+    const $_label = document.createElement(`label`)
+    $_label.innerHTML = label
+    $_field.appendChild($_label)
     
     const value = property.endsWith(`()`)
         ? this[property.substring(0, property.length - 2)].apply(this)
         : this[property]
     
-    let $input
+    let $_input
     
-    const $reset = document.createElement(`button`)
-    $reset.classList.add(`no-text`)
-    $reset.style.alignSelf = `flex-start`
-    $reset.style.backgroundImage = `url(${LightingUtils.getResUrl(`power.svg`)})`
+    const $_reset = document.createElement(`button`)
+    $_reset.classList.add(`no-text`)
+    $_reset.style.alignSelf = `flex-start`
+    $_reset.style.backgroundImage = `url(${LightingUtils.getResUrl(`power.svg`)})`
     
-    const $code = document.createElement(`button`)
-    $code.classList.add(`no-text`)
-    $code.style.alignSelf = `flex-start`
-    $code.style.backgroundImage = `url(${LightingUtils.getResUrl(`code.svg`)})`
+    const $_code = document.createElement(`button`)
+    $_code.classList.add(`no-text`)
+    $_code.style.alignSelf = `flex-start`
     
-    const $codeInfo = document.createElement(`div`)
-    $codeInfo.classList.add(`codeInfo`)
-    $codeInfo.innerHTML = `Copied to Clipboard`
-    
-    $code.addEventListener(`click`, async () =>
+    if (property.endsWith(`()`))
     {
-        $code.disabled = true
+        $_code.style.backgroundImage = `url(${LightingUtils.getResUrl(`copy.svg`)})`
+        $_code.style.backgroundSize = `75%`
+        $_code.style.backgroundRepeat = `no-repeat`
+    }
+    else
+    {
+        $_code.style.backgroundImage = `url(${LightingUtils.getResUrl(`code.svg`)})`
+        $_code.style.backgroundSize = `92.5%`
+        $_code.style.backgroundRepeat = `no-repeat`
+    }
+    
+    const $_codeInfo = document.createElement(`div`)
+    $_codeInfo.classList.add(`codeInfo`)
+    $_codeInfo.innerHTML = `Copied to Clipboard`
+    
+    $_code.addEventListener(`click`, async () =>
+    {
+        $_code.disabled = true
         await navigator.clipboard.writeText(this.generateScriptCommand(property.endsWith(`()`) ? null : property))
-        $codeInfo.classList.add(`visible`)
+        $_codeInfo.classList.add(`visible`)
         await new Promise(x => setTimeout(x, 2000))
-        $codeInfo.classList.remove(`visible`)
-        $code.disabled = false
+        $_codeInfo.classList.remove(`visible`)
+        $_code.disabled = false
     })
     
-    const invalidate = () => SceneManager._scene?.invalidate?.call(SceneManager._scene)
-    
-    const dump = options?.dump ?? false
+    const dump = options?.dump
+        ? () => { LightingUtils.dump() }
+        : () => { }
     
     switch (options?.type)
     {
         case `toggle`:
-            const $inputContainer = document.createElement(`div`)
-            $field.appendChild($inputContainer)
-            $input = document.createElement(`input`)
-            $input.type = `checkbox`
-            $input.checked = eval(value ?? `true`)
-            $input.addEventListener(`change`, () =>
+            const $_inputContainer = document.createElement(`div`)
+            $_field.appendChild($_inputContainer)
+            $_input = document.createElement(`input`)
+            $_input.type = `checkbox`
+            $_input.checked = eval(value ?? `true`)
+            $_input.addEventListener(`change`, () =>
             {
-                if (this[property] != $input.checked)
+                if (this[property] != $_input.checked)
                 {
-                    this[property] = $input.checked
-                    if (dump)
-                    {
-                        LightingUtils.dump()
-                    }
-                    invalidate()
+                    this[property] = $_input.checked
+                    dump()
+                    LightingUtils.invalidate()
                 }
             })
-            $inputContainer.appendChild($input)
-            $reset.addEventListener(`click`, () =>
+            $_inputContainer.appendChild($_input)
+            $_reset.addEventListener(`click`, () =>
             {
-                if ($input.value != _default[property])
+                if ($_input.value != _default[property])
                 {
-                    $input.value = _default[property]
-                    $input.dispatchEvent(new Event(`change`))
+                    $_input.value = _default[property]
+                    this[property] = $_input.checked
+                    dump()
+                    LightingUtils.invalidate()
                 }
             })
             break
         
         case `number`:
-            $input = document.createElement(`input`)
-            $input.type = `number`
-            $input.min = options?.min ?? 0
-            $input.max = options?.max ?? 1000
-            $input.value = Number(value || 0)
-            $input.addEventListener(`input`, () =>
+            $_input = document.createElement(`input`)
+            $_input.type = `number`
+            $_input.min = options?.min ?? 0
+            $_input.max = options?.max ?? 1000
+            $_input.value = Number(value || 0)
+            $_input.addEventListener(`input`, () =>
             {
-                this[property] = Number($input.value || 0)
-                invalidate()
+                this[property] = Number($_input.value || 0)
+                LightingUtils.invalidate()
             })
-            if (dump)
+            $_input.addEventListener(`change`, () =>
             {
-                $input.addEventListener(`change`, () =>
-                {
-                    LightingUtils.dump()
-                    invalidate()
-                })
-            }
-            $field.appendChild($input)
-            $reset.addEventListener(`click`, () =>
+                dump()
+                LightingUtils.invalidate()
+            })
+            $_field.appendChild($_input)
+            $_reset.addEventListener(`click`, () =>
             {
-                if ($input.value != _default[property])
+                if ($_input.value != _default[property])
                 {
-                    $input.value = _default[property]
-                    $input.dispatchEvent(new Event(`input`))
-                    $input.dispatchEvent(new Event(`change`))
+                    $_input.value = _default[property]
+                    this[property] = Number($_input.value || 0)
+                    dump()
+                    LightingUtils.invalidate()
                 }
             })
             break
         
+        case `event`:
+            const $_button = document.createElement(`button`)
+            $_button.innerHTML = LightingUtils.getEventHtml(Number(value || 0))
+            $_button.addEventListener(`click`, () =>
+            {
+                LightingUtils.setActiveTool(`selectEvent`, x =>
+                {
+                    LightingUtils.setActiveTool(`selectEvent`, null)
+                    this[property] = x
+                    $_button.innerHTML = LightingUtils.getEventHtml(x)
+                    dump()
+                    requestAnimationFrame(() =>
+                    {
+                        LightingUtils.setActiveTool(`select`)
+                        LightingUtils.invalidate()
+                    })
+                })
+                LightingUtils.invalidate()
+            })
+            $_field.appendChild($_button)
+            break
+        
         case `dropdown`:
-            const $select = document.createElement(`select`)
+            const $_select = document.createElement(`select`)
             const selectedValue = Number(value || 0)
             
             const items = options?.items ?? []
@@ -287,7 +342,7 @@ LightingUtils.createField = function($_properties, _default, property, options)
                     const value = Number(item.value || 0)
                     option.value = value
                     option.innerHTML = item.text || value.toString()
-                    $select.appendChild(option)
+                    $_select.appendChild(option)
                 }
             }
             else
@@ -295,150 +350,167 @@ LightingUtils.createField = function($_properties, _default, property, options)
                 const option = document.createElement(`option`)
                 option.value = 0
                 option.innerHTML = `-`
-                $select.appendChild(option)
+                $_select.appendChild(option)
             }
             
-            $select.value = selectedValue
+            $_select.value = selectedValue
             
-            $select.addEventListener(`change`, () =>
+            $_select.addEventListener(`change`, () =>
             {
-                if (this[property] != Number($select.value || 0))
+                if (this[property] != Number($_select.value || 0))
                 {
-                    this[property] = Number($select.value || 0)
-                    if (dump)
-                    {
-                        LightingUtils.dump()
-                    }
-                    invalidate()
+                    this[property] = Number($_select.value || 0)
+                    dump()
+                    LightingUtils.invalidate()
                 }
             })
             
-            $field.appendChild($select)
-            $reset.addEventListener(`click`, () =>
+            $_field.appendChild($_select)
+            $_reset.addEventListener(`click`, () =>
             {
-                if ($select.value != _default[property])
+                if ($_select.value != _default[property])
                 {
-                    $select.value = _default[property]
-                    $select.dispatchEvent(new Event(`change`))
+                    $_select.value = _default[property]
+                    this[property] = Number($_select.value || 0)
+                    dump()
+                    LightingUtils.invalidate()
                 }
             })
             break
         
         case `slider`:
-            $input = document.createElement(`input`)
-            $input.type = `range`
-            $input.min = options?.min ?? 0
-            $input.max = options?.max ?? 100
-            $input.step = options?.step ?? 1
-            $input.value = Number(value || 0)
-            $input.addEventListener(`input`, () =>
+            $_input = document.createElement(`input`)
+            $_input.type = `range`
+            $_input.min = options?.min ?? 0
+            $_input.max = options?.max ?? 100
+            $_input.step = options?.step ?? 1
+            $_input.value = Number(value || 0)
+            $_input.addEventListener(`input`, () =>
             {
-                this[property] = Number($input.value || 0)
-                invalidate()
+                this[property] = Number($_input.value || 0)
+                LightingUtils.invalidate()
             })
-            if (dump)
+            $_input.addEventListener(`change`, () =>
             {
-                $input.addEventListener(`change`, () =>
-                {
-                    LightingUtils.dump()
-                    invalidate()
-                })
-            }
-            $field.appendChild($input)
-            $reset.addEventListener(`click`, () =>
+                dump()
+                LightingUtils.invalidate()
+            })
+            $_field.appendChild($_input)
+            $_reset.addEventListener(`click`, () =>
             {
-                if ($input.value != _default[property])
+                if ($_input.value != _default[property])
                 {
-                    $input.value = _default[property]
-                    $input.dispatchEvent(new Event(`input`))
-                    $input.dispatchEvent(new Event(`change`))
+                    $_input.value = _default[property]
+                    this[property] = Number($_input.value || 0)
+                    dump()
+                    LightingUtils.invalidate()
                 }
             })
             break
             
         case `color`:
-            $input = document.createElement(`div`)
-            $input.classList.add(`color`)
-            $field.appendChild($input)
+            $_input = document.createElement(`div`)
+            $_input.classList.add(`color`)
+            $_field.appendChild($_input)
+            
+            const resetActions = []
+            
             for (let i = 0; i < 4; i++)
             {
                 const _i = i
-                const $ = document.createElement(`input`)
-                $.type = `range`
-                $.min = 0
+                const $_ = document.createElement(`input`)
+                $_.type = `range`
+                $_.min = 0
                 switch (_i)
                 {
                     case 0:
-                        $.classList.add(`r`)
-                        $.max = options?.max?.r ?? 255
+                        $_.classList.add(`r`)
+                        $_.max = options?.max?.r ?? 255
                         break
                     case 1:
-                        $.classList.add(`g`)
-                        $.max = options?.max?.g ?? 255
+                        $_.classList.add(`g`)
+                        $_.max = options?.max?.g ?? 255
                         break
                     case 2:
-                        $.classList.add(`b`)
-                        $.max = options?.max?.b ?? 255
+                        $_.classList.add(`b`)
+                        $_.max = options?.max?.b ?? 255
                         break
                     case 3:
-                        $.classList.add(`a`)
-                        $.max = options?.max?.a ?? 255
+                        $_.classList.add(`a`)
+                        $_.max = options?.max?.a ?? 255
                         break
                 }
-                $.value = Number(value[_i] || 0)
-                $.addEventListener(`input`, () =>
+                $_.value = Number(value[_i] || 0)
+                $_.addEventListener(`input`, () =>
                 {
-                    this[property][_i] = Number($.value || 0)
-                    invalidate()
+                    this[property][_i] = Number($_.value || 0)
+                    LightingUtils.invalidate()
                 })
-                if (dump)
+                $_.addEventListener(`change`, () =>
                 {
-                    $.addEventListener(`change`, () =>
-                    {
-                        LightingUtils.dump()
-                        invalidate()
-                    })
-                }
-                $input.appendChild($)
-                $reset.addEventListener(`click`, () =>
+                    dump()
+                    LightingUtils.invalidate()
+                })
+                $_input.appendChild($_)
+                resetActions.push(() =>
                 {
-                    if ($.value != _default[property][_i])
+                    if ($_.value == _default[property][_i])
                     {
-                        $.value = _default[property][_i]
-                        $.dispatchEvent(new Event(`input`))
+                        return false
                     }
+                    
+                    $_.value = _default[property][_i]
+                    this[property][_i] = Number($_.value || 0)
+                    
+                    return true
                 })
             }
+            
+            $_reset.addEventListener(`click`, () =>
+            {
+                let dirty = false
+                for (const resetAction of resetActions)
+                {
+                    if (resetAction())
+                    {
+                        dirty = true
+                    }
+                }
+                if (dirty)
+                {
+                    dump()
+                    LightingUtils.invalidate()
+                }
+            })
             break
         
         default:
-            $input = document.createElement(`input`)
-            $input.type = `text`
-            $input.value = value
-            $input.readOnly = true
-            $field.appendChild($input)
+            $_input = document.createElement(`input`)
+            $_input.type = `text`
+            $_input.value = value
+            $_input.readOnly = true
+            $_field.appendChild($_input)
             break
-        
     }
     
-    const $buttons = document.createElement(`div`)
-    $buttons.classList.add(`buttons`)
-    $field.appendChild($buttons)
+    const $_buttons = document.createElement(`div`)
+    $_buttons.classList.add(`buttons`)
+    $_field.appendChild($_buttons)
     
     if (this.generateScriptCommand)
     {
-        $buttons.appendChild($code)
-        $buttons.appendChild($codeInfo)
+        $_buttons.appendChild($_code)
+        $_buttons.appendChild($_codeInfo)
     }
     
     if (_default)
     {
-        $buttons.appendChild($reset)
+        $_buttons.appendChild($_reset)
     }
     
-    $_properties.appendChild($field)
+    $_properties.appendChild($_field)
     
-    return $field
+    return $_field
 }
 
 LightingUtils.dump = function()
@@ -522,4 +594,114 @@ LightingUtils.restore = function(validation, index)
     }
     
     return true
+}
+
+LightingUtils.patchEvents = function()
+{
+    for (const eventId in $dataMap.events)
+    {
+        const event = $dataMap.events[eventId]
+        
+        if (!event)
+        {
+            continue
+        }
+        
+        for (const item of (event.pages ?? []).map(x => x.list ?? []).flat())
+        {
+            if (item.code != 357)
+            {
+                continue
+            }
+            
+            if (item.parameters[0] != `TausiLighting`)
+            {
+                continue
+            }
+            
+            if (item.parameters[1] != `copyEventFrom`)
+            {
+                continue
+            }
+            
+            this.copyEvent(
+                Number(item.parameters[3].sourceMapId || 0),
+                Number(item.parameters[3].sourceEventId || 0),
+                eventId
+            )
+            
+            break
+        }
+    }
+}
+
+LightingUtils.isPatched = function(eventId)
+{
+    const pages = $dataMap.events[eventId]?.pages ?? []
+    const list = pages.map(x => x.list ?? []).flat()
+    return list.some(x => x.code == 108 && x.parameters[0] == `Patched by TausiLighting`)
+}
+
+LightingUtils.copyEvent = function(sourceMapId, sourceEventId, destinationEventId)
+{
+    const sourceEvent = (!sourceMapId || sourceMapId == $dataMap.id)
+        ? $dataMap.events[sourceEventId]
+        : $dataMapEvents[sourceMapId][sourceEventId]
+    
+    const destinationEvent = $dataMap.events[destinationEventId]
+    
+    const newEvent = JSON.parse(JSON.stringify(sourceEvent))
+    newEvent.id = destinationEvent.id
+    newEvent.x = destinationEvent.x
+    newEvent.y = destinationEvent.y
+    newEvent.pages[0].list.unshift({
+        code: 108,
+        indent: 0,
+        parameters: [ `Patched by TausiLighting` ]
+    })
+    
+    $dataMap.events[destinationEventId] = newEvent
+}
+
+LightingUtils.loadPreset = function(name, modifyJson)
+{
+    
+    let fs
+    
+    try
+    {
+        fs = require(`fs`)
+    }
+    catch
+    {
+        return null
+    }
+    
+    const path = `tausi-lighting/editor/presets/${name}.json`
+    const json = fs.readFileSync(path, `utf8`)
+    
+    return JSON.parse(modifyJson ? modifyJson(json) : json)
+}
+
+LightingUtils.getEventHtml = function(eventId)
+{
+    if (eventId)
+    {
+        const event = $dataMap.events[eventId]
+        
+        if (event)
+        {
+            return `<span class="id">${eventId.padZero(3)}</span>`
+                + `<span class="name">${event?.name ?? `-`}</span>`
+        }
+        else
+        {
+            return `<span class="id error">${eventId.padZero(3)}</span>`
+                + `<span class="error">Event does not exists</span>`
+        }
+    }
+    else
+    {
+        return `<span class="unset">Unset</span>`
+    }
 }

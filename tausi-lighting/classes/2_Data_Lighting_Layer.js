@@ -6,7 +6,6 @@ class Data_Lighting_Layer extends Data_Lighting_Object
     urlContent = null
     urlContentHash = null
     scale = .25
-    //invertedOrder = false
     filterMode = 0
     blendMode = 0
     opacity = 255
@@ -26,7 +25,6 @@ class Data_Lighting_Layer extends Data_Lighting_Object
         data.urlContent = this.urlContent
         data.urlContentHash = this.urlContentHash
         data.scale = this.scale
-        //data.invertedOrder = this.invertedOrder
         data.filterMode = this.filterMode
         data.blendMode = this.blendMode
         data.opacity = this.opacity
@@ -43,7 +41,6 @@ class Data_Lighting_Layer extends Data_Lighting_Object
         result.urlContent = data.urlContent
         result.urlContentHash = data.urlContentHash
         result.scale = data.scale
-        //result.invertedOrder = data.invertedOrder
         result.filterMode = data.filterMode
         result.blendMode = data.blendMode
         result.opacity = data.opacity
@@ -63,9 +60,9 @@ class Data_Lighting_Layer extends Data_Lighting_Object
         }
     }
     
-    createPropertiesEditor($_properties)
+    tausiLighting_createPropertiesEditor($_properties)
     {
-        super.createPropertiesEditor($_properties)
+        super.tausiLighting_createPropertiesEditor($_properties)
         
         const _default = new Data_Lighting_Layer
         
@@ -96,9 +93,8 @@ class Data_Lighting_Layer extends Data_Lighting_Object
     
     onCreate()
     {
-        const mapInfo = LightingUtils.getMapInfo()
-        this.width = mapInfo.width
-        this.height = mapInfo.height
+        this.width = LightingUtils.getMapWidth()
+        this.height = LightingUtils.getMapHeight()
         this.url = `data/tausi-lighting-layers/${$gameMap.mapId()}-${this.id}.png`
         this.setUrlContent(new Bitmap(this.width * this.scale, this.height * this.scale))
     }

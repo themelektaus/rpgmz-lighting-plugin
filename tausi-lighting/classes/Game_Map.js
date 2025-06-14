@@ -3,32 +3,12 @@ Game_Map.prototype.update = function()
 {
     TausiLighting__Game_Map__update.apply(this, arguments)
     
-    this.updateLights()
+    this.tausiLighting_updateBindings()
 }
 
-const TausiLighting__Game_Map__updateInterpreter = Game_Map.prototype.updateInterpreter
-Game_Map.prototype.updateInterpreter = function()
+Game_Map.prototype.tausiLighting_updateBindings = function()
 {
-    TausiLighting__Game_Map__updateInterpreter.apply(this, arguments)
-    
-    for (const interpolation of [...(this.interpolations ?? [])])
-    {
-        interpolation.frame ??= 0
-        interpolation.frame++
-        
-        interpolation.update(interpolation.frame / interpolation.duration)
-        
-        if (interpolation.frame == interpolation.duration)
-        {
-            this.interpolations ??= []
-            this.interpolations.splice(this.interpolations.indexOf(interpolation), 1)
-        }
-    }
-}
-
-Game_Map.prototype.updateLights = function()
-{
-    for (const binding of this._lightingSwitchBinding ?? [])
+    for (const binding of this._tausiLighting_swtichBindings ?? [])
     {
         const objects = binding.objects ?? []
         
@@ -48,7 +28,7 @@ Game_Map.prototype.updateLights = function()
         }
     }
     
-    for (const binding of this._lightingVariableBinding ?? [])
+    for (const binding of this._tausiLighting_VariableBindings ?? [])
     {
         const objects = binding.objects ?? []
         
@@ -72,31 +52,31 @@ Game_Map.prototype.updateLights = function()
     }
 }
 
-Game_Map.prototype.bindSwitch = function(interpreter, options)
+Game_Map.prototype.tausiLighting_bindSwitch = function(interpreter, options)
 {
-    this._lightingSwitchBinding ??= []
+    this._tausiLighting_swtichBindings ??= []
     
-    let binding = this._lightingSwitchBinding.find(x => x.switch == options.switch)
+    let binding = this._tausiLighting_swtichBindings.find(x => x.switch == options.switch)
     
     if (!binding)
     {
         binding = { switch: options.switch }
-        this._lightingSwitchBinding.push(binding)
+        this._tausiLighting_swtichBindings.push(binding)
     }
     
     binding.objects = options.objects
 }
 
-Game_Map.prototype.bindVariable = function(interpreter, options)
+Game_Map.prototype.tausiLighting_bindVariable = function(interpreter, options)
 {
-    this._lightingVariableBinding ??= []
+    this._tausiLighting_VariableBindings ??= []
     
-    let binding = this._lightingVariableBinding.find(x => x.variable == options.variable)
+    let binding = this._tausiLighting_VariableBindings.find(x => x.variable == options.variable)
     
     if (!binding)
     {
         binding = { variable: options.variable }
-        this._lightingVariableBinding.push(binding)
+        this._tausiLighting_VariableBindings.push(binding)
     }
     
     binding.objects = options.objects
@@ -104,7 +84,7 @@ Game_Map.prototype.bindVariable = function(interpreter, options)
     binding.max = options.max
 }
 
-Game_Map.prototype.startInterpolation = function(interpreter, options)
+Game_Map.prototype.tausiLighting_interpolate = function(interpreter, options)
 {
     const duration = options?.duration ?? 60
     
@@ -144,8 +124,8 @@ Game_Map.prototype.startInterpolation = function(interpreter, options)
             update: t => updates.forEach(x => x.call(interpreter, t))
         }
         
-        this.interpolations ??= []
-        this.interpolations.push(interpolation)
+        this._tausiLighting_interpolations ??= []
+        this._tausiLighting_interpolations.push(interpolation)
         
         interpolation.update(0)
     }
@@ -153,5 +133,25 @@ Game_Map.prototype.startInterpolation = function(interpreter, options)
     if (duration && (options?.wait ?? false))
     {
         interpreter.wait(duration)
+    }
+}
+
+const TausiLighting__Game_Map__updateInterpreter = Game_Map.prototype.updateInterpreter
+Game_Map.prototype.updateInterpreter = function()
+{
+    TausiLighting__Game_Map__updateInterpreter.apply(this, arguments)
+    
+    for (const interpolation of [...(this._tausiLighting_interpolations ?? [])])
+    {
+        interpolation.frame ??= 0
+        interpolation.frame++
+        
+        interpolation.update(interpolation.frame / interpolation.duration)
+        
+        if (interpolation.frame == interpolation.duration)
+        {
+            this._tausiLighting_interpolations ??= []
+            this._tausiLighting_interpolations.splice(this._tausiLighting_interpolations.indexOf(interpolation), 1)
+        }
     }
 }

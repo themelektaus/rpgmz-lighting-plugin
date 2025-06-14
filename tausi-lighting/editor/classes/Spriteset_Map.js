@@ -1,34 +1,61 @@
+const TausiLighting__Editor__Spriteset_Map__initialize = Spriteset_Map.prototype.initialize
+Spriteset_Map.prototype.initialize = function()
+{
+    TausiLighting__Editor__Spriteset_Map__initialize.apply(this, arguments)
+    
+    this._tausiLighting_mapObjectSprites = []
+}
+
 const TausiLighting__Editor__Spriteset_Map__update = Spriteset_Map.prototype.update
 Spriteset_Map.prototype.update = function()
 {
     TausiLighting__Editor__Spriteset_Map__update.apply(this, arguments)
     
-    if (LightingUtils._editorNeedRefresh)
+    if (LightingUtils._editorNeedsRefresh)
     {
-        LightingUtils._editorNeedRefresh = false
-        this.refreshMapObjectSprites()
-        this.refreshCursorSprites()
+        LightingUtils._editorNeedsRefresh = false
+        
+        this._tausiLighting_refreshMapObjectSprites()
+        this._tausiLighting_refreshCursorSprites()
+        
         this.update()
     }
     
     if (TouchInput.isTriggered())
     {
-        if (!TouchInput._lastMapObject)
+        if (!TouchInput.tausiLighting_lastSelection)
         {
-            if (LightingUtils.getActiveTool() == `select`)
+            const tool = LightingUtils.getActiveTool()
+            if (tool == `select`)
             {
-                LightingUtils.setSelectedMapObject(null)
+                LightingUtils.setSelection(null)
+            }
+            else if (tool == `selectEvent`)
+            {
+                const action = LightingUtils.getActiveToolData()
+                if (action)
+                {
+                    action(0)
+                }
             }
         }
     }
     
-    this.updateLayerPainting()
+    this._tausiLighting_updateLayerPainting()
 }
 
-Spriteset_Map.prototype.updateLayers = function()
+Spriteset_Map.prototype._tausiLighting_updateLayers = function()
 {
-    const a = (this._layerSprites ?? []).map(x => [ x.mapObject.objectId, x.filterMode ])
-    const b = this.getLayerMapObjects().map(x => [ x.object.id, x.object.filterMode ])
+    const a = this._tausiLighting_layerSprites.map(x =>
+    {
+        return [ x.mapObject.objectId, x.filterMode ]
+    })
+    
+    const b = this._tausiLighting_getLayerMapObjects().map(x =>
+    {
+        const object = x.getObject()
+        return [ object.id, object.filterMode ]
+    })
     
     if (JSON.stringify(a) != JSON.stringify(b))
     {
@@ -39,15 +66,15 @@ Spriteset_Map.prototype.updateLayers = function()
     return true
 }
 
-Spriteset_Map.prototype.refreshMapObjectSprites = function()
+Spriteset_Map.prototype._tausiLighting_refreshMapObjectSprites = function()
 {
-    for (const sprite of this._mapObjectSprites ?? [])
+    for (const sprite of this._tausiLighting_mapObjectSprites)
     {
         this.removeChild(sprite)
         sprite.destroy()
     }
     
-    this._mapObjectSprites = []
+    this._tausiLighting_mapObjectSprites = []
     
     for (const event of $gameMap.events())
     {
@@ -55,45 +82,48 @@ Spriteset_Map.prototype.refreshMapObjectSprites = function()
         
         sprite.onPress = () =>
         {
-            if (LightingUtils.getActiveTool() == `select`)
+            const tool = LightingUtils.getActiveTool()
+            if (tool == `select`)
             {
-                LightingUtils.setSelectedMapObject(sprite.reference, { stick: true })
+                LightingUtils.setSelection(sprite.reference, { stick: true })
+            }
+            else if (tool == `selectEvent`)
+            {
+                const action = LightingUtils.getActiveToolData()
+                action(event.eventId())
             }
         }
         
-        this._mapObjectSprites.push(sprite)
+        this._tausiLighting_mapObjectSprites.push(sprite)
     }
     
-    const mapId = $gameMap.mapId()
-    const map = $dataLighting.getMap(mapId)
-    
-    const mapInfo = LightingUtils.getMapInfo()
+    const map = $dataLighting.getCurrentMap()
     
     for (const mapObject of map.objects)
     {
         const sprite = new Sprite_MapObject(mapObject)
         
-        sprite.reference.x = Math.min(Math.max(0, mapObject.x), mapInfo.width)
-        sprite.reference.y = Math.min(Math.max(0, mapObject.y), mapInfo.height)
+        sprite.reference.x = Math.min(Math.max(0, mapObject.x), LightingUtils.getMapWidth())
+        sprite.reference.y = Math.min(Math.max(0, mapObject.y), LightingUtils.getMapHeight())
         
         sprite.onPress = () =>
         {
             if (LightingUtils.getActiveTool() == `select`)
             {
-                LightingUtils.setSelectedMapObject(sprite.reference, { stick: true })
+                LightingUtils.setSelection(sprite.reference, { stick: true })
             }
         }
         
-        this._mapObjectSprites.push(sprite)
+        this._tausiLighting_mapObjectSprites.push(sprite)
     }
     
-    for (const sprite of this._mapObjectSprites)
+    for (const sprite of this._tausiLighting_mapObjectSprites)
     {
         this.addChild(sprite)
     }
 }
 
-Spriteset_Map.prototype.refreshCursorSprites = function()
+Spriteset_Map.prototype._tausiLighting_refreshCursorSprites = function()
 {
     if (this._radiusSprite)
     {
@@ -128,7 +158,7 @@ Spriteset_Map.prototype.refreshCursorSprites = function()
     this.addChild(this._radiusSprite)
 }
 
-Spriteset_Map.prototype.updateLayerPainting = function()
+Spriteset_Map.prototype._tausiLighting_updateLayerPainting = function()
 {
     const tool = LightingUtils.getActiveTool()
     if (tool != `paint` && tool != `erase`)
@@ -137,30 +167,30 @@ Spriteset_Map.prototype.updateLayerPainting = function()
         return
     }
     
-    const mapObject = LightingUtils.getSelectedMapObject()
-    if (!mapObject)
+    const selection = LightingUtils.getSelection()
+    if (!selection)
     {
         this._radiusSprite.visible = false
         return
     }
     
-    const sprite = (this._layerSprites ?? []).find(x => x.mapObject == mapObject)
+    const sprite = this._tausiLighting_layerSprites.find(x => x.mapObject == selection)
     if (!sprite)
     {
         this._radiusSprite.visible = false
         return
     }
     
-    this.updateLayerPaint(sprite, tool)
+    this._tausiLighting_updateLayerPaint(sprite, tool)
 }
 
-Spriteset_Map.prototype.updateLayerPaint = function(sprite, tool)
+Spriteset_Map.prototype._tausiLighting_updateLayerPaint = function(sprite, tool)
 {
-    if (TouchInput._mousePressed || TouchInput._mousePressed2)
+    if (TouchInput._mousePressed || TouchInput._tausiLighting_mousePressed)
     {
         this._radiusSprite.visible = false
         
-        if (TouchInput._mousePressed2)
+        if (TouchInput._tausiLighting_mousePressed)
         {
             switch (tool)
             {
@@ -174,27 +204,28 @@ Spriteset_Map.prototype.updateLayerPaint = function(sprite, tool)
             }
         }
         
-        const x = (TouchInput.x - sprite.x) * sprite.mapObject.object.scale
-        const y = (TouchInput.y - sprite.y) * sprite.mapObject.object.scale
+        const scale = sprite.mapObject.getObject().scale
+        const x = (TouchInput.x - sprite.x) * scale
+        const y = (TouchInput.y - sprite.y) * scale
         
         const color = LightingUtils.toolSettings.color
-        const radius = LightingUtils.toolSettings.radius * sprite.mapObject.object.scale
+        const radius = LightingUtils.toolSettings.radius * scale
         const smoothness = LightingUtils.toolSettings.smoothness / 100
         
-        const paintLayer = () => this.paintLayer(sprite, tool, x, y, color, radius, smoothness)
+        const paintLayer = () => this._tausiLighting_paintLayer(sprite, tool, x, y, color, radius, smoothness)
         
-        if (!this._lastLayerSprite)
+        if (!this._tausiLighting_lastLayerSprite)
         {
             paintLayer()
         }
         else
         {
             // a²
-            let a = this._lastX - x
+            let a = this._tausiLighting_lastX - x
             a *= a
             
             // b²
-            let b = this._lastY - y
+            let b = this._tausiLighting_lastY - y
             b *= b
             
             // c² (current)
@@ -211,33 +242,33 @@ Spriteset_Map.prototype.updateLayerPaint = function(sprite, tool)
     }
     else
     {
-        if (sprite == this._lastLayerSprite)
+        if (sprite == this._tausiLighting_lastLayerSprite)
         {
-            sprite.mapObject.object.setUrlContent(sprite.bitmap)
+            sprite.mapObject.getObject().setUrlContent(sprite.bitmap)
             
             LightingUtils.dump()
             
             SceneManager._scene?.invalidate?.call(SceneManager._scene)
         }
         
-        this._lastLayerSprite = null
+        this._tausiLighting_lastLayerSprite = null
         
         this._radiusSprite.visible = true
-        this._radiusSprite.x = TouchInput._lastMoveX
-        this._radiusSprite.y = TouchInput._lastMoveY
+        this._radiusSprite.x = TouchInput.tausiLighting_lastMoveX
+        this._radiusSprite.y = TouchInput.tausiLighting_lastMoveY
         this._radiusSprite.scale.x = LightingUtils.toolSettings.radius / (this._radiusSprite.bitmap.width / 2)
         this._radiusSprite.scale.y = LightingUtils.toolSettings.radius / (this._radiusSprite.bitmap.height / 2)
     }
 }
 
-Spriteset_Map.prototype.paintLayer = function(sprite, tool, x, y, color, radius, smoothness)
+Spriteset_Map.prototype._tausiLighting_paintLayer = function(sprite, tool, x, y, color, radius, smoothness)
 {
-    this._lastLayerSprite = sprite
-    this._lastX = x
-    this._lastY = y
+    this._tausiLighting_lastLayerSprite = sprite
+    this._tausiLighting_lastX = x
+    this._tausiLighting_lastY = y
     
     // Use Randomness?
-    //const s = 1 / sprite.mapObject.object.scale
+    //const s = 1 / sprite.mapObject.getObject().scale
     //x += Math.random() * s - s / 2
     //y += Math.random() * s - s / 2
     

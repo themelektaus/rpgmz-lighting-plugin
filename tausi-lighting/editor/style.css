@@ -34,6 +34,10 @@ body, button, input, select {
     font-family: MonoFont;
 }
 
+.accent {
+    color: #3cf;
+}
+
 button, input, select {
     padding: .5em .825em;
     border: none;
@@ -287,6 +291,16 @@ video {
     display: flex;
 }
 
+#addMenu .title {
+    margin: .5em .25em 0;
+    color: #aaa;
+    font-size: .85em;
+}
+
+#addMenu .title:first-child {
+    margin-top: .125em;
+}
+
 #addMenu button {
     text-align: left;
 }
@@ -307,6 +321,11 @@ video {
     margin: 5px 0 0 5px;
     display: block;
     margin: auto;
+}
+
+#gameCanvasScreenshot {
+    position: absolute;
+    z-index: 1;
 }
 
 #properties {
@@ -366,6 +385,19 @@ video {
 .field .buttons .codeInfo.visible {
     opacity: 1;
     transform: translate(calc(-100% - .375em), -.25em);
+}
+
+.field button .unset {
+    color: #999;
+}
+
+.field button .id {
+    color: #3cf;
+    margin-right: .25em;
+}
+
+.field button .error {
+    color: #c33;
 }
 
 #overlay {

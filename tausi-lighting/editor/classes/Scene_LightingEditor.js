@@ -12,9 +12,9 @@ Scene_LightingEditor.prototype.initialize = function()
     
     LightingUtils.preloadBitmaps().then(() =>
     {
-        document.querySelectorAll(`[data-icon]`).forEach($ =>
+        document.querySelectorAll(`[data-icon]`).forEach($_ =>
         {
-            $.style.backgroundImage = `url(${LightingUtils.getResUrl($.dataset.icon)}.svg?css)`
+            $_.style.backgroundImage = `url(${LightingUtils.getResUrl($_.dataset.icon)}.svg?css)`
         })
     })
     
@@ -48,7 +48,7 @@ Scene_LightingEditor.prototype.initialize = function()
         {
             if (this._mapId == mapId)
             {
-                return
+                //return
             }
             
             const $_gameCanvasContainer = document.querySelector(`#gameCanvasContainer`)
@@ -63,10 +63,10 @@ Scene_LightingEditor.prototype.initialize = function()
     
     this._validations = []
     
-    document.querySelectorAll(`[data-action]`).forEach($ =>
+    document.querySelectorAll(`[data-action]`).forEach($_ =>
     {
-        this._validations.push(() => $.disabled = !(this[$.dataset.action].call(this, true)))
-        $.addEventListener(`click`, () => this[$.dataset.action].call(this, false))
+        this._validations.push(() => $_.disabled = !(this[$_.dataset.action].call(this, true)))
+        $_.addEventListener(`click`, () => this[$_.dataset.action].call(this, false))
     })
     
     Scene_Base.prototype.initialize.call(this)
@@ -118,7 +118,7 @@ Scene_LightingEditor.prototype.loadMap = function(mapId, options)
     {
         if (this._mapId == mapId)
         {
-            return
+            //return
         }
         
         if (this._loading)
@@ -129,9 +129,9 @@ Scene_LightingEditor.prototype.loadMap = function(mapId, options)
         this._loading = options?.loadingPower || 1
     }
     
-    document.querySelectorAll(`#maps li`).forEach($ =>
+    document.querySelectorAll(`#maps li`).forEach($_ =>
     {
-        $.classList.toggle(`active`, $.dataset.id == mapId)
+        $_.classList.toggle(`active`, $_.dataset.id == mapId)
     })
     
     if (this._spriteset)
@@ -141,16 +141,11 @@ Scene_LightingEditor.prototype.loadMap = function(mapId, options)
         this._spriteset = null
     }
     
-    this.setSelectedMapObject(null)
+    this.setSelection(null)
 
     this._mapId = mapId
     
     DataManager.loadMapData(this._mapId)
-}
-
-Scene_LightingEditor.prototype.getMap = function()
-{
-    return $dataLighting.getMap(this._mapId)
 }
 
 Scene_LightingEditor.prototype.update = function()
@@ -165,11 +160,12 @@ Scene_LightingEditor.prototype.update = function()
             
             const $_gameCanvasContainer = document.querySelector(`#gameCanvasContainer`)
             
-            const mapInfo = LightingUtils.getMapInfo()
             Graphics.resize(
-                Math.min($_gameCanvasContainer.clientWidth - 10, mapInfo.width),
-                Math.min($_gameCanvasContainer.clientHeight - 10, mapInfo.height)
+                Math.min($_gameCanvasContainer.clientWidth - 10, LightingUtils.getMapWidth()),
+                Math.min($_gameCanvasContainer.clientHeight - 10, LightingUtils.getMapHeight())
             )
+            
+            LightingUtils.patchEvents()
             
             $gameMap.setup(this._mapId)
             
@@ -186,6 +182,14 @@ Scene_LightingEditor.prototype.update = function()
             }
             else
             {
+                Graphics.hideGameCanvasScreenshot()
+                
+                if (this.onMapLoaded)
+                {
+                    this.onMapLoaded()
+                    this.onMapLoaded = null
+                }
+                
                 setTimeout(() => $_gameCanvasContainer.classList.remove(`loading`), 195)
             }
         }
@@ -204,9 +208,9 @@ Scene_LightingEditor.prototype.invalidate = function()
     }
 }
 
-Scene_LightingEditor.prototype.setSelectedMapObject = function(mapObject, options)
+Scene_LightingEditor.prototype.setSelection = function(selection, options)
 {
-    this.selectedMapObject = mapObject
+    this.selection = selection
     this.setActiveTool(`select`)
     
     this.invalidate()
@@ -214,38 +218,39 @@ Scene_LightingEditor.prototype.setSelectedMapObject = function(mapObject, option
     const $_properties = document.querySelector(`#properties`)
     $_properties.innerHTML = ``
     
-    if (mapObject)
+    if (selection)
     {
         if (options?.stick)
         {
-            TouchInput._lastMapObject = mapObject
+            TouchInput.tausiLighting_lastSelection = selection
         }
     }
     else
     {
-        TouchInput._lastMapObject = null
+        TouchInput.tausiLighting_lastSelection = null
         return
     }
     
-    if (mapObject.createPropertiesEditor)
+    if (selection.tausiLighting_createPropertiesEditor)
     {
-        mapObject.createPropertiesEditor($_properties)
+        selection.tausiLighting_createPropertiesEditor($_properties)
     }
 }
 
-Scene_LightingEditor.prototype.setActiveTool = function(tool)
+Scene_LightingEditor.prototype.setActiveTool = function(tool, data)
 {
     this.activeTool = tool
+    this.activeToolData = data
     
     const $_tools = document.querySelector(`#tools`)
     
-    $_tools.querySelectorAll(`[data-action]`).forEach($ => $.classList.remove(`active`))
-    $_tools.querySelector(`[data-action="setTool_${tool}"]`).classList.add(`active`)
+    $_tools.querySelectorAll(`[data-action]`).forEach($_ => $_.classList.remove(`active`))
+    $_tools.querySelectorAll(`[data-action="setTool_${tool}"]`).forEach($_ => $_.classList.add(`active`))
 }
 
 Scene_LightingEditor.prototype.add = function(validation)
 {
-    const map = this.getMap()
+    const map = $dataLighting.getMap(this._mapId)
     if (!map)
     {
         return validation ? false : null
@@ -297,9 +302,51 @@ Scene_LightingEditor.prototype.addLayer = function(validation)
     return this._add(Data_Lighting_Layer, validation)
 }
 
+Scene_LightingEditor.prototype.addFireBowl = function(validation)
+{
+    if (validation)
+    {
+        return true
+    }
+    
+    const mapData = this._loadMapData(this._mapId)
+    
+    const event = LightingUtils.loadPreset(`FireBowl`)
+    
+    event.id = Math.max(...mapData.events.map(x => x?.id ?? 0)) + 1
+    event.x = 1
+    event.y = 1
+    
+    const eventId = event.id
+    mapData.events[eventId] = event
+    
+    this._saveMapData(this._mapId, mapData)
+    
+    Graphics.showGameCanvasScreenshot()
+    
+    this.onMapLoaded = () =>
+    {
+        const object = $dataLighting.copyObject(
+            LightingUtils.loadPreset(`FireBowlLight`)
+        )
+        
+        const mapObject = $dataLighting.getMap(this._mapId).createObject(object)
+        mapObject.x += $gameMap.tileWidth() * 1.5
+        mapObject.y += $gameMap.tileHeight()
+        mapObject.referenceEventId = eventId
+        
+        this.setSelection($gameMap.event(eventId), { stick: true })
+        TouchInput._moved = true
+        
+        LightingUtils.refresh()
+    }
+    
+    this.loadMap(this._mapId, { loadingPower: 3 })
+}
+
 Scene_LightingEditor.prototype._add = function(type, validation)
 {
-    const map = this.getMap()
+    const map = $dataLighting.getMap(this._mapId)
     if (!map)
     {
         return validation ? false : null
@@ -310,20 +357,10 @@ Scene_LightingEditor.prototype._add = function(type, validation)
         return true
     }
     
-    if (type == Data_Lighting_AmbientLight)
-    {
-        const mapObjects = map.getMapObjectsOfType(type)
-        
-        if (mapObjects.length)
-        {
-            this.setSelectedMapObject(mapObjects[0])
-            return mapObjects[0]
-        }
-    }
-    
     const mapObject = map.createObject(type)
     
-    this.setSelectedMapObject(mapObject, { stick: true })
+    this.setSelection(mapObject, { stick: true })
+    TouchInput._moved = true
     
     LightingUtils.refresh()
     
@@ -332,67 +369,122 @@ Scene_LightingEditor.prototype._add = function(type, validation)
 
 Scene_LightingEditor.prototype.cloneSelectedLight = function(validation)
 {
-    if (!this.selectedMapObject)
+    if (!this.selection)
     {
         return false
     }
     
-    if (!this.selectedMapObject.object)
+    if (this.selection instanceof Data_Lighting_MapObject)
     {
-        return false
-    }
-    
-    if (this.selectedMapObject.object instanceof Data_Lighting_AmbientLight)
-    {
-        return false
-    }
-    
-    if (this.selectedMapObject.object instanceof Data_Lighting_Layer)
-    {
-        return false
-    }
-    
-    if (!validation)
-    {
-        const map = this.getMap()
-        const mapObject = map.createObject(this.selectedMapObject.object)
+        const selectedObject = this.selection.getObject()
         
-        this.setSelectedMapObject(mapObject, { stick: true })
+        if (!selectedObject)
+        {
+            return false
+        }
         
-        LightingUtils.refresh()
+        if (selectedObject instanceof Data_Lighting_AmbientLight)
+        {
+            return false
+        }
+        
+        if (selectedObject instanceof Data_Lighting_Layer)
+        {
+            return false
+        }
+        
+        if (!validation)
+        {
+            const map = $dataLighting.getMap(this._mapId)
+            const mapObject = map.createObject(selectedObject)
+            
+            this.setSelection(mapObject, { stick: true })
+            TouchInput._moved = true
+            
+            LightingUtils.refresh()
+        }
+        
+        return true
     }
     
-    return true
+    if (this.selection instanceof Game_Event)
+    {
+        if (LightingUtils.isPatched(this.selection._eventId))
+        {
+            return false
+        }
+        
+        if (!validation)
+        {
+            const mapData = this._loadMapData(this._mapId)
+            
+            const event = LightingUtils.loadPreset(`Event`, x => x
+                .replaceAll(`<sourceMapId>`, `0`)
+                .replaceAll(`<sourceEventId>`, this.selection._eventId.toString())
+            )
+            
+            const sourceEvent = this.selection.event()
+            
+            const eventId = Math.max(...mapData.events.map(x => x?.id ?? 0)) + 1
+            
+            event.id = eventId
+            event.name = "Clone of " + sourceEvent.name
+            event.x = 0
+            event.y = 0
+            event.pages[0].image = sourceEvent.pages[0].image
+            
+            mapData.events[eventId] = event
+            
+            this._saveMapData(this._mapId, mapData)
+            
+            Graphics.showGameCanvasScreenshot()
+            
+            this.onMapLoaded = () =>
+            {
+                this.setSelection($gameMap.event(eventId), { stick: true })
+                TouchInput._moved = true
+            }
+            
+            this.loadMap(this._mapId, { loadingPower: 3 })
+        }
+        
+        return true
+    }
+    
+    return false
 }
 
 Scene_LightingEditor.prototype.duplicateSelectedLight = function(validation)
 {
-    if (!this.selectedMapObject)
+    if (!this.selection)
     {
         return false
     }
     
-    if (!this.selectedMapObject.object)
+    if (!(this.selection instanceof Data_Lighting_MapObject))
     {
         return false
     }
     
-    if (this.selectedMapObject.object instanceof Data_Lighting_AmbientLight)
+    const selectedObject = this.selection.getObject()
+    
+    if (!selectedObject)
     {
         return false
     }
     
-    if (this.selectedMapObject.object instanceof Data_Lighting_Layer)
+    if (selectedObject instanceof Data_Lighting_Layer)
     {
         return false
     }
     
     if (!validation)
     {
-        const map = this.getMap()
-        const mapObject = map.createObject(map.root.copyObject(this.selectedMapObject.object))
+        const map = $dataLighting.getMap(this._mapId)
+        const mapObject = map.createObject(map.root.copyObject(selectedObject))
         
-        this.setSelectedMapObject(mapObject, { stick: true })
+        this.setSelection(mapObject, { stick: true })
+        TouchInput._moved = true
         
         LightingUtils.refresh()
     }
@@ -402,25 +494,58 @@ Scene_LightingEditor.prototype.duplicateSelectedLight = function(validation)
 
 Scene_LightingEditor.prototype.removeSelectedLight = function(validation)
 {
-    if (!this.selectedMapObject)
+    if (!this.selection)
     {
         return false
     }
     
-    if (validation)
+    if (this.selection instanceof Data_Lighting_MapObject)
     {
+        if (!validation)
+        {
+            const map = $dataLighting.getMap(this._mapId)
+            if (map)
+            {
+                map.objects = map.objects.filter(x => x != this.selection)
+                
+                LightingUtils.dump()
+                
+                this.setSelection(null)
+                
+                LightingUtils.refresh()
+            }
+        }
+        
         return true
     }
     
-    const map = this.getMap()
+    if (this.selection instanceof Game_Event)
+    {
+        if (!validation)
+        {
+            const mapData = this._loadMapData(this._mapId)
+            
+            const eventId = this.selection._eventId
+            
+            mapData.events[eventId] = null
+            
+            this._saveMapData(this._mapId, mapData)
+            
+            const map = $dataLighting.getMap(this._mapId)
+            if (map)
+            {
+                map.events = map.events.filter(x => x.eventId != eventId)
+            }
+            
+            Graphics.showGameCanvasScreenshot()
+            
+            this.loadMap(this._mapId, { loadingPower: 3 })
+        }
+        
+        return true
+    }
     
-    map.objects = map.objects.filter(x => x != this.selectedMapObject)
-    
-    LightingUtils.dump()
-    
-    this.setSelectedMapObject(null)
-    
-    LightingUtils.refresh()
+    return false
 }
 
 Scene_LightingEditor.prototype.undo = function(validation)
@@ -438,6 +563,7 @@ Scene_LightingEditor.prototype.undo = function(validation)
     if (!validation)
     {
         this.reselectMapObject(this.activeTool)
+        
         this.invalidate()
     }
     
@@ -459,6 +585,7 @@ Scene_LightingEditor.prototype.redo = function(validation)
     if (!validation)
     {
         this.reselectMapObject(this.activeTool)
+        
         this.invalidate()
     }
     
@@ -467,20 +594,39 @@ Scene_LightingEditor.prototype.redo = function(validation)
 
 Scene_LightingEditor.prototype.reselectMapObject = function(tool)
 {
-    if (!this.selectedMapObject)
+    if (!this.selection)
     {
         return
     }
     
-    const mapObject = this.getMap().objects
-        .find(x => x.objectId == this.selectedMapObject.objectId)
+    if (!this.selection.objectId)
+    {
+        return
+    }
     
-    this.setSelectedMapObject(mapObject)
+    const map = $dataLighting.getMap(this._mapId)
+    const mapObject = map.objects.find(x => x.objectId == this.selection.objectId)
     
-    if (mapObject && mapObject.object instanceof Data_Lighting_Layer)
+    this.setSelection(mapObject)
+    
+    if (mapObject && mapObject instanceof Data_Lighting_MapObject && mapObject.getObject() instanceof Data_Lighting_Layer)
     {
         this.setActiveTool(tool)
     }
+}
+
+Scene_LightingEditor.prototype.isDirty = function(data, debug)
+{
+    const fs = require(`fs`)
+    const a = fs.readFileSync(`data/Lighting.json`, `utf8`)
+    const b = JSON.stringify(data)
+    
+    if (LightingUtils.hashCode(a) == LightingUtils.hashCode(b))
+    {
+        return false
+    }
+    
+    return true
 }
 
 Scene_LightingEditor.prototype.save = function(validation)
@@ -490,48 +636,123 @@ Scene_LightingEditor.prototype.save = function(validation)
         return false
     }
     
-    const fs = require(`fs`)
+    let data = $dataLighting.serializeWithoutUrlContent()
     
-    const data = $dataLighting.serialize()
-    
-    for (const object of data.objects)
-    {
-        if (object.urlContent)
-        {
-            delete object.urlContent
-        }
-    }
-    
-    for (const map of data.maps)
-    {
-        for (const mapObject of map.objects)
-        {
-            if (mapObject.object && mapObject.object.urlContent)
-            {
-                delete mapObject.object.urlContent
-            }
-        }
-    }
-    
-    const a = fs.readFileSync(`data/Lighting.json`, `utf8`)
-    const b = JSON.stringify(data)
-    
-    if (LightingUtils.hashCode(a) == LightingUtils.hashCode(b))
+    if (!this.isDirty(data))
     {
         return false
     }
     
     if (!validation)
     {
+        const fs = require(`fs`)
+        
+        let dirty = false
+        
+        for (const map of $dataLighting.maps)
+        {
+            const mapData = this._loadMapData(map.id)
+            
+            let mapDirty = false
+            
+            for (const event of map.events)
+            {
+                const mapDataEvent = mapData.events[event.eventId]
+                
+                if (!mapDataEvent)
+                {
+                    continue
+                }
+                
+                let eventDirty = false
+                
+                const offset = (x, y) =>
+                {
+                    event.offsetX += x
+                    event.offsetY += y
+                    
+                    for (const item of LightingUtils.history)
+                    {
+                        const historyEvent = item.maps?.find(x => x.id == map.id)?.events?.find(x => x.eventId == event.eventId)
+                        
+                        if (historyEvent)
+                        {
+                            historyEvent.offsetX += x
+                            historyEvent.offsetY += y
+                        }
+                    }
+                    
+                    mapDataEvent.x -= x
+                    mapDataEvent.y -= y
+                    
+                    eventDirty = true
+                }
+                
+                if (Math.abs(event.offsetX) > .5 || Math.abs(event.offsetY) > .5)
+                {
+                    while (event.offsetX < .5)
+                    {
+                        offset(1, 0)
+                    }
+                    
+                    while (event.offsetX > .5)
+                    {
+                        offset(-1, 0)
+                    }
+                    
+                    while (event.offsetY < .5)
+                    {
+                        offset(0, 1)
+                    }
+                    
+                    while (event.offsetY > .5)
+                    {
+                        offset(0, -1)
+                    }
+                    
+                    mapDirty = true
+                    
+                    if ($gameMap._mapId == map.id)
+                    {
+                        const gameMapEvent = $gameMap.event(event.eventId)
+                        gameMapEvent.setPosition(mapDataEvent.x, mapDataEvent.y)
+                        gameMapEvent._tausiLighting_originalRealX = gameMapEvent._realX
+                        gameMapEvent._tausiLighting_originalRealY = gameMapEvent._realY
+                    }
+                }
+            }
+            
+            if (mapDirty)
+            {
+                this._saveMapData(map.id, mapData)
+                
+                dirty = true
+            }
+        }
+        
+        if (dirty)
+        {
+            this.setSelection(null)
+            
+            LightingUtils.dump()
+            
+            data = $dataLighting.serializeWithoutUrlContent()
+        }
+        
         this._writeToDataFile(`Lighting.json`, data)
         
         for (const map of $dataLighting.maps)
         {
             for (const mapObject of map.objects)
             {
-                if (mapObject.object instanceof Data_Lighting_Layer)
+                if (mapObject instanceof Data_Lighting_MapObject)
                 {
-                    Data_Lighting_Layer.saveUrlContent(mapObject.object.url, mapObject.object.urlContent)
+                    const object = mapObject.getObject()
+                    
+                    if (object instanceof Data_Lighting_Layer)
+                    {
+                        Data_Lighting_Layer.saveUrlContent(object.url, object.urlContent)
+                    }
                 }
             }
         }
@@ -554,6 +775,21 @@ Scene_LightingEditor.prototype._getDataFilePath = function(name)
     const path = require(`path`)
     const base = path.dirname(process.mainModule.filename)
     return path.join(base, `data`, name)
+}
+
+Scene_LightingEditor.prototype._loadMapData = function(mapId)
+{
+    const fs = require(`fs`)
+    const path = `data/Map${mapId.padZero(3)}.json`
+    const mapDataJson = fs.readFileSync(path, `utf8`)
+    return JsonEx.parse(mapDataJson)
+}
+
+Scene_LightingEditor.prototype._saveMapData = function(mapId, data)
+{
+    const fs = require(`fs`)
+    const path = `data/Map${mapId.padZero(3)}.json`
+    fs.writeFileSync(path, JsonEx.stringify(data))
 }
 
 Scene_LightingEditor.prototype.saveAndClose = function(validation)
@@ -606,6 +842,11 @@ Scene_LightingEditor.prototype.help = function(validation)
 
 Scene_LightingEditor.prototype.setTool_select = function(validation)
 {
+    if (this.activeTool == `selectEvent`)
+    {
+        return validation ? false : null
+    }
+    
     if (!validation)
     {
         this.setActiveTool(`select`)
@@ -616,14 +857,22 @@ Scene_LightingEditor.prototype.setTool_select = function(validation)
 
 Scene_LightingEditor.prototype.setTool_paint = function(validation)
 {
-    if (this.selectedMapObject?.object instanceof Data_Lighting_Layer)
+    if (this.activeTool == `selectEvent`)
     {
-        if (!validation)
+        return validation ? false : null
+    }
+    
+    if (this.selection instanceof Data_Lighting_MapObject)
+    {
+        if (this.selection.getObject() instanceof Data_Lighting_Layer)
         {
-            this.setActiveTool(`paint`)
+            if (!validation)
+            {
+                this.setActiveTool(`paint`)
+            }
+            
+            return true
         }
-        
-        return true
     }
     
     return false
@@ -631,14 +880,22 @@ Scene_LightingEditor.prototype.setTool_paint = function(validation)
 
 Scene_LightingEditor.prototype.setTool_erase = function(validation)
 {
-    if (this.selectedMapObject?.object instanceof Data_Lighting_Layer)
+    if (this.activeTool == `selectEvent`)
     {
-        if (!validation)
+        return validation ? false : null
+    }
+    
+    if (this.selection instanceof Data_Lighting_MapObject)
+    {
+        if (this.selection.getObject() instanceof Data_Lighting_Layer)
         {
-            this.setActiveTool(`erase`)
+            if (!validation)
+            {
+                this.setActiveTool(`erase`)
+            }
+            
+            return true
         }
-        
-        return true
     }
     
     return false

@@ -2,6 +2,7 @@ const TausiLighting__Editor__DataManager__makeEmptyMap = DataManager.makeEmptyMa
 DataManager.makeEmptyMap = function()
 {
     TausiLighting__Editor__DataManager__makeEmptyMap.apply(this, arguments)
+    
     $dataMap.width = 17
     $dataMap.height = 13
 }

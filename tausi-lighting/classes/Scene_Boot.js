@@ -10,7 +10,7 @@ Scene_Boot.prototype.create = function()
             case `Enabled`: return [ `enabled`, true ]
             case `X`: return [ `x`, null ]
             case `Y`: return [ `y`, null ]
-            case `Follow Event ID`: return [ `followEventId`, null ]
+            case `Reference Event ID`: return [ `referenceEventId`, null ]
             case `Light: Color (R)`: return [ `color[0]`, null ]
             case `Light: Color (G)`: return [ `color[1]`, null ]
             case `Light: Color (B)`: return [ `color[2]`, null ]
@@ -18,6 +18,7 @@ Scene_Boot.prototype.create = function()
             case `Ambient Light: Weight`: return [ `weight`, null ]
             case `Ambient Light: Exposure`: return [ `exposure`, null ]
             case `Ambient Light: Saturation`: return [ `saturation`, null ]
+            case `Ambient Light: Contrast`: return [ `contrast`, null ]
             case `Ambient Light: Power (R)`: return [ `power[0]`, null ]
             case `Ambient Light: Power (G)`: return [ `power[1]`, null ]
             case `Ambient Light: Power (B)`: return [ `power[2]`, null ]
@@ -63,7 +64,7 @@ Scene_Boot.prototype.create = function()
             switch: _switch
         }
         
-        this.bindSwitch(options)
+        $gameMap.tausiLighting_bindSwitch(this, options)
     })
     
     PluginManager.registerCommand(`TausiLighting`, `bindVariable`, function(args)
@@ -91,11 +92,12 @@ Scene_Boot.prototype.create = function()
             max: max
         }
         
-        this.bindVariable(options)
+        $gameMap.tausiLighting_bindVariable(this, options)
     })
     
     PluginManager.registerCommand(`TausiLighting`, `interpolate`, function(args)
     {
+        const eventId = this.eventId()
         const objects = JSON.parse(args.objects)
         const duration = JSON.parse(args.duration)
         const wait = JSON.parse(args.wait)
@@ -103,7 +105,9 @@ Scene_Boot.prototype.create = function()
         for (const i in objects)
         {
             objects[i] = JSON.parse(objects[i])
-            objects[i].target = eval(objects[i].target)
+            objects[i].target = objects[i].target
+                ? eval(objects[i].target)
+                : objects[i].target = $dataLighting.getCurrentMap().objects.find(x => x.referenceEventId && x.referenceEventId == eventId)
             const info = propertyInfo(objects[i].property)
             objects[i].property = info[0]
             objects[i].isBoolean = !!info[1]
@@ -116,7 +120,7 @@ Scene_Boot.prototype.create = function()
             wait: wait
         }
         
-        this.interpolate(options)
+        $gameMap.tausiLighting_interpolate(this, options)
     })
     
     if (LightingUtils.getPluginParameterBoolean(`Show Overlay`))
@@ -259,6 +263,50 @@ Scene_Boot.prototype.create = function()
             })
         }
     }
+}
+
+const TausiLighting__Scene_Boot__isReady = Scene_Boot.prototype.isReady
+Scene_Boot.prototype.isReady = function()
+{
+    if (window.$dataMapInfos)
+    {
+        if (window.$dataMapEvents === undefined)
+        {
+            window.$dataMapEvents = null
+            
+            const mapIds = JSON.parse(JSON.stringify($dataMapInfos)).filter(x => x).map(x => x?.id)
+            const mapInfos = []
+            
+            for (const mapId of mapIds)
+            {
+                fetch(`data/Map${mapId.padZero(3)}.json`)
+                    .then(x => x.json())
+                    .then(x =>
+                    {
+                        x.id = mapId
+                        mapInfos.push(x)
+                        
+                        if (mapInfos.length == mapIds.length)
+                        {
+                            const mapEvents = []
+                            for (const mapInfo of mapInfos)
+                            {
+                                mapEvents[mapInfo.id] = mapInfo.events
+                            }
+                            window.$dataMapEvents = mapEvents
+                        }
+                    })
+            }
+            
+            return false
+        }
+        else if (window.$dataMapEvents === null)
+        {
+            return false
+        }
+    }
+    
+    return TausiLighting__Scene_Boot__isReady.apply(this, arguments)
 }
 
 const TausiLighting__Scene_Boot__onDatabaseLoaded = Scene_Boot.prototype.onDatabaseLoaded

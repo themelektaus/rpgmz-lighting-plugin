@@ -1,6 +1,17 @@
 TouchInput._onWheel = function(event)
 {
+    let scale = $gameScreen._zoomScale
     
+    if (event.deltaY > 0)
+    {
+        // TODO: decrease zoom
+    }
+    else
+    {
+        // TODO: increase zoom
+    }
+    
+    $gameScreen._zoomScale = scale
 }
 
 const TausiLighting__Editor__TouchInput__onMouseDown = TouchInput._onMouseDown
@@ -15,7 +26,7 @@ TouchInput._onMouseDown = function(event)
     {
         if (event.button == 1)
         {
-            this._lastPanningPosition = [ x, y ]
+            this._tausiLighting_lastPanningPosition = [ x, y ]
         }
     }
 }
@@ -30,7 +41,7 @@ TouchInput._onRightButtonDown = function(event)
     
     if (Graphics.isInsideCanvas(x, y))
     {
-        this._mousePressed2 = true
+        this._tausiLighting_mousePressed = true
     }
 }
 
@@ -41,35 +52,38 @@ TouchInput._onMouseUp = function(event)
     
     if (event.button == 0)
     {
-        if (this._lastMapObjectMoved)
+        if (this.tausiLighting_lastSelectionMoved)
         {
             LightingUtils.dump()
         }
         
-        if (this._lastMapObject)
+        if (this.tausiLighting_lastSelection)
         {
-            if (this._lastMapObject.createPropertiesEditor)
+            if (this.tausiLighting_lastSelection.tausiLighting_createPropertiesEditor)
             {
                 const $_properties = document.querySelector(`#properties`)
                 $_properties.innerHTML = ``
-                this._lastMapObject.createPropertiesEditor($_properties)
+                this.tausiLighting_lastSelection.tausiLighting_createPropertiesEditor($_properties)
             }
-            delete this._lastMapObject
+            delete this.tausiLighting_lastSelection
         }
         
-        delete this._lastMapObjectMoved
+        if (this.tausiLighting_lastSelectionMoved)
+        {
+            delete this.tausiLighting_lastSelectionMoved
+        }
         
         SceneManager._scene?.invalidate?.call(SceneManager._scene)
     }
     
     if (event.button == 1)
     {
-        delete this._lastPanningPosition
+        delete this._tausiLighting_lastPanningPosition
     }
     
     if (event.button == 2)
     {
-        this._mousePressed2 = false
+        this._tausiLighting_mousePressed = false
     }
 }
 
@@ -78,7 +92,7 @@ TouchInput.clear = function(event)
 {
     TausiLighting__Editor__TouchInput__clear.call(this, event)
     
-    this._mousePressed2 = false
+    this._tausiLighting_mousePressed = false
 }
 
 const TausiLighting__Editor__TouchInput__onMouseMove = TouchInput._onMouseMove
@@ -86,31 +100,31 @@ TouchInput._onMouseMove = function(event)
 {
     TausiLighting__Editor__TouchInput__onMouseMove.call(this, event)
     
-    this._lastMoveX = Graphics.pageToCanvasX(event.pageX)
-    this._lastMoveY = Graphics.pageToCanvasY(event.pageY)
+    this.tausiLighting_lastMoveX = Graphics.pageToCanvasX(event.pageX)
+    this.tausiLighting_lastMoveY = Graphics.pageToCanvasY(event.pageY)
     
-    if (!this._lastMapObject && !this._lastPanningPosition)
+    if (!this.tausiLighting_lastSelection && !this._tausiLighting_lastPanningPosition)
     {
         return
     }
     
-    const x = this._lastMoveX
-    const y = this._lastMoveY
+    const x = this.tausiLighting_lastMoveX
+    const y = this.tausiLighting_lastMoveY
     
-    if (this._lastMapObject)
+    if (this.tausiLighting_lastSelection && this._moved)
     {
-        if (this._lastMapObject.editorMove)
+        if (this.tausiLighting_lastSelection.tausiLighting_EditorMove)
         {
-            this._lastMapObject.editorMove(x, y)
-            this._lastMapObjectMoved = true
+            this.tausiLighting_lastSelection.tausiLighting_EditorMove(x, y)
+            this.tausiLighting_lastSelectionMoved = true
         }
     }
     
-    if (this._lastPanningPosition)
+    if (this._tausiLighting_lastPanningPosition)
     {
         const panning = {
-            x: (this._lastPanningPosition[0] - x) * .025,
-            y: (this._lastPanningPosition[1] - y) * .025
+            x: (this._tausiLighting_lastPanningPosition[0] - x) * .025,
+            y: (this._tausiLighting_lastPanningPosition[1] - y) * .025
         }
         
         if (panning.x > 0)
@@ -131,7 +145,7 @@ TouchInput._onMouseMove = function(event)
             $gameMap.scrollUp(-panning.y)
         }
         
-        this._lastPanningPosition[0] = x
-        this._lastPanningPosition[1] = y
+        this._tausiLighting_lastPanningPosition[0] = x
+        this._tausiLighting_lastPanningPosition[1] = y
     }
 }
