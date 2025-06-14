@@ -1,4 +1,4 @@
-[B][SIZE=22px]Tausi Lighting[/SIZE][/B] - v0.1.5
+[B][SIZE=22px]Tausi Lighting[/SIZE][/B] - v0.1.6
 
 Author: [URL='https://github.com/themelektaus']themelektaus[/URL]
 Source: [URL='https://github.com/themelektaus/rpgmz-lighting-plugin']github.com/themelektaus/rpgmz-lighting-plugin[/URL]
