@@ -31,7 +31,7 @@ Yet another **Lighting System** with an **integrated WYSIWYG editor** for RPG Ma
 ## Plugin Commands
 - ```Bind Switch```
 - ```Bind Variable```
-- ```Copy Event from```
+- ```Copy Event From```
 - ```Interpolate```
 
 ## Known Issues
