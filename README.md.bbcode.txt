@@ -35,20 +35,23 @@ Yet another [B]Lighting System[/B] with an integrated [B]WYSIWYG editor[/B] for 
 
 [B][SIZE=18px]Hints[/SIZE][/B]
 [LIST]
-[*]There can only be one ambient light
+[*][S]There can only be one ambient light[/S]
 [*]Press and hold the right mouse button to use the eraser
 [*]Press and hold the middle mouse button for panning
 [/LIST]
 
 [B][SIZE=18px]Plugin Commands[/SIZE][/B]
 [LIST]
+[*][FONT=Courier New][B]Bind Switch[/B][/FONT]
+[*][FONT=Courier New][B]Bind Variable[/B][/FONT]
+[*][FONT=Courier New][B]Copy Event From[/B][/FONT]
 [*][FONT=Courier New][B]Interpolate[/B][/FONT]
 [/LIST]
 
 [B][SIZE=18px]Known Issues[/SIZE][/B]
 [LIST]
 [*]Slightly poorer quality when painting during overlay mode
-[*]Missing undo function
+[*][S]Missing undo function[/S]
 [/LIST]
 
 [B][SIZE=18px]Terms and Credits[/SIZE][/B]
@@ -59,6 +62,15 @@ Yet another [B]Lighting System[/B] with an integrated [B]WYSIWYG editor[/B] for 
 
 
 [B][SIZE=18px]Changelog[/SIZE][/B]
+
+[B]v0.1.6[/B]
+[LIST]
+[*]Plugin Command [FONT=Courier New][B]Bind Switch[/B][/FONT]
+[*]Plugin Command [FONT=Courier New][B]Bind Variable[/B][/FONT]
+[*]Plugin Command [FONT=Courier New][B]Copy Event From[/B][/FONT]
+[*]Interactive Fire Bowl (Example Preset)
+[*]Offset the pixel position of Events
+[/LIST]
 
 [B]v0.1.5[/B]
 [LIST]

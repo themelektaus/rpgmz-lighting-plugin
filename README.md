@@ -24,11 +24,14 @@ Yet another **Lighting System** with an **integrated WYSIWYG editor** for RPG Ma
 - Enable the plugin
 
 ## Hints
-- There can only be one ambient light
+- <del>There can only be one ambient light</del>
 - Press and hold the right mouse button to use the eraser
 - Press and hold the middle mouse button for panning
 
 ## Plugin Commands
+- ```Bind Switch```
+- ```Bind Variable```
+- ```Copy Event from```
 - ```Interpolate```
 
 ## Known Issues
@@ -40,6 +43,13 @@ Yet another **Lighting System** with an **integrated WYSIWYG editor** for RPG Ma
 - No credits needed
 
 ## Changelog
+
+### v0.1.6
+- Plugin Command ```Bind Switch```
+- Plugin Command ```Bind Variable```
+- Plugin Command ```Copy Event From```
+- Interactive Fire Bowl (Example Preset)
+- Offset the pixel position of Events
 
 ### v0.1.5
 - Plugin Command ```Interpolate```
