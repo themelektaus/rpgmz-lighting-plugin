@@ -705,3 +705,36 @@ LightingUtils.getEventHtml = function(eventId)
         return `<span class="unset">Unset</span>`
     }
 }
+
+LightingUtils.getObjectUsage = function()
+{
+    const usage = []
+    
+    for (const object of $dataLighting.objects)
+    {
+        usage.push({ id: object.id, count: 0, exists: true })
+    }
+    
+    for (const map of $dataLighting.maps)
+    {
+        for (const mapObject of map.objects)
+        {
+            let entry = usage.find(x => x.id == mapObject.objectId)
+            if (!entry)
+            {
+                entry = { id: mapObject.objectId, count: 0, exists: false }
+                usage.push(entry)
+            }
+            
+            entry.count++
+        }
+    }
+    
+    return usage
+}
+
+LightingUtils.clearUnusedObjects = function()
+{
+    const unusedIds = this.getObjectUsage().filter(x => !x.count || !x.exists).map(x => x.id)
+    $dataLighting.objects = $dataLighting.objects.filter(x => !unusedIds.includes(x.id))
+}

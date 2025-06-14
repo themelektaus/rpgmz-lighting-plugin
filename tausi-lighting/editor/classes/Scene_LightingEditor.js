@@ -36,21 +36,30 @@ Scene_LightingEditor.prototype.initialize = function()
     const mapInfos = [...$dataMapInfos]
     mapInfos.sort((a, b) => (a?.order ?? 0) - (b?.order ?? 0))
     
-    for (const $mapInfo of mapInfos)
+    let nullInList = false
+    
+    for (const mapInfo of mapInfos)
     {
-        const mapId = Number($mapInfo?.id || 0)
-        const mapName = String($mapInfo?.name ?? `<span style="color:#999">Empty</span>`)
+        if (!mapInfo)
+        {
+            if (nullInList)
+            {
+                continue
+            }
+            else
+            {
+                nullInList = true
+            }
+        }
+        
+        const mapId = Number(mapInfo?.id || 0)
+        const mapName = String(mapInfo?.name ?? `<span style="color:#999">Empty</span>`)
         
         const $_li = document.createElement(`li`)
         $_li.dataset.id = mapId
         $_li.innerHTML = mapName
         $_li.addEventListener(`click`, () =>
         {
-            if (this._mapId == mapId)
-            {
-                //return
-            }
-            
             const $_gameCanvasContainer = document.querySelector(`#gameCanvasContainer`)
             if (!$_gameCanvasContainer.classList.contains(`loading`))
             {
@@ -652,6 +661,10 @@ Scene_LightingEditor.prototype.save = function(validation)
         for (const map of $dataLighting.maps)
         {
             const mapData = this._loadMapData(map.id)
+            if (!mapData)
+            {
+                continue
+            }
             
             let mapDirty = false
             
@@ -781,8 +794,12 @@ Scene_LightingEditor.prototype._loadMapData = function(mapId)
 {
     const fs = require(`fs`)
     const path = `data/Map${mapId.padZero(3)}.json`
-    const mapDataJson = fs.readFileSync(path, `utf8`)
-    return JsonEx.parse(mapDataJson)
+    if (fs.existsSync(path))
+    {
+        const mapDataJson = fs.readFileSync(path, `utf8`)
+        return JsonEx.parse(mapDataJson)
+    }
+    return null
 }
 
 Scene_LightingEditor.prototype._saveMapData = function(mapId, data)
