@@ -5,7 +5,7 @@ class Data_Lighting
     objects = []
     maps = []
     
-    serialize()
+    serialize(includeUrlContent)
     {
         const data = {
             version: this.version,
@@ -15,11 +15,14 @@ class Data_Lighting
         
         data.objects = data.objects.filter(x => Data_Lighting_Object.getUsage(data, x.id).length)
         
-        for (const object of data.objects)
+        if (!includeUrlContent)
         {
-            if (object.urlContent)
+            for (const object of data.objects)
             {
-                delete object.urlContent
+                if (object.urlContent)
+                {
+                    delete object.urlContent
+                }
             }
         }
         

@@ -278,6 +278,33 @@ LightingUtils.createField = function($_properties, _default, property, options)
             })
             break
         
+        case `text`:
+            $_input = document.createElement(`input`)
+            $_input.type = `text`
+            $_input.value = value || ``
+            $_input.addEventListener(`input`, () =>
+            {
+                this[property] = $_input.value || ``
+                LightingUtils.invalidate()
+            })
+            $_input.addEventListener(`change`, () =>
+            {
+                dump()
+                LightingUtils.invalidate()
+            })
+            $_field.appendChild($_input)
+            $_reset.addEventListener(`click`, () =>
+            {
+                if ($_input.value != _default[property])
+                {
+                    $_input.value = _default[property]
+                    this[property] = $_input.value || ``
+                    dump()
+                    LightingUtils.invalidate()
+                }
+            })
+            break
+        
         case `number`:
             $_input = document.createElement(`input`)
             $_input.type = `number`
@@ -531,7 +558,7 @@ LightingUtils.dump = function()
         return false
     }
     
-    const data = $dataLighting.serialize()
+    const data = $dataLighting.serialize(true)
     
     this.history ??= []
     this.historyIndex = (this.historyIndex ?? -1) + 1

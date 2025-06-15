@@ -10,6 +10,7 @@ class Data_Lighting_Layer extends Data_Lighting_Object
     blendMode = 0
     opacity = 255
     power = 100
+    //image = null
     
     get icon()
     {
@@ -29,6 +30,7 @@ class Data_Lighting_Layer extends Data_Lighting_Object
         data.blendMode = this.blendMode
         data.opacity = this.opacity
         data.power = this.power
+        //data.image = this.image
         return data
     }
     
@@ -45,6 +47,7 @@ class Data_Lighting_Layer extends Data_Lighting_Object
         result.blendMode = data.blendMode
         result.opacity = data.opacity
         result.power = data.power
+        //result.image = data.image
         const layer = Object.assign(result, Data_Lighting_Object.deserialize(root, data))
         layer.loadUrlContent()
         return layer
@@ -89,6 +92,7 @@ class Data_Lighting_Layer extends Data_Lighting_Object
         
         this.createField($_properties, _default, `opacity`, { type: `slider`, max: 255 })
         this.createField($_properties, _default, `power`, { type: `slider`, max: 1000 })
+        //this.createField($_properties, _default, `image`, { type: `text` })
     }
     
     onCreate()
