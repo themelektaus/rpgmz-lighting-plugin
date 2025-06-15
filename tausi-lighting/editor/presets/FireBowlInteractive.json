@@ -1,0 +1,217 @@
+{
+  "name": "Fire Bowl (Interactive)",
+  "icon": "fire",
+  "note": "",
+  "lights": [
+    {
+      "typeName": "Data_Lighting_PointLight",
+      "color": [ 255, 130, 110, 510 ],
+      "intensity": 10,
+      "radius": 550,
+      "smoothness": 200,
+      "flickerStrength": 12,
+      "flickerSpeed": 40,
+      "offsetY": -0.5
+    }
+  ],
+  "pages": [
+    {
+      "conditions": {
+        "actorId": 1,
+        "actorValid": false,
+        "itemId": 1,
+        "itemValid": false,
+        "selfSwitchCh": "A",
+        "selfSwitchValid": false,
+        "switch1Id": 1,
+        "switch1Valid": false,
+        "switch2Id": 1,
+        "switch2Valid": false,
+        "variableId": 1,
+        "variableValid": false,
+        "variableValue": 0
+      },
+      "directionFix": true,
+      "image": {
+        "tileId": 0,
+        "characterName": "!Other2",
+        "direction": 2,
+        "pattern": 1,
+        "characterIndex": 7
+      },
+      "list": [
+        {
+          "code": 357,
+          "indent": 0,
+          "parameters": [
+            "TausiLighting",
+            "interpolate",
+            "Interpolate",
+            {
+              "objects": "[\"{\\\"target\\\":\\\"\\\",\\\"property\\\":\\\"Point/Spot Light: Intensity\\\",\\\"to\\\":\\\"0\\\"}\"]",
+              "duration": "0",
+              "wait": "false"
+            }
+          ]
+        },
+        {
+          "code": 657,
+          "indent": 0,
+          "parameters": [
+            "Objects = [\"{\\\"target\\\":\\\"\\\",\\\"property\\\":\\\"Point/Spot Light: Intensity\\\",\\\"to\\\":\\\"0\\\"}\"]"
+          ]
+        },
+        { "code": 657, "indent": 0, "parameters": ["Duration = 0"] },
+        { "code": 657, "indent": 0, "parameters": ["Wait = false"] },
+        { "code": 123, "indent": 0, "parameters": ["A", 0] },
+        { "code": 0, "indent": 0, "parameters": [] }
+      ],
+      "moveFrequency": 3,
+      "moveRoute": {
+        "list": [{ "code": 0, "parameters": [] }],
+        "repeat": true,
+        "skippable": false,
+        "wait": false
+      },
+      "moveSpeed": 6,
+      "moveType": 0,
+      "priorityType": 1,
+      "stepAnime": true,
+      "through": false,
+      "trigger": 3,
+      "walkAnime": true
+    },
+    {
+      "conditions": {
+        "actorId": 1,
+        "actorValid": false,
+        "itemId": 1,
+        "itemValid": false,
+        "selfSwitchCh": "A",
+        "selfSwitchValid": true,
+        "switch1Id": 1,
+        "switch1Valid": false,
+        "switch2Id": 1,
+        "switch2Valid": false,
+        "variableId": 1,
+        "variableValid": false,
+        "variableValue": 0
+      },
+      "directionFix": true,
+      "image": {
+        "tileId": 0,
+        "characterName": "!Other2",
+        "direction": 8,
+        "pattern": 1,
+        "characterIndex": 7
+      },
+      "list": [
+        {
+          "code": 357,
+          "indent": 0,
+          "parameters": [
+            "TausiLighting",
+            "interpolate",
+            "Interpolate",
+            {
+              "objects": "[\"{\\\"target\\\":\\\"\\\",\\\"property\\\":\\\"Point/Spot Light: Intensity\\\",\\\"to\\\":\\\"10\\\"}\"]",
+              "duration": "10",
+              "wait": "false"
+            }
+          ]
+        },
+        {
+          "code": 657,
+          "indent": 0,
+          "parameters": [
+            "Objects = [\"{\\\"target\\\":\\\"\\\",\\\"property\\\":\\\"Point/Spot Light: Intensity\\\",\\\"to\\\":\\\"10\\\"}\"]"
+          ]
+        },
+        { "code": 657, "indent": 0, "parameters": ["Duration = 10"] },
+        { "code": 657, "indent": 0, "parameters": ["Wait = false"] },
+        { "code": 123, "indent": 0, "parameters": ["B", 0] },
+        { "code": 0, "indent": 0, "parameters": [] }
+      ],
+      "moveFrequency": 3,
+      "moveRoute": {
+        "list": [{ "code": 0, "parameters": [] }],
+        "repeat": true,
+        "skippable": false,
+        "wait": false
+      },
+      "moveSpeed": 6,
+      "moveType": 0,
+      "priorityType": 1,
+      "stepAnime": false,
+      "through": false,
+      "trigger": 0,
+      "walkAnime": true
+    },
+    {
+      "conditions": {
+        "actorId": 1,
+        "actorValid": false,
+        "itemId": 1,
+        "itemValid": false,
+        "selfSwitchCh": "B",
+        "selfSwitchValid": true,
+        "switch1Id": 1,
+        "switch1Valid": false,
+        "switch2Id": 1,
+        "switch2Valid": false,
+        "variableId": 1,
+        "variableValid": false,
+        "variableValue": 0
+      },
+      "directionFix": true,
+      "image": {
+        "tileId": 0,
+        "characterName": "!Other2",
+        "direction": 2,
+        "pattern": 1,
+        "characterIndex": 7
+      },
+      "list": [
+        {
+          "code": 357,
+          "indent": 0,
+          "parameters": [
+            "TausiLighting",
+            "interpolate",
+            "Interpolate",
+            {
+              "objects": "[\"{\\\"target\\\":\\\"\\\",\\\"property\\\":\\\"Point/Spot Light: Intensity\\\",\\\"to\\\":\\\"0\\\"}\"]",
+              "duration": "30",
+              "wait": "false"
+            }
+          ]
+        },
+        {
+          "code": 657,
+          "indent": 0,
+          "parameters": [
+            "Objects = [\"{\\\"target\\\":\\\"\\\",\\\"property\\\":\\\"Point/Spot Light: Intensity\\\",\\\"to\\\":\\\"0\\\"}\"]"
+          ]
+        },
+        { "code": 657, "indent": 0, "parameters": ["Duration = 30"] },
+        { "code": 657, "indent": 0, "parameters": ["Wait = false"] },
+        { "code": 123, "indent": 0, "parameters": ["B", 1] },
+        { "code": 0, "indent": 0, "parameters": [] }
+      ],
+      "moveFrequency": 3,
+      "moveRoute": {
+        "list": [{ "code": 0, "parameters": [] }],
+        "repeat": true,
+        "skippable": false,
+        "wait": false
+      },
+      "moveSpeed": 6,
+      "moveType": 0,
+      "priorityType": 1,
+      "stepAnime": true,
+      "through": false,
+      "trigger": 0,
+      "walkAnime": true
+    }
+  ]
+}

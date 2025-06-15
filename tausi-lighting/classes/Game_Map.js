@@ -99,35 +99,37 @@ Game_Map.prototype.tausiLighting_interpolate = function(interpreter, options)
         
         if (target && property && to !== null)
         {
+            this._tausiLighting_interpolations = this._tausiLighting_interpolations?.filter(
+                x => x.target != target || x.property != property
+            ) ?? []
+            
             if (duration == 0)
             {
                 target.set(property, isBoolean ? !!to : to)
+                continue
             }
-            else if (isBoolean)
+            
+            const interpolation = {
+                target: target,
+                property: property,
+                duration: duration,
+                frame: 0
+            }
+            
+            if (isBoolean)
             {
                 const _from = target.get(property) ? 1 : 0
                 const _to = to ? 1 : 0
-                updates.push(t => target.set(property, !!LightingUtils.lerp(_from, _to, t)))
+                interpolation.update = t => target.set(property, !!LightingUtils.lerp(_from, _to, t))
             }
             else
             {
                 const from = target.get(property)
-                updates.push(t => target.set(property, LightingUtils.lerp(from, to, t)))
+                interpolation.update = t => target.set(property, LightingUtils.lerp(from, to, t))
             }
+            
+            this._tausiLighting_interpolations.push(interpolation)
         }
-    }
-    
-    if (updates.length)
-    {
-        const interpolation = {
-            duration: duration,
-            update: t => updates.forEach(x => x.call(interpreter, t))
-        }
-        
-        this._tausiLighting_interpolations ??= []
-        this._tausiLighting_interpolations.push(interpolation)
-        
-        interpolation.update(0)
     }
     
     if (duration && (options?.wait ?? false))
@@ -141,17 +143,21 @@ Game_Map.prototype.updateInterpreter = function()
 {
     TausiLighting__Game_Map__updateInterpreter.apply(this, arguments)
     
-    for (const interpolation of [...(this._tausiLighting_interpolations ?? [])])
+    if (!this._tausiLighting_interpolations)
     {
-        interpolation.frame ??= 0
-        interpolation.frame++
+        return
+    }
+    
+    for (const interpolation of [ ...this._tausiLighting_interpolations ])
+    {
+        interpolation.update(++interpolation.frame / interpolation.duration)
         
-        interpolation.update(interpolation.frame / interpolation.duration)
-        
-        if (interpolation.frame == interpolation.duration)
+        if (interpolation.frame < interpolation.duration)
         {
-            this._tausiLighting_interpolations ??= []
-            this._tausiLighting_interpolations.splice(this._tausiLighting_interpolations.indexOf(interpolation), 1)
+            continue
         }
+        
+        const index = this._tausiLighting_interpolations.indexOf(interpolation)
+        this._tausiLighting_interpolations.splice(index, 1)
     }
 }

@@ -7,25 +7,13 @@ class Data_Lighting
     
     serialize()
     {
-        const result = {
+        const data = {
             version: this.version,
             objects: this.objects.map(x => x.serialize()),
-            maps: this.maps.map(x => x.serialize())
+            maps: this.maps.map(x => x.serialize()).filter(x => x)
         }
         
-        for (const map of result.maps)
-        {
-            map.events = map.events.filter(x => x.offsetX || x.offsetY)
-        }
-        
-        result.maps = result.maps.filter(x => x.objects?.length || x.events?.length)
-        
-        return result
-    }
-    
-    serializeWithoutUrlContent()
-    {
-        const data = this.serialize()
+        data.objects = data.objects.filter(x => Data_Lighting_Object.getUsage(data, x.id).length)
         
         for (const object of data.objects)
         {

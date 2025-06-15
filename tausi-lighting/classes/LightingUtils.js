@@ -665,7 +665,6 @@ LightingUtils.copyEvent = function(sourceMapId, sourceEventId, destinationEventI
 
 LightingUtils.loadPreset = function(name, modifyJson)
 {
-    
     let fs
     
     try

@@ -20,6 +20,24 @@ class Data_Lighting_Object
         return result
     }
     
+    static getUsage(data, id)
+    {
+        const usage = []
+        
+        for (const map of data.maps)
+        {
+            for (const mapObject of map.objects)
+            {
+                if (id == mapObject.objectId)
+                {
+                    usage.push(mapObject)
+                }
+            }
+        }
+        
+        return usage
+    }
+    
     get(property)
     {
         return LightingUtils.property(this, property).get()

@@ -78,6 +78,35 @@ Scene_LightingEditor.prototype.initialize = function()
         $_.addEventListener(`click`, () => this[$_.dataset.action].call(this, false))
     })
     
+    const $_addMenu = document.querySelector(`#addMenu`)
+        
+    let $_title = null
+    
+    const fs = require(`fs`)
+    fs.readdirSync(`tausi-lighting/editor/presets`).forEach((file, _) =>
+    {
+        if (file.endsWith(`.json`) && file != `Event.json`)
+        {
+            if (!$_title)
+            {
+                $_title = document.createElement(`div`)
+                $_title.classList.add(`title`)
+                $_title.innerHTML = `Presets / Examples`
+                $_addMenu.appendChild($_title)
+            }
+            
+            const presetName = file.substring(0, file.length - 5)
+            const preset = LightingUtils.loadPreset(presetName)
+            
+            const $_button = document.createElement(`button`)
+            $_button.classList.add(`positive`)
+            $_button.innerHTML = preset.name
+            $_button.dataset.icon = preset.icon
+            $_button.addEventListener(`click`, () => this._addPreset(presetName))
+            $_addMenu.appendChild($_button)
+        }
+    })
+    
     Scene_Base.prototype.initialize.call(this)
     
     const pluginParameters = PluginManager.parameters(`TausiLighting`)
@@ -269,10 +298,10 @@ Scene_LightingEditor.prototype.add = function(validation)
     {
         requestAnimationFrame(() =>
         {
-            const $_addMenu = document.querySelector(`#addMenu`)
-            
             const $_button = document.querySelector(`#toolbar button[data-action="add"]`)
             const rect = $_button.getBoundingClientRect()
+            
+            const $_addMenu = document.querySelector(`#addMenu`)
             
             $_addMenu.style.top = `calc(${rect.bottom}px + .5em)`
             $_addMenu.style.left = `${rect.left}px`
@@ -311,48 +340,6 @@ Scene_LightingEditor.prototype.addLayer = function(validation)
     return this._add(Data_Lighting_Layer, validation)
 }
 
-Scene_LightingEditor.prototype.addFireBowl = function(validation)
-{
-    if (validation)
-    {
-        return true
-    }
-    
-    const mapData = this._loadMapData(this._mapId)
-    
-    const event = LightingUtils.loadPreset(`FireBowl`)
-    
-    event.id = Math.max(...mapData.events.map(x => x?.id ?? 0)) + 1
-    event.x = 1
-    event.y = 1
-    
-    const eventId = event.id
-    mapData.events[eventId] = event
-    
-    this._saveMapData(this._mapId, mapData)
-    
-    Graphics.showGameCanvasScreenshot()
-    
-    this.onMapLoaded = () =>
-    {
-        const object = $dataLighting.copyObject(
-            LightingUtils.loadPreset(`FireBowlLight`)
-        )
-        
-        const mapObject = $dataLighting.getMap(this._mapId).createObject(object)
-        mapObject.x += $gameMap.tileWidth() * 1.5
-        mapObject.y += $gameMap.tileHeight()
-        mapObject.referenceEventId = eventId
-        
-        this.setSelection($gameMap.event(eventId), { stick: true })
-        TouchInput._moved = true
-        
-        LightingUtils.refresh()
-    }
-    
-    this.loadMap(this._mapId, { loadingPower: 3 })
-}
-
 Scene_LightingEditor.prototype._add = function(type, validation)
 {
     const map = $dataLighting.getMap(this._mapId)
@@ -374,6 +361,54 @@ Scene_LightingEditor.prototype._add = function(type, validation)
     LightingUtils.refresh()
     
     return mapObject
+}
+
+Scene_LightingEditor.prototype._addPreset = function(name)
+{
+    const preset = LightingUtils.loadPreset(name)
+    delete preset.icon
+    
+    const mapData = this._loadMapData(this._mapId)
+    
+    preset.id = Math.max(...mapData.events.map(x => x?.id ?? 0)) + 1
+    preset.x = 1
+    preset.y = 1
+    
+    const additionalLights = preset.lights ?? []
+    delete preset.lights
+    
+    const eventId = preset.id
+    mapData.events[eventId] = preset
+    
+    this._saveMapData(this._mapId, mapData)
+    
+    Graphics.showGameCanvasScreenshot()
+    
+    this.onMapLoaded = () =>
+    {
+        for (const additionalLight of additionalLights)
+        {
+            const offsetX = additionalLight.offsetX ?? 0
+            const offsetY = additionalLight.offsetY ?? 0
+            
+            delete additionalLight.offsetX
+            delete additionalLight.offsetY
+            
+            const object = $dataLighting.copyObject(additionalLight)
+            
+            const mapObject = $dataLighting.getMap(this._mapId).createObject(object)
+            mapObject.x = $gameMap.tileWidth() * (1.5 + offsetX)
+            mapObject.y = $gameMap.tileHeight() * (1.5 + offsetY)
+            mapObject.referenceEventId = eventId
+        }
+        
+        this.setSelection($gameMap.event(eventId), { stick: true })
+        TouchInput._moved = true
+        
+        LightingUtils.refresh()
+    }
+    
+    this.loadMap(this._mapId, { loadingPower: 3 })
 }
 
 Scene_LightingEditor.prototype.cloneSelectedLight = function(validation)
@@ -645,7 +680,7 @@ Scene_LightingEditor.prototype.save = function(validation)
         return false
     }
     
-    let data = $dataLighting.serializeWithoutUrlContent()
+    let data = $dataLighting.serialize()
     
     if (!this.isDirty(data))
     {
@@ -749,7 +784,7 @@ Scene_LightingEditor.prototype.save = function(validation)
             
             LightingUtils.dump()
             
-            data = $dataLighting.serializeWithoutUrlContent()
+            data = $dataLighting.serialize()
         }
         
         this._writeToDataFile(`Lighting.json`, data)

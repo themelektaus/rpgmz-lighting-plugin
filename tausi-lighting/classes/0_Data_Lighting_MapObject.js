@@ -27,6 +27,11 @@ class Data_Lighting_MapObject
     
     serialize()
     {
+        if (!this.getObject())
+        {
+            return null
+        }
+        
         return {
             id: this.id,
             objectId: this.objectId,

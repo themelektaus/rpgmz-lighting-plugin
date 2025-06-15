@@ -8,11 +8,18 @@ class Data_Lighting_Map
     
     serialize()
     {
-        return {
+        const data = {
             id: this.id,
-            objects: this.objects.map(x => x.serialize()),
-            events: this.events.map(x => x.serialize())
+            objects: this.objects.map(x => x.serialize()).filter(x => x),
+            events: this.events.map(x => x.serialize()).filter(x => x)
         }
+        
+        if (data.objects.length || data.events.length)
+        {
+            return data
+        }
+        
+        return null
     }
     
     static deserialize(root, data)
@@ -21,7 +28,7 @@ class Data_Lighting_Map
         result.root = root
         result.id = data.id
         result.objects = [ ...(data.objects ?? []).map(x => Data_Lighting_MapObject.deserialize(result, x)) ]
-        result.events = [ ...(data.events ?? []).map(x => Data_Lighting_MapEvent.deserialize(x)) ]
+        result.events = [ ...(data.events ?? []).map(x => Data_Lighting_MapEvent.deserialize(result, x)) ]
         return result
     }
     
@@ -53,7 +60,7 @@ class Data_Lighting_Map
     getEvent(eventId)
     {
         return this.events.find(x => x.eventId == eventId)
-            || Data_Lighting_MapEvent.create(eventId)
+            || Data_Lighting_MapEvent.create(this, eventId)
     }
     
     setEventOffset(eventId, x, y)
@@ -62,7 +69,7 @@ class Data_Lighting_Map
         
         if (!event)
         {
-            event = Data_Lighting_MapEvent.create(eventId)
+            event = Data_Lighting_MapEvent.create(this, eventId)
             this.events.push(event)
         }
         
@@ -78,28 +85,5 @@ class Data_Lighting_Map
             mapObject.x += xDiff * $gameMap.tileWidth()
             mapObject.y += yDiff * $gameMap.tileHeight()
         }
-    }
-    
-    cleanupEvents()
-    {
-        this.events = this.events.filter(x =>
-        {
-            if (!$dataMap.events[x.eventId])
-            {
-                return false
-            }
-            
-            const y = Data_Lighting_MapEvent.create(x.eventId)
-            
-            const a = JSON.stringify(x.serialize())
-            const b = JSON.stringify(y.serialize())
-            
-            if (LightingUtils.hashCode(a) == LightingUtils.hashCode(b))
-            {
-                return false
-            }
-            
-            return true
-        })
     }
 }

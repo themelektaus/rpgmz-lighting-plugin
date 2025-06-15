@@ -1,9 +1,0 @@
-{
-  "typeName": "Data_Lighting_PointLight",
-  "color": [ 255, 130, 110, 510 ],
-  "intensity": 10,
-  "radius": 550,
-  "smoothness": 200,
-  "flickerStrength": 12,
-  "flickerSpeed": 40
-}

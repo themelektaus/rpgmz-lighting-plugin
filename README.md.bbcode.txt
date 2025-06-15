@@ -1,4 +1,4 @@
-[B][SIZE=22px]Tausi Lighting[/SIZE][/B] - v0.1.6
+[B][SIZE=22px]Tausi Lighting[/SIZE][/B] - v0.1.7
 
 Author: [URL='https://github.com/themelektaus']themelektaus[/URL]
 Source: [URL='https://github.com/themelektaus/rpgmz-lighting-plugin']github.com/themelektaus/rpgmz-lighting-plugin[/URL]
@@ -63,6 +63,11 @@ Yet another [B]Lighting System[/B] with an integrated [B]WYSIWYG editor[/B] for 
 
 
 [B][SIZE=18px]Changelog[/SIZE][/B]
+
+[B]v0.1.7[/B]
+[LIST]
+[*]Clean-up Serialization
+[/LIST]
 
 [B]v0.1.6[/B]
 [LIST]

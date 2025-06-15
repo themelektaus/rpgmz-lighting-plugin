@@ -45,6 +45,9 @@ Yet another **Lighting System** with an **integrated WYSIWYG editor** for RPG Ma
 
 ## Changelog
 
+### v0.1.7
+- Clean-up Serialization
+
 ### v0.1.6
 - Plugin Command ```Bind Switch```
 - Plugin Command ```Bind Variable```
