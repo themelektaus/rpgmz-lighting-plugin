@@ -24,7 +24,7 @@ Yet another [B]Lighting System[/B] with an integrated [B]WYSIWYG editor[/B] for 
 
 [B][SIZE=18px]Demo[/SIZE][/B]
 [LIST]
-[*][URL='https://raw.githubusercontent.com/themelektaus/rpgmz-lighting-plugin/refs/heads/main/tausi-lighting-demo-v0.1.6.zip']tausi-lighting-demo-v0.1.6.zip[/URL]
+[*][B][URL='https://raw.githubusercontent.com/themelektaus/rpgmz-lighting-plugin/refs/heads/main/tausi-lighting-demo-v0.1.6.zip']tausi-lighting-demo-v0.1.6.zip[/URL][/B]
 [*][URL='https://raw.githubusercontent.com/themelektaus/rpgmz-lighting-plugin/refs/heads/main/tausi-lighting-demo-v0.1.1.zip']tausi-lighting-demo-v0.1.1.zip[/URL]
 [/LIST]
 
