@@ -369,7 +369,7 @@ Scene_LightingEditor.prototype._addPreset = function(name)
     
     const mapData = this._loadMapData(this._mapId)
     
-    preset.id = Math.max(...mapData.events.map(x => x?.id ?? 0)) + 1
+    preset.id = Math.max(0, ...mapData.events.map(x => x?.id ?? 0)) + 1
     preset.x = 1
     preset.y = 1
     
@@ -385,6 +385,10 @@ Scene_LightingEditor.prototype._addPreset = function(name)
     
     this.onMapLoaded = () =>
     {
+        const map = $dataLighting.getMap(this._mapId)
+        
+        map.setEventOffset(eventId, 0, 0)
+        
         for (const additionalLight of additionalLights)
         {
             const offsetX = additionalLight.offsetX ?? 0
@@ -395,7 +399,7 @@ Scene_LightingEditor.prototype._addPreset = function(name)
             
             const object = $dataLighting.copyObject(additionalLight)
             
-            const mapObject = $dataLighting.getMap(this._mapId).createObject(object)
+            const mapObject = map.createObject(object)
             mapObject.x = $gameMap.tileWidth() * (1.5 + offsetX)
             mapObject.y = $gameMap.tileHeight() * (1.5 + offsetY)
             mapObject.referenceEventId = eventId
@@ -468,7 +472,7 @@ Scene_LightingEditor.prototype.cloneSelectedLight = function(validation)
             
             const sourceEvent = this.selection.event()
             
-            const eventId = Math.max(...mapData.events.map(x => x?.id ?? 0)) + 1
+            const eventId = Math.max(0, ...mapData.events.map(x => x?.id ?? 0)) + 1
             
             event.id = eventId
             event.name = "Clone of " + sourceEvent.name
