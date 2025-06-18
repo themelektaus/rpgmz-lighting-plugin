@@ -12,11 +12,13 @@ Yet another **Lighting System** with an **integrated WYSIWYG editor** for RPG Ma
 - Plugin Updater
 
 ## Screenshot
+![screenshots/game-v0.1.8.png](https://raw.githubusercontent.com/themelektaus/rpgmz-lighting-plugin/refs/heads/main/screenshots/game-v0.1.8.png)
+
 ![screenshots/editor-v0.0.9.png](https://raw.githubusercontent.com/themelektaus/rpgmz-lighting-plugin/refs/heads/main/screenshots/editor-v0.0.9.png)
 
 ## Demo
-- [tausi-lighting-demo-v0.1.1.zip](https://raw.githubusercontent.com/themelektaus/rpgmz-lighting-plugin/refs/heads/main/tausi-lighting-demo-v0.1.1.zip)
 - [tausi-lighting-demo-v0.1.6.zip](https://raw.githubusercontent.com/themelektaus/rpgmz-lighting-plugin/refs/heads/main/tausi-lighting-demo-v0.1.6.zip)
+- [tausi-lighting-demo-v0.1.1.zip](https://raw.githubusercontent.com/themelektaus/rpgmz-lighting-plugin/refs/heads/main/tausi-lighting-demo-v0.1.1.zip)
 
 ## Installation
 - Download [js/plugins/TausiLighting.js](https://raw.githubusercontent.com/themelektaus/rpgmz-lighting-plugin/refs/heads/main/js/plugins/TausiLighting.js) (Right click - Save as...)
@@ -44,6 +46,11 @@ Yet another **Lighting System** with an **integrated WYSIWYG editor** for RPG Ma
 - No credits needed
 
 ## Changelog
+
+### v0.1.8
+- Layer Noise/Smoke
+- Layer Overlay Slider
+- Color Picker
 
 ### v0.1.7
 - Clean-up Serialization

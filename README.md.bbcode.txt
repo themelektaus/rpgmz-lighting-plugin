@@ -1,9 +1,11 @@
-[B][SIZE=22px]Tausi Lighting[/SIZE][/B] - v0.1.7
+[B][SIZE=22px]Tausi Lighting[/SIZE][/B] - v0.1.8
 
 Author: [URL='https://github.com/themelektaus']themelektaus[/URL]
 Source: [URL='https://github.com/themelektaus/rpgmz-lighting-plugin']github.com/themelektaus/rpgmz-lighting-plugin[/URL]
 
-[ATTACH type="full"]342048[/ATTACH]
+[ATTACH type="full" width="320px"]343165[/ATTACH]
+
+[ATTACH type="full" height="360px"]342048[/ATTACH]
 
 
 [B][SIZE=18px]Introduction[/SIZE][/B]
@@ -22,8 +24,8 @@ Yet another [B]Lighting System[/B] with an integrated [B]WYSIWYG editor[/B] for 
 
 [B][SIZE=18px]Demo[/SIZE][/B]
 [LIST]
-[*][URL='https://raw.githubusercontent.com/themelektaus/rpgmz-lighting-plugin/refs/heads/main/tausi-lighting-demo-v0.1.1.zip']tausi-lighting-demo-v0.1.1.zip[/URL]
 [*][URL='https://raw.githubusercontent.com/themelektaus/rpgmz-lighting-plugin/refs/heads/main/tausi-lighting-demo-v0.1.6.zip']tausi-lighting-demo-v0.1.6.zip[/URL]
+[*][URL='https://raw.githubusercontent.com/themelektaus/rpgmz-lighting-plugin/refs/heads/main/tausi-lighting-demo-v0.1.1.zip']tausi-lighting-demo-v0.1.1.zip[/URL]
 [/LIST]
 
 [B][SIZE=18px]Installation[/SIZE][/B]
@@ -63,6 +65,13 @@ Yet another [B]Lighting System[/B] with an integrated [B]WYSIWYG editor[/B] for 
 
 
 [B][SIZE=18px]Changelog[/SIZE][/B]
+
+[B]v0.1.8[/B]
+[LIST]
+[*]Layer Noise/Smoke
+[*]Layer Overlay Slider
+[*]Color Picker
+[/LIST]
 
 [B]v0.1.7[/B]
 [LIST]
