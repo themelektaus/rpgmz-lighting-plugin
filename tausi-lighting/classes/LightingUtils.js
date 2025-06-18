@@ -764,3 +764,10 @@ LightingUtils.clearUnusedObjects = function()
     const unusedIds = this.getObjectUsage().filter(x => !x.count || !x.exists).map(x => x.id)
     $dataLighting.objects = $dataLighting.objects.filter(x => !unusedIds.includes(x.id))
 }
+
+LightingUtils.clearPropertiesEditor = function($_properties)
+{
+    $_properties ??= document.querySelector(`#properties`)
+    $_properties.innerHTML = ``
+    return $_properties
+}

@@ -61,8 +61,7 @@ TouchInput._onMouseUp = function(event)
         {
             if (this.tausiLighting_lastSelection.tausiLighting_createPropertiesEditor)
             {
-                const $_properties = document.querySelector(`#properties`)
-                $_properties.innerHTML = ``
+                const $_properties = LightingUtils.clearPropertiesEditor()
                 this.tausiLighting_lastSelection.tausiLighting_createPropertiesEditor($_properties)
             }
             delete this.tausiLighting_lastSelection

@@ -345,6 +345,10 @@ video {
     position: relative;
 }
 
+.field.hidden {
+    display: none;
+}
+
 .field label {
     position: absolute;
     background-color: #333;

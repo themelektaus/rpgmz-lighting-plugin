@@ -8,9 +8,13 @@ class Data_Lighting_Layer extends Data_Lighting_Object
     scale = .25
     filterMode = 0
     blendMode = 0
+    shaderOverlay = 0
     opacity = 255
     power = 100
-    //image = null
+    noise = 0
+    noiseScale = 100
+    noiseSpeedX = 0
+    noiseSpeedY = 0
     
     get icon()
     {
@@ -28,9 +32,13 @@ class Data_Lighting_Layer extends Data_Lighting_Object
         data.scale = this.scale
         data.filterMode = this.filterMode
         data.blendMode = this.blendMode
+        data.shaderOverlay = this.shaderOverlay
         data.opacity = this.opacity
         data.power = this.power
-        //data.image = this.image
+        data.noise = this.noise
+        data.noiseScale = this.noiseScale
+        data.noiseSpeedX = this.noiseSpeedX
+        data.noiseSpeedY = this.noiseSpeedY
         return data
     }
     
@@ -45,9 +53,13 @@ class Data_Lighting_Layer extends Data_Lighting_Object
         result.scale = data.scale
         result.filterMode = data.filterMode
         result.blendMode = data.blendMode
+        result.shaderOverlay = data.shaderOverlay ?? 0
         result.opacity = data.opacity
         result.power = data.power
-        //result.image = data.image
+        result.noise = data.noise ?? 0
+        result.noiseScale = data.noiseScale ?? 100
+        result.noiseSpeedX = data.noiseSpeedX ?? 0
+        result.noiseSpeedY = data.noiseSpeedY ?? 0
         const layer = Object.assign(result, Data_Lighting_Object.deserialize(root, data))
         layer.loadUrlContent()
         return layer
@@ -58,8 +70,13 @@ class Data_Lighting_Layer extends Data_Lighting_Object
         return {
             filterMode: x.get(`filterMode`),
             blendMode: x.get(`blendMode`),
+            shaderOverlay: x.get(`shaderOverlay`),
             opacity: x.get(`opacity`),
-            power: x.get(`power`)
+            power: x.get(`power`),
+            noise: x.get(`noise`),
+            noiseScale: x.get(`noiseScale`),
+            noiseSpeedX: x.get(`noiseSpeedX`),
+            noiseSpeedY: x.get(`noiseSpeedY`)
         }
     }
     
@@ -69,16 +86,16 @@ class Data_Lighting_Layer extends Data_Lighting_Object
         
         const _default = new Data_Lighting_Layer
         
-        this.createField($_properties, _default, `filterMode`, {
+        const $_filterMode = this.createField($_properties, _default, `filterMode`, {
             type: `dropdown`,
             items: [
-                { value: -1, text: `Pre Overlay` },
-                { value: 0, text: `Default Blend` },
-                { value: 1, text: `Post Overlay` }
+                { value: -1, text: `Pre Shader` },
+                { value: 0, text: `Blend` },
+                { value: 1, text: `Post Shader` }
             ]
         })
         
-        this.createField($_properties, _default, `blendMode`, {
+        const $_blendMode = this.createField($_properties, _default, `blendMode`, {
             type: `dropdown`,
             items: [
                 { value: 0, text: `Normal` },
@@ -90,9 +107,28 @@ class Data_Lighting_Layer extends Data_Lighting_Object
             ]
         })
         
+        const $_shaderOverlay = this.createField($_properties, _default, `shaderOverlay`, { type: `slider`, min: -100, max: 100 })
         this.createField($_properties, _default, `opacity`, { type: `slider`, max: 255 })
-        this.createField($_properties, _default, `power`, { type: `slider`, max: 1000 })
-        //this.createField($_properties, _default, `image`, { type: `text` })
+        const $_power = this.createField($_properties, _default, `power`, { type: `slider`, max: 1000 })
+        const $_noise = this.createField($_properties, _default, `noise`, { type: `slider`, max: 100 })
+        const $_noiseScale = this.createField($_properties, _default, `noiseScale`, { type: `slider`, min: 10, max: 600 })
+        const $_noiseSpeedX = this.createField($_properties, _default, `noiseSpeedX`, { type: `slider`, min: -100, max: 100 })
+        const $_noiseSpeedY = this.createField($_properties, _default, `noiseSpeedY`, { type: `slider`, min: -100, max: 100 })
+        
+        const refreshPropertiesVisibility = () =>
+        {
+            const filterMode = this.get(`filterMode`)
+            $_blendMode.classList.toggle(`hidden`, filterMode != 0)
+            $_shaderOverlay.classList.toggle(`hidden`, filterMode == 0)
+            $_power.classList.toggle(`hidden`, filterMode == 0)
+            $_noise.classList.toggle(`hidden`, filterMode == 0)
+            $_noiseScale.classList.toggle(`hidden`, filterMode == 0)
+            $_noiseSpeedX.classList.toggle(`hidden`, filterMode == 0)
+            $_noiseSpeedY.classList.toggle(`hidden`, filterMode == 0)
+        }
+        
+        $_filterMode.querySelector(`select`).addEventListener(`change`, refreshPropertiesVisibility.bind(this))
+        refreshPropertiesVisibility()
     }
     
     onCreate()

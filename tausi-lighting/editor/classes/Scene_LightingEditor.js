@@ -253,8 +253,7 @@ Scene_LightingEditor.prototype.setSelection = function(selection, options)
     
     this.invalidate()
     
-    const $_properties = document.querySelector(`#properties`)
-    $_properties.innerHTML = ``
+    const $_properties = LightingUtils.clearPropertiesEditor()
     
     if (selection)
     {

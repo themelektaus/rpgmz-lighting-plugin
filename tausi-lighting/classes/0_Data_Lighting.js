@@ -1,6 +1,6 @@
 class Data_Lighting
 {
-    version = 3
+    version = 4
     
     objects = []
     maps = []
@@ -255,6 +255,17 @@ class Data_Lighting
                         for (const mapObject of map.objects)
                         {
                             mapObject.referenceEventId = mapObject.followEventId
+                        }
+                    }
+                    break
+                
+                case 3:
+                    data.version = 4
+                    for (const object of data.objects)
+                    {
+                        if (object.typeName == `Data_Lighting_Layer`)
+                        {
+                            object.shaderOverlay = 100
                         }
                     }
                     break

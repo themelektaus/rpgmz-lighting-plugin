@@ -56,7 +56,7 @@ Game_Event.prototype.tausiLighting_createPropertiesEditor = function($_propertie
         LightingUtils.dump()
         LightingUtils.invalidate()
         
-        $_properties.innerHTML = ``
+        LightingUtils.clearPropertiesEditor($_properties)
         this.tausiLighting_createPropertiesEditor.call(this, $_properties)
     })
     
