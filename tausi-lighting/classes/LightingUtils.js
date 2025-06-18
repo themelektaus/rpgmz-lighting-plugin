@@ -167,6 +167,20 @@ LightingUtils.colorToHex = function(x)
     return x.toString(16).padStart(2, '0')
 }
 
+LightingUtils.hexToColor = function(x)
+{
+    if (x.startsWith(`#`))
+    {
+        x = x.substring(1)
+    }
+    
+    return [
+        parseInt(`0x${x.substring(0, 2)}`, 16),
+        parseInt(`0x${x.substring(2, 4)}`, 16),
+        parseInt(`0x${x.substring(4, 6)}`, 16)
+    ]
+}
+
 LightingUtils.property = function(object, property)
 {
     if (property.endsWith(`]`))
@@ -442,55 +456,130 @@ LightingUtils.createField = function($_properties, _default, property, options)
             
             const resetActions = []
             
-            for (let i = 0; i < 4; i++)
+            if (LightingUtils.getPluginParameterBoolean(`Use Color Picker`))
             {
-                const _i = i
-                const $_ = document.createElement(`input`)
-                $_.type = `range`
-                $_.min = 0
-                switch (_i)
+                const $_color = document.createElement(`input`)
+                $_color.type = `color`
+                $_color.value = LightingUtils.colorToHex([value[0], value[1], value[2]])
+                $_color.addEventListener(`input`, () =>
                 {
-                    case 0:
-                        $_.classList.add(`r`)
-                        $_.max = options?.max?.r ?? 255
-                        break
-                    case 1:
-                        $_.classList.add(`g`)
-                        $_.max = options?.max?.g ?? 255
-                        break
-                    case 2:
-                        $_.classList.add(`b`)
-                        $_.max = options?.max?.b ?? 255
-                        break
-                    case 3:
-                        $_.classList.add(`a`)
-                        $_.max = options?.max?.a ?? 255
-                        break
-                }
-                $_.value = Number(value[_i] || 0)
-                $_.addEventListener(`input`, () =>
-                {
-                    this[property][_i] = Number($_.value || 0)
+                    const c = LightingUtils.hexToColor($_color.value)
+                    this[property][0] = c[0]
+                    this[property][1] = c[1]
+                    this[property][2] = c[2]
                     LightingUtils.invalidate()
                 })
-                $_.addEventListener(`change`, () =>
+                $_color.addEventListener(`change`, () =>
                 {
                     dump()
                     LightingUtils.invalidate()
                 })
-                $_input.appendChild($_)
+                $_input.appendChild($_color)
+                
                 resetActions.push(() =>
                 {
-                    if ($_.value == _default[property][_i])
+                    const c = LightingUtils.hexToColor($_color.value)
+                    
+                    if (c[0] == _default[property][0] && c[1] == _default[property][1] && c[1] == _default[property][1])
                     {
                         return false
                     }
                     
-                    $_.value = _default[property][_i]
-                    this[property][_i] = Number($_.value || 0)
+                    $_color.value = LightingUtils.colorToHex([
+                        _default[property][0],
+                        _default[property][1],
+                        _default[property][2]
+                    ])
+                    
+                    this[property][0] = _default[property][0]
+                    this[property][1] = _default[property][1]
+                    this[property][2] = _default[property][2]
                     
                     return true
                 })
+                
+                const $_alpha = document.createElement(`input`)
+                $_alpha.type = `range`
+                $_alpha.min = 0
+                $_alpha.max = options?.max?.a ?? 255
+                $_alpha.value = Number(value[3] || 0)
+                $_alpha.addEventListener(`input`, () =>
+                {
+                    this[property][3] = Number($_alpha.value || 0)
+                    LightingUtils.invalidate()
+                })
+                $_alpha.addEventListener(`change`, () =>
+                {
+                    dump()
+                    LightingUtils.invalidate()
+                })
+                $_input.appendChild($_alpha)
+                
+                resetActions.push(() =>
+                {
+                    if ($_alpha.value == _default[property][3])
+                    {
+                        return false
+                    }
+                    
+                    $_alpha.value = _default[property][3]
+                    this[property][3] = Number($_alpha.value || 0)
+                    
+                    return true
+                })
+            }
+            else
+            {
+                for (let i = 0; i < 4; i++)
+                {
+                    const _i = i
+                    const $_ = document.createElement(`input`)
+                    $_.type = `range`
+                    $_.min = 0
+                    switch (_i)
+                    {
+                        case 0:
+                            $_.classList.add(`r`)
+                            $_.max = options?.max?.r ?? 255
+                            break
+                        case 1:
+                            $_.classList.add(`g`)
+                            $_.max = options?.max?.g ?? 255
+                            break
+                        case 2:
+                            $_.classList.add(`b`)
+                            $_.max = options?.max?.b ?? 255
+                            break
+                        case 3:
+                            $_.classList.add(`a`)
+                            $_.max = options?.max?.a ?? 255
+                            break
+                    }
+                    $_.value = Number(value[_i] || 0)
+                    $_.addEventListener(`input`, () =>
+                    {
+                        this[property][_i] = Number($_.value || 0)
+                        LightingUtils.invalidate()
+                    })
+                    $_.addEventListener(`change`, () =>
+                    {
+                        dump()
+                        LightingUtils.invalidate()
+                    })
+                    $_input.appendChild($_)
+                    resetActions.push(() =>
+                    {
+                        if ($_.value == _default[property][_i])
+                        {
+                            return false
+                        }
+                        
+                        $_.value = _default[property][_i]
+                        this[property][_i] = Number($_.value || 0)
+                        
+                        return true
+                    })
+                }
             }
             
             $_reset.addEventListener(`click`, () =>

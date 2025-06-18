@@ -178,6 +178,25 @@ input[type="range"]:hover::-webkit-slider-thumb {
     outline-offset: 0.125em;
 }
 
+input[type="color"] {
+    padding: 0;
+    background: none;
+    width: calc(100% - 2em);
+    height: 2.5em;
+    margin: .5em 1em;
+    border-radius: .25em;
+    overflow: hidden;
+    box-shadow: 0 0 .25em 0 black;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border: none;
+}
+
 button:disabled, input:disabled {
     filter: opacity(.5);
     cursor: default;
